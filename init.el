@@ -259,7 +259,7 @@ frames with exactly two windows."
          ("<f2> i" . counsel-info-lookup-symbol)
          ("<f2> u" . counsel-unicode-char)
          ("<f2> j" . counsel-set-variable)
-         ("C-c c" . counsel-compile)
+         ("C-c C" . counsel-compile)
          ("C-c g" . counsel-git)
          ("C-c j" . counsel-git-grep)
          ("C-c L" . counsel-git-log)
@@ -518,8 +518,8 @@ frames with exactly two windows."
               ("TAB" . company-indent-or-complete-common)))
 
 (use-package org
-  :bind (("C-x C" . org-capture)
-         ("C-x A" . org-agenda))
+  :bind (("C-c c" . org-capture)
+         ("C-c a" . org-agenda))
   :custom
   (org-startup-indented t)
   ;; make it short to start with
