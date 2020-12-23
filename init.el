@@ -1,0 +1,522 @@
+;;; init.el --- monolithic emacs config -*- no-byte-compile: t -*-
+;;;
+;;; Commentary:
+;;;
+;;; All of the things in one file, with three exceptions. First, the packaging
+;;; system gets bootstrapped in the boot.el file. Second, key bindings have
+;;; their own file. Third, hooks, which join packages together, are in hooks.el.
+;;;
+;;; Code:
+
+(add-to-list 'load-path (concat user-emacs-directory "lisp"))
+(require 'boot)
+
+(use-package emacs
+  :hook ((before-save . delete-trailing-whitespace)
+         (emacs-lisp . enable-paredit-mode)
+         (prog . whitespace-mode))
+  :custom
+  (inhibit-startup-screen t)
+  (vc-follow-symlinks t)
+  (find-file-suppress-same-file-warnings t)
+  (read-file-name-completion-ignore-case t)
+  (comint-prompt-read-only t)
+  ;; hmm
+  (select-enable-clipboard t)
+  (select-enable-primary t)
+  (uniquify-buffer-name-style 'forward)
+  (save-interprogram-paste-before-kill t)
+  (compilation-always-kill  t)
+  (compilation-ask-about-save nil)
+  (apropos-do-all t)
+  (mouse-yank-at-point t)
+  (save-place-file (concat user-emacs-directory ".places"))
+  (backup-directory-alist `(("." . ,(concat user-emacs-directory ".backups"))))
+  (enable-local-variables :all)
+  (confirm-kill-emacs nil)
+  (sentence-end-double-space nil)
+  (whitespace-line-column 100)
+  (whitespace-style '(face trailing lines-tail tabs))
+  (delete-old-versions t)
+  (version-control t)
+  (custom-safe-themes t)
+  :init
+  (setq-default browse-url-browser-function
+                (cl-case system-type
+                  ((darwin macos) 'browse-url-default-macosx-browser)
+                  (t 'browse-url-firefox)))
+  (defalias 'yes-or-no-p 'y-or-n-p)
+  (set-language-environment "UTF-8")
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (prefer-coding-system 'utf-8)
+  (set-frame-font "Iosevka Snuggle-13" t t)
+  (set-fontset-font t 'unicode "Symbola" nil 'prepend)
+  (setq auto-revert-verbose nil)
+  (setq create-lockfiles nil)
+  (setq redisplay-dont-pause t)
+  (setq disabled-command-function nil)
+  (setq ring-bell-function 'ignore)
+  (setq next-screen-context-lines 5)
+  (setq read-buffer-completion-ignore-case t)
+  (setq indent-tabs-mode nil)
+  (setq load-prefer-newer t)
+  (setq highlight-nonselected-windows nil)
+  (setq kill-buffer-query-functions nil)
+  (setq display-time-format nil)
+  (setq display-time-24hr-format t)
+  (setq display-time-day-and-date t)
+  (setq display-time-interval 15)
+  (setq display-time-default-load-average nil)
+  (setq zoneinfo-style-world-list
+        '(("America/Los_Angeles" "San Francisco")
+          ("America/New_York" "Toronto")
+          ("Europe/London" "London")
+          ("Europe/Berlin" "Berlin")
+          ("Asia/Hong_Kong" "Hong Kong")
+          ("Asia/Tokyo" "Tokyo")))
+  (setq-default cache-long-scans t)
+  (setq-default word-wrap nil)
+  (setq-default truncate-lines t)
+  (setq-default indicate-buffer-boundaries 'left)
+  (setq-default fill-column 80)
+  (setq-default line-spacing 0)
+  ;; Shamelessly lifted from @zarkone's config, and tweaked
+  (defun j0ni/delete-whitespace (&optional backward-only)
+    "Replaces all spaces, tabs and newlinesaround point with a single space.
+If BACKWARD-ONLY is non-nil, only delete them before point."
+    (interactive "*P")
+    (let ((orig-pos (point)))
+      (delete-region
+       (if backward-only
+           orig-pos
+         (progn
+           (skip-chars-forward " \t\n")
+           (constrain-to-field nil orig-pos t)))
+       (progn
+         (skip-chars-backward " \t\n")
+         (constrain-to-field nil orig-pos)))
+      (unless backward-only (insert " "))))
+  ;; Been missing yooooou
+  (defun j0ni/insert-shrug ()
+    (interactive)
+    (insert "¯\\_(ツ)_/¯"))
+  :config
+  (when window-system
+    (fringe-mode 8)
+    (menu-bar-mode -1)
+    (scroll-bar-mode -1)
+    (tool-bar-mode -1)
+    (tooltip-mode -1))
+  (show-paren-mode 1)
+  (save-place-mode 1)
+  (global-hl-line-mode 1)
+  (column-number-mode 1)
+  (winner-mode 1)
+  (global-auto-revert-mode 1)
+  (blink-cursor-mode -1)
+  (display-time-mode 1)
+  (remove-hook 'minibuffer-setup-hook 'winner-save-unconditionally)
+  :bind (("M-[" . beginning-of-buffer)
+         ("M-]" . end-of-buffer)
+         ("C-c ." . j0ni/delete-whitespace)
+         ("C-c s" . j0ni/insert-shrug)))
+
+(use-package exec-path-from-shell
+  :init
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+
+(use-package diminish)
+
+(use-package modus-themes
+  :init
+  (setq modus-themes-mode-line nil)
+  (setq modus-themes-bold-constructs nil)
+  (setq modus-themes-syntax nil)
+  (setq modus-themes-fringes nil)
+  (setq modus-themes-completions nil) ;; or 'moderate, or 'opinionated
+  (setq modus-themes-scale-headings t)
+  :config
+  (load-theme 'modus-vivendi t)
+  (set-face-attribute 'bold nil :weight 'semibold))
+
+(use-package rainbow-mode)
+(use-package rainbow-delimiters)
+
+(use-package browse-at-remote)
+
+(use-package diff-hl
+  :diminish
+  :hook ((after-init . global-diff-hl-mode)
+         (diff-hl-mode . diff-hl-flydiff-mode))
+  :config
+  (eval-after-load 'magit
+    '(progn
+       (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
+       (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))))
+
+(use-package company
+  :diminish
+  :custom
+  (company-global-modes '(not org-mode telega-chat-mode))
+  :hook (after-init . global-company-mode)
+  :config
+  (push 'company-elisp company-backends))
+
+(use-package dockerfile-mode)
+
+(use-package prescient)
+
+(use-package company-prescient
+  :diminish
+  :commands (company-prescient-mode)
+  :hook (company-mode . company-prescient-mode))
+
+(use-package ivy-prescient
+  :diminish
+  :after (ivy)
+  :hook (after-init . ivy-prescient-mode))
+
+(use-package ivy
+  :diminish
+  :hook (afer-init . ivy-mode)
+  :custom
+  (ivy-height 15)
+  (ivy-wrap t)
+  (ivy-use-virtual-buffers t)
+  (ivy-extra-directories nil)
+  (confirm-nonexistent-file-or-buffer t)
+  :init
+  (setq ivy-re-builders-alist
+        '((read-file-name-internal . ivy--regex-fuzzy)
+          (t . ivy--regex-plus)))
+  :bind (("C-x b" . ivy-switch-buffer)
+         ("C-c v" . ivy-push-view)
+         ("C-c V" . ivy-pop-view)
+         ("C-c C-r" . ivy-resume)))
+
+(use-package swiper
+  :bind (("C-s" . swiper-isearch)
+         ("C-c u" . swiper-all)))
+
+(use-package counsel
+  :diminish
+  :bind (("M-x" . counsel-M-x)
+         ("C-x C-f" . counsel-find-file)
+         ("M-y" . counsel-yank-pop)
+         ("<f1> f" . counsel-describe-function)
+         ("<f1> v" . counsel-describe-variable)
+         ("<f1> l" . counsel-find-library)
+         ("<f2> i" . counsel-info-lookup-symbol)
+         ("<f2> u" . counsel-unicode-char)
+         ("<f2> j" . counsel-set-variable)
+         ("C-c c" . counsel-compile)
+         ("C-c g" . counsel-git)
+         ("C-c j" . counsel-git-grep)
+         ("C-c L" . counsel-git-log)
+         ("C-c k" . counsel-rg)
+         ;; ("C-c m" 'counsel-linux-app)
+         ("C-c n" . counsel-fzf)
+         ("C-x l" . counsel-locate)
+         ("C-c J" . counsel-file-jump)
+         ;; ("C-S-o" . counsel-rhythmbox)
+         ("C-c w" . counsel-wmctrl)
+         ("C-c b" . counsel-bookmark)
+         ("C-c d" . counsel-descbinds)
+         ("C-c o" . counsel-outline)
+         ("C-c t" . counsel-load-theme)
+         ("C-c F" . counsel-org-file)))
+
+(use-package ivy-rich
+  :diminish
+  :after (ivy)
+  :hook (after-init . ivy-rich-mode)
+  :custom
+  (ivy-rich-display-transformers-list
+   '(ivy-switch-buffer
+     (:columns
+      ((ivy-rich-candidate (:width 40))
+       (ivy-rich-switch-buffer-size (:width 7))
+       (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
+       (ivy-rich-switch-buffer-major-mode (:width 30 :face warning))
+       (ivy-rich-switch-buffer-project (:width 20 :face success))
+       (ivy-rich-switch-buffer-path
+        (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path
+                             x (ivy-rich-minibuffer-width 0.4))))))
+      :predicate
+      (lambda (cand) (get-buffer cand)))
+     counsel-find-file
+     (:columns
+      ((ivy-read-file-transformer)
+       (ivy-rich-counsel-find-file-truename (:face font-lock-doc-face))))
+     counsel-M-x
+     (:columns
+      ((counsel-M-x-transformer (:width 45))
+       (ivy-rich-counsel-function-docstring (:face font-lock-doc-face))))
+     counsel-describe-function
+     (:columns
+      ((counsel-describe-function-transformer (:width 40))
+       (ivy-rich-counsel-function-docstring (:face font-lock-doc-face))))
+     counsel-describe-variable
+     (:columns
+      ((counsel-describe-variable-transformer (:width 40))
+       (ivy-rich-counsel-variable-docstring (:face font-lock-doc-face))))
+     counsel-recentf
+     (:columns
+      ((ivy-rich-candidate (:width 0.8))
+       (ivy-rich-file-last-modified-time (:face font-lock-comment-face))))
+     package-install
+     (:columns
+      ((ivy-rich-candidate (:width 40))
+       (ivy-rich-package-version (:width 16 :face font-lock-comment-face))
+       (ivy-rich-package-archive-summary (:width 7 :face font-lock-builtin-face))
+       (ivy-rich-package-install-summary (:face font-lock-doc-face))))))
+  :config
+  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
+
+(use-package counsel-projectile
+  :diminish
+  :commands (counsel-projectile-mode)
+  :hook (after-init . counsel-projectile-mode))
+
+(use-package magit
+  :custom
+  (magit-completing-read-function 'ivy-completing-read)
+  (magit-diff-refine-hunk t)
+  (magit-bury-buffer-function 'magit-mode-quit-window)
+  :bind (("C-x g" . magit-status)
+         ("C-x M-g" . magit-dispatch-popup)))
+
+(use-package gitignore-mode)
+(use-package gitconfig-mode)
+(use-package browse-at-remote)
+
+(use-package projectile
+  :diminish
+  :after (ivy)
+  :custom
+  (projectile-completion-system 'ivy)
+  :bind-keymap ("C-c p" . projectile-command-map))
+
+(use-package ripgrep
+  :config
+  (grep-apply-setting
+   'grep-find-command
+   '("rg -n -H --no-heading -e '' $(git rev-parse --show-toplevel || pwd)" . 27)))
+
+(use-package projectile-ripgrep)
+
+(use-package paredit
+  :diminish "Par"
+  :hook ((emacs-lisp-mode . enable-paredit-mode)
+         (lisp-mode . enable-paredit-mode)
+         (scheme-mode . enable-paredit-mode))
+  :commands (enable-paredit-mode))
+
+(use-package smartparens
+  :diminish
+  :config
+  (require 'smartparens-config))
+
+(use-package which-key
+  :diminish
+  :hook (after-init . which-key-mode))
+
+(use-package ace-window
+  :commands (ace-window)
+  :bind ("C-x o" . ace-window))
+
+(use-package yaml-mode)
+
+(use-package web-mode
+  :custom
+  (web-mode-markup-indent-offset 2)
+  (web-mode-js-indent-offset 2)
+  (web-mode-script-padding 0)
+  (web-mode-code-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  :init
+  (add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.svelte\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.jsp\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.rjs\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode)))
+
+(use-package restclient)
+
+(use-package lsp-mode
+  :commands (lsp lsp-register-custom-settings lsp-deferred)
+  :custom
+  (lsp-enable-indentation nil)
+  (lsp-auto-configure t)
+  (lsp-enable-xref t)
+  (lsp-enable-snippet nil)
+  (lsp-auto-guess-root t)
+  (lsp-eldoc-render-all t)
+  (lsp-signature-render-all t)
+  (lsp-keymap-prefix "s-p")
+  (lsp-prefer-flymake nil)
+  :bind (("C-c d" . lsp-describe-thing-at-point)
+         ("C-c e n" . flymake-goto-next-error)
+         ("C-c e p" . flymake-goto-prev-error)
+         ("C-c e r" . lsp-find-references)
+         ("C-c e R" . lsp-rename)
+         ("C-c e i" . lsp-find-implementation)
+         ("C-c e t" . lsp-find-type-definition)))
+
+(use-package lsp-ivy)
+
+(use-package cider
+  :commands (cider-mode)
+  :hook (cider-mode . turn-on-eldoc-mode)
+  :custom
+  (cider-repl-pop-to-buffer-on-connect t)
+  (cider-save-file-on-load t)
+  (cider-repl-display-help-banner nil)
+  (cider-use-overlays t) ; display eval results inline
+  (cider-use-fringe-indicators nil)
+  (cider-stacktrace-default-filters '(project))
+  (cider-buffer-name-show-port t)
+  (cider-repl-history-size 10000)
+  (cider-prompt-for-symbol nil)
+  (cider-known-endpoints nil)
+  (cider-repl-history-file (concat user-emacs-directory ".cider-repl-history"))
+  (nrepl-buffer-name-show-port t)
+  (cider-prefer-local-resources t)
+  (cider-inject-dependencies-at-jack-in t)
+  (cider-eldoc-display-context-dependent-info t))
+
+(use-package cider-eval-sexp-fu)
+
+(use-package flycheck-clj-kondo)
+
+(use-package clj-refactor
+  :commands (clj-refactor-mode)
+  :custom
+  (cljr-warn-on-eval nil)
+  (cljr-suppress-middleware-warnings t)
+  (cljr-favor-prefix-notation nil)
+  (cljr-favor-private-functions nil)
+  (cljr-inject-dependencies-at-jack-in t)
+  (cljr-eagerly-build-asts-on-startup nil)
+  (cljr-ignore-analyzer-errors t)
+  :config
+  (cljr-add-keybindings-with-prefix "C-c C-j"))
+
+(use-package clojure-mode
+  :hook ((clojure-mode . cider-mode)
+         (clojure-mode . enable-paredit-mode)
+         (clojure-mode . flycheck-mode)
+         (clojure-mode . clj-refactor-mode))
+  :config
+  (require 'flycheck-clj-kondo))
+
+(use-package tide
+  :commands (tide-setup tide-hl-identifier-mode tide-format-before-save)
+  :after (typescript-mode company flycheck)
+  :custom
+  (typescript-indent-level 2))
+
+(use-package typescript-mode
+  :custom
+  (flycheck-check-syntax-automatically '(save mode-enabled))
+  :hook ((typescript-mode . tide-setup)
+         (typescript-mode . flycheck-mode)
+         (typescript-mode . tide-hl-identifier-mode)
+         (before-save . tide-format-before-save)))
+
+(use-package flycheck
+  :hook (prog-mode . flycheck-mode)
+  :custom
+  (flycheck-indication-mode 'right-fringe)
+  (flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+  :config
+  (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
+    [16 48 112 240 112 48 16] nil nil 'center))
+
+(use-package cargo)
+(use-package flycheck-rust)
+(use-package rust-mode
+  :hook ((flycheck-mode . flycheck-rust-setup)
+         (rust-mode . lsp)
+         (rust-mode . cargo-minor-mode)
+         (rust-mode . flycheck-mode))
+  :custom
+  (indent-tabs-mode nil)
+  (rust-format-on-save t)
+  (compile-command "cargo build")
+  :config
+  (require 'lsp-rust)
+  (setq lsp-rust-server 'rust-analyzer)
+  :bind (:map rust-mode-map
+              ("TAB" . company-indent-or-complete-common)))
+
+(use-package org
+  :bind (("C-x O" . org-capture))
+  :custom
+  ;; make it short to start with
+  (org-startup-folded t)
+  ;; where things live
+  (org-directory "~/Dropbox/OrgMode/")
+  ;; Set agenda file(s)
+  (org-agenda-files (list (concat org-directory "journal.org")
+                          (concat org-directory "berlin.org")
+                          (concat org-directory "shrieks.org")))
+  (org-agenda-span 14)
+  ;; prevent org-mode hijacking arrow keys
+  (org-replace-disputed-keys t)
+  ;; set our own todo keywords
+  (org-todo-keywords
+   '((sequence "TODO(t)" "WAITING(w!)" "PAUSED(p!)" "|" "DONE(d!)" "ABANDONED(a!)")))
+  (org-tag-persistent-alist
+   '(home xapix sanity rachel lauren alice grace family self))
+  ;; switch quickly
+  (org-use-fast-todo-selection 'auto)
+  (org-priority-default ?C)
+  ;; extra indentation
+  (org-adapt-indentation t)
+  ;; Let's have pretty source code blocks
+  (org-edit-src-content-indentation 0)
+  (org-src-tab-acts-natively t)
+  (org-src-fontify-natively t)
+  (org-confirm-babel-evaluate nil)
+  (org-default-notes-file (concat org-directory "/berlin.org"))
+  (org-capture-templates
+   `(("j" "Journal" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+      "* %T\n  %?\n\n%a")
+     ("s" "Shriek" entry (file+headline ,(concat org-directory "/shrieks.org") "Shrieks")
+      "* %T\n%?\n")
+     ("t" "Task" entry (file+headline ,(concat org-directory "/berlin.org") "Inbox")
+      "* TODO %?\n  %a\n%i")
+     ("b" "BP Journal" entry (file+olp+datetree ,(concat org-directory "/bp.org") "Blood Pressure")
+      "* %T\n** Systolic: %^{systolic}\n** Diastolic: %^{diastolic}\n** Pulse: %^{pulse}\n** Notes\n%?\n")))
+  :init
+  (defun j0ni/org-mode-hook ()
+    (auto-fill-mode 1)
+    (add-hook 'before-save-hook 'org-update-all-dblocks nil 'local-only))
+  :hook ((org-mode . j0ni/org-mode-hook)
+         (org-capture-mode . j0ni/org-mode-hook))
+  :config
+  ;; org-capture
+  (require 'org-datetree)
+  (org-clock-persistence-insinuate))
+
+(use-package telega
+  :commands (telega telega-mode-line-mode)
+  :bind (("C-x M-t" . telega))
+  :config
+  (telega-mode-line-mode t))
+
+(use-package markdown-mode
+  :hook (markdown-mode . visual-line-mode))
+
+;; Do this last, since it may contain references to package functions
+(require 'keys)

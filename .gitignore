@@ -1,0 +1,11 @@
+*~
+/straight
+/transient
+/.backups
+/.places
+/auto-save-list
+\#.*\#
+/.lsp-session-*
+/recentf
+/.cider-repl-history
+/projectile-bookmarks.eld
