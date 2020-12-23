@@ -519,5 +519,7 @@ If BACKWARD-ONLY is non-nil, only delete them before point."
 (use-package markdown-mode
   :hook (markdown-mode . visual-line-mode))
 
+(use-package all-the-icons)
+
 ;; Do this last, since it may contain references to package functions
 (require 'keys)
