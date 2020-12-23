@@ -2,9 +2,10 @@
 ;;;
 ;;; Commentary:
 ;;;
-;;; All of the things in one file, with three exceptions. First, the packaging
-;;; system gets bootstrapped in the boot.el file. Second, key bindings have
-;;; their own file. Third, hooks, which join packages together, are in hooks.el.
+;;; All of the things in one file, with exceptions. First, the packaging system
+;;; gets bootstrapped in the boot.el file. Second, some key bindings have their
+;;; own file, and more will probably move there. Third, eventually hooks, which
+;;; join packages together, will go into hooks.el.
 ;;;
 ;;; Code:
 
