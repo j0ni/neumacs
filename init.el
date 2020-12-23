@@ -367,6 +367,8 @@ frames with exactly two windows."
   :hook (after-init . which-key-mode))
 
 (use-package ace-window
+  :custom
+  (aw-keys '(?a ?s ?d ?f ?j ?k ?l ?n ?m))
   :commands (ace-window)
   :bind ("C-x o" . ace-window))
 
