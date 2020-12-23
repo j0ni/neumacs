@@ -518,8 +518,10 @@ frames with exactly two windows."
               ("TAB" . company-indent-or-complete-common)))
 
 (use-package org
-  :bind (("C-x O" . org-capture))
+  :bind (("C-x C" . org-capture)
+         ("C-x A" . org-agenda))
   :custom
+  (org-startup-indented t)
   ;; make it short to start with
   (org-startup-folded t)
   ;; where things live
@@ -535,7 +537,15 @@ frames with exactly two windows."
   (org-todo-keywords
    '((sequence "TODO(t)" "WAITING(w!)" "PAUSED(p!)" "|" "DONE(d!)" "ABANDONED(a!)")))
   (org-tag-persistent-alist
-   '(home xapix sanity rachel lauren alice grace family self))
+   '((home . ?h)
+     (xapix . ?x)
+     (sanity . ?s)
+     (rachel . ?r)
+     (lauren . ?l)
+     (ari . ?a)
+     (grace . ?g)
+     (family . ?f)
+     (self . ?m)))
   ;; switch quickly
   (org-use-fast-todo-selection 'auto)
   (org-priority-default ?C)
