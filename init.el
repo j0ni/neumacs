@@ -22,6 +22,10 @@
   (find-file-suppress-same-file-warnings t)
   (read-file-name-completion-ignore-case t)
   (comint-prompt-read-only t)
+  ;; This defaults to a warning - abo-abo uses advice quite a bit, which is
+  ;; where this comes from; I don't see much in the way of warnings yet so let's
+  ;; leave this out for now.
+  ;; (ad-redefinition-action 'accept)
   ;; hmm
   (select-enable-clipboard t)
   (select-enable-primary t)
@@ -53,6 +57,7 @@
   (prefer-coding-system 'utf-8)
   (set-frame-font "Iosevka Snuggle-13" t t)
   (set-fontset-font t 'unicode "Symbola" nil 'prepend)
+  (setq gc-cons-threshold (* 20 1024 1024))
   (setq auto-revert-verbose nil)
   (setq create-lockfiles nil)
   (setq redisplay-dont-pause t)
