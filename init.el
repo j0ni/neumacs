@@ -56,10 +56,10 @@
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
-  (set-frame-font "Iosevka Snuggle-13" t t)
+  (set-frame-font "Iosevka Snuggle-12" t t)
   (set-face-font 'variable-pitch "Lucida Grande-14" nil)
-  (set-face-font 'fixed-pitch "Iosevka Snuggle-13" nil)
-  (set-face-font 'fixed-pitch-serif "PragmataPro Mono-13" nil)
+  (set-face-font 'fixed-pitch "Iosevka Snuggle-12" nil)
+  (set-face-font 'fixed-pitch-serif "PragmataPro Mono-12" nil)
   (set-fontset-font t 'unicode "Symbola" nil 'prepend)
   (setq gc-cons-threshold (* 20 1024 1024))
   (setq auto-revert-verbose nil)
@@ -573,8 +573,10 @@ frames with exactly two windows."
   :hook ((org-mode . j0ni/org-mode-hook)
          (org-capture-mode . j0ni/org-mode-hook))
   :config
-  ;; org-capture
+  ;; org-capture - for inserting into date based trees
   (require 'org-datetree)
+  ;; needed for structure templates (<s-TAB etc)
+  (require 'org-tempo)
   (org-clock-persistence-insinuate))
 
 (use-package telega
