@@ -66,7 +66,7 @@
   (setq kill-buffer-query-functions nil)
   (setq display-time-format nil)
   (setq display-time-24hr-format t)
-  (setq display-time-day-and-date t)
+  (setq display-time-day-and-date nil)
   (setq display-time-interval 15)
   (setq display-time-default-load-average nil)
   (setq zoneinfo-style-world-list
@@ -102,6 +102,9 @@ If BACKWARD-ONLY is non-nil, only delete them before point."
   (defun j0ni/insert-shrug ()
     (interactive)
     (insert "¯\\_(ツ)_/¯"))
+  (defun j0ni/reload-config ()
+    (interactive)
+    (load-file (expand-file-name "init.el" user-emacs-directory)))
   :config
   (when window-system
     (fringe-mode 8)
