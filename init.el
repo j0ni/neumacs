@@ -17,6 +17,7 @@
          (emacs-lisp . enable-paredit-mode)
          (prog . whitespace-mode))
   :custom
+  (flymake-fringe-indicator-position 'right-fringe)
   (inhibit-startup-screen t)
   (vc-follow-symlinks t)
   (find-file-suppress-same-file-warnings t)
@@ -117,6 +118,7 @@ If BACKWARD-ONLY is non-nil, only delete them before point."
     (scroll-bar-mode -1)
     (tool-bar-mode -1)
     (tooltip-mode -1))
+  (electric-indent-mode t)
   (show-paren-mode 1)
   (save-place-mode 1)
   (global-hl-line-mode 1)
@@ -429,9 +431,10 @@ If BACKWARD-ONLY is non-nil, only delete them before point."
   (require 'flycheck-clj-kondo))
 
 (use-package ruby-mode
-  :hook (ruby-mode . flymake-mode))
+  :hook (ruby-mode . flycheck-mode))
 (use-package inf-ruby)
 (use-package rbenv
+  :custom ((rbenv-show-active-ruby-in-modeline nil))
   :commands (global-rbenv-mode rbenv-use-corresponding rbenv-use)
   :hook ((after-init . global-rbenv-mode)
          (ruby-mode . rbenv-use-corresponding)))
@@ -465,7 +468,8 @@ If BACKWARD-ONLY is non-nil, only delete them before point."
   :hook ((flycheck-mode . flycheck-rust-setup)
          (rust-mode . lsp)
          (rust-mode . cargo-minor-mode)
-         (rust-mode . flycheck-mode))
+         (rust-mode . flycheck-mode)
+         (rust-mode . electric-pair-mode))
   :custom
   (indent-tabs-mode nil)
   (rust-format-on-save t)
