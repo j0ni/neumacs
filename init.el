@@ -449,8 +449,6 @@ If BACKWARD-ONLY is non-nil, only delete them before point."
   (typescript-indent-level 2))
 
 (use-package typescript-mode
-  :custom
-  (flycheck-check-syntax-automatically '(save mode-enabled))
   :hook ((typescript-mode . tide-setup)
          (typescript-mode . flycheck-mode)
          (typescript-mode . tide-hl-identifier-mode)
