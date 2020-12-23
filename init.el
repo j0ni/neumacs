@@ -167,6 +167,9 @@ If BACKWARD-ONLY is non-nil, only delete them before point."
        (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
        (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))))
 
+(use-package expand-region
+  :bind (("C-x x" . er/expand-region)))
+
 (use-package company
   :diminish
   :custom
