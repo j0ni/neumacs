@@ -428,6 +428,14 @@ If BACKWARD-ONLY is non-nil, only delete them before point."
   :config
   (require 'flycheck-clj-kondo))
 
+(use-package ruby-mode
+  :hook (ruby-mode . flymake-mode))
+(use-package inf-ruby)
+(use-package rbenv
+  :commands (global-rbenv-mode rbenv-use-corresponding rbenv-use)
+  :hook ((after-init . global-rbenv-mode)
+         (ruby-mode . rbenv-use-corresponding)))
+
 (use-package tide
   :commands (tide-setup tide-hl-identifier-mode tide-format-before-save)
   :after (typescript-mode company flycheck)
