@@ -160,7 +160,9 @@ frames with exactly two windows."
          ("M-]" . end-of-buffer)
          ("C-c ." . j0ni/delete-whitespace)
          ("C-c s" . j0ni/insert-shrug)
-         ("C-x |" . j0ni/toggle-window-split)))
+         ("C-x |" . j0ni/toggle-window-split)
+         ("C-=" . text-scale-increase)
+         ("C--" . text-scale-decrease)))
 
 (use-package exec-path-from-shell
   :init
