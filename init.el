@@ -486,6 +486,15 @@ frames with exactly two windows."
   :hook ((after-init . global-rbenv-mode)
          (ruby-mode . rbenv-use-corresponding)))
 
+(use-package json-mode)
+(use-package graphql-mode)
+
+(use-package purescript-mode
+  :hook (purescript-mode . turn-on-purescript-indentation))
+
+(use-package psc-ide
+  :hook (purescript-mode . psc-ide-mode))
+
 (use-package tide
   :commands (tide-setup tide-hl-identifier-mode tide-format-before-save)
   :after (typescript-mode company flycheck)
