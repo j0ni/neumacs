@@ -46,6 +46,8 @@
   (delete-old-versions t)
   (version-control t)
   (custom-safe-themes t)
+  (mouse-wheel-scroll-amount '(1 ((shift) . 1))) ; one line at a time
+  (mouse-wheefl-progressive-speed t)              ; don't accelerate scrolling
   :init
   (setq-default browse-url-browser-function
                 (cl-case system-type
@@ -61,6 +63,12 @@
   (set-face-font 'fixed-pitch "Iosevka Snuggle-12" nil)
   (set-face-font 'fixed-pitch-serif "PragmataPro Mono-12" nil)
   (set-fontset-font t 'unicode "Symbola" nil 'prepend)
+  (setq scroll-step 0)
+  (setq scroll-margin 2)
+  (setq auto-window-vscroll nil)
+  ;; be sure to set this to 0 in any auto-scrolling buffers
+  (setq scroll-conservatively 100000)
+  (setq scroll-preserve-screen-position t)
   (setq gc-cons-threshold (* 20 1024 1024))
   (setq auto-revert-verbose nil)
   (setq create-lockfiles nil)
