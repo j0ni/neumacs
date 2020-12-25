@@ -260,7 +260,7 @@ frames with exactly two windows."
   :diminish
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
-         ("M-y" . counsel-yank-pop)
+         ;; ("M-y" . counsel-yank-pop)
          ("<f1> f" . counsel-describe-function)
          ("<f1> v" . counsel-describe-variable)
          ("<f1> l" . counsel-find-library)
@@ -335,6 +335,10 @@ frames with exactly two windows."
   :diminish
   :commands (counsel-projectile-mode)
   :hook (after-init . counsel-projectile-mode))
+
+(use-package browse-kill-ring
+  :init
+  (browse-kill-ring-default-keybindings))
 
 (use-package magit
   :custom
