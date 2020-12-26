@@ -551,21 +551,21 @@ frames with exactly two windows."
 
 (use-package cargo)
 (use-package flycheck-rust)
-(use-package rust-mode
+(use-package rustic
   :hook ((flycheck-mode . flycheck-rust-setup)
-         (rust-mode . lsp)
-         (rust-mode . cargo-minor-mode)
-         (rust-mode . flycheck-mode)
-         (rust-mode . electric-pair-mode))
+         (rustic-mode . lsp)
+         (rustic-mode . cargo-minor-mode)
+         (rustic-mode . flycheck-mode)
+         (rustic-mode . electric-pair-mode))
   :custom
   (indent-tabs-mode nil)
-  (rust-format-on-save t)
-  (compile-command "cargo build")
+  (rustic-format-trigger 'on-save)
+  (rustic-lsp-server 'rust-analyzer)
+  ;;(rustic-compile-command "cargo build")
   :config
   (require 'lsp-rust)
   (setq lsp-rust-server 'rust-analyzer)
-  :bind (:map rust-mode-map
-              ("TAB" . company-indent-or-complete-common)))
+  (push 'rustic-clippy flycheck-checkers))
 
 (use-package org
   :bind (("C-c c" . org-capture)
