@@ -33,6 +33,6 @@
 
 (fset 'j0ni/unicode-shortcut-map j0ni/unicode-shortcut-map)
 
-(global-set-key (kbd "C-;") 'j0ni/unicode-shortcut-map)
+(global-set-key (kbd "C-'") 'j0ni/unicode-shortcut-map)
 
 (provide 'keys)

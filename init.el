@@ -274,6 +274,13 @@ frames with exactly two windows."
          ("C-c V" . ivy-pop-view)
          ("C-c C-r" . ivy-resume)))
 
+(use-package hydra
+  :commands (hydra-add-imenu)
+  :hook (emacs-lisp-mode . hydra-add-imenu))
+
+(use-package ivy-hydra
+  :commands (hydra-ivy/body))
+
 (use-package swiper
   :bind (("C-s" . swiper-isearch)
          ("C-c u" . swiper-all)))
