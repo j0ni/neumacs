@@ -169,6 +169,7 @@ frames with exactly two windows."
   (remove-hook 'minibuffer-setup-hook 'winner-save-unconditionally)
   :bind (("M-[" . beginning-of-buffer)
          ("M-]" . end-of-buffer)
+         ("C-x C-b" . ibuffer)
          ("C-c ." . j0ni/delete-whitespace)
          ("C-c s" . j0ni/insert-shrug)
          ("C-x |" . j0ni/toggle-window-split)
