@@ -201,6 +201,10 @@ frames with exactly two windows."
   (load-theme 'modus-vivendi t)
   (set-face-attribute 'bold nil :weight 'semibold))
 
+(use-package golden
+  :straight (golden :type git :repo "git@git.sr.ht:~wklew/golden")
+  :hook (after-init . global-golden-mode))
+
 (use-package ibuffer-vc
   :hook ((ibuffer-hook . j0ni/ibuffer-vc-hook))
   :custom
