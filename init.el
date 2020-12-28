@@ -638,6 +638,7 @@ frames with exactly two windows."
 (use-package telega
   :commands (telega telega-mode-line-mode)
   :bind (("C-x M-t" . telega))
+  :hook (telega-chat . auto-fill-mode)
   :config
   (telega-mode-line-mode t))
 
