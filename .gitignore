@@ -9,3 +9,6 @@
 /recentf
 /.cider-repl-history
 /projectile-bookmarks.eld
+/projectile.cache
+/var
+/url
