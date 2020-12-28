@@ -250,7 +250,9 @@ frames with exactly two windows."
 
 (use-package dockerfile-mode)
 
-(use-package prescient)
+(use-package prescient
+  :commands (prescient-persist-mode)
+  :hook (after-init . prescient-persist-mode))
 
 (use-package company-prescient
   :diminish
