@@ -95,10 +95,16 @@
           ("Asia/Tokyo" "Tokyo")))
   (setq-default cache-long-scans t)
   (setq-default word-wrap nil)
-  (setq-default truncate-lines t)
   (setq-default indicate-buffer-boundaries 'left)
   (setq-default fill-column 80)
   (setq-default line-spacing 0)
+  (setq-default truncate-lines t)
+  (defun j0ni/disable-truncate-lines ()
+    (interactive)
+    (setq-local truncate-lines nil))
+  (defun j0ni/enable-truncate-lines ()
+    (interactive)
+    (setq-local truncate-lines t))
   ;; Shamelessly lifted from @zarkone's config, and tweaked
   (defun j0ni/delete-whitespace (&optional backward-only)
     "Replaces all spaces, tabs and newlinesaround point with a single space.
