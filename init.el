@@ -47,7 +47,7 @@
   (version-control t)
   (custom-safe-themes t)
   (mouse-wheel-scroll-amount '(1 ((shift) . 1))) ; one line at a time
-  (mouse-wheefl-progressive-speed t)              ; don't accelerate scrolling
+  (mouse-wheel-progressive-speed t)              ; don't accelerate scrolling
   :init
   (setq-default browse-url-browser-function
                 (cl-case system-type
