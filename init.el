@@ -518,6 +518,7 @@ frames with exactly two windows."
 (use-package flycheck-clj-kondo)
 
 (use-package clj-refactor
+  :diminish
   :commands (clj-refactor-mode)
   :custom
   (cljr-warn-on-eval nil)
