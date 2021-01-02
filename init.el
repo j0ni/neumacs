@@ -671,7 +671,8 @@ frames with exactly two windows."
 (use-package all-the-icons)
 
 (use-package lpy
-  :hook (python-mode))
+  :commands (lpy-mode)
+  :hook (python-mode . lpy-mode))
 
 ;; Do this last, since it may contain references to package functions
 (require 'keys)
