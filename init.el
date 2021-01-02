@@ -62,7 +62,7 @@
   (set-face-font 'variable-pitch "Lucida Grande-12" nil)
   (set-face-font 'fixed-pitch "Iosevka Snuggle-11" nil)
   (set-face-font 'fixed-pitch-serif "PragmataPro Mono-11" nil)
-  (set-fontset-font t 'unicode "Symbola" nil 'prepend)
+  (set-fontset-font t 'unicode "Iosevka Snuggle" nil 'prepend)
   (when (string= system-type "gnu/linux")
     (setq x-super-keysym 'meta))
   (setq scroll-step 0)
