@@ -425,7 +425,7 @@ frames with exactly two windows."
 ;; C-M-SPC mark-sexp Put the mark at the end of the sexp.
 
 (use-package paredit
-  :diminish " ("
+  :diminish " ()"
   :hook ((emacs-lisp-mode . enable-paredit-mode)
          (lisp-mode . enable-paredit-mode)
          (scheme-mode . enable-paredit-mode))
