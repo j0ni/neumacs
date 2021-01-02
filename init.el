@@ -48,6 +48,7 @@
   (custom-safe-themes t)
   (mouse-wheel-scroll-amount '(1 ((shift) . 1))) ; one line at a time
   (mouse-wheel-progressive-speed t)              ; don't accelerate scrolling
+  (shr-color-visible-luminance-min 80)
   :init
   (setq-default browse-url-browser-function
                 (cl-case system-type
@@ -61,8 +62,8 @@
   (set-frame-font "Iosevka Snuggle-11" t t)
   (set-face-font 'variable-pitch "Lucida Grande-12" nil)
   (set-face-font 'fixed-pitch "Iosevka Snuggle-11" nil)
-  (set-face-font 'fixed-pitch-serif "PragmataPro Mono-11" nil)
-  (set-fontset-font t 'unicode "Iosevka Snuggle" nil 'prepend)
+  (set-face-font 'fixed-pitch-serif "Iosevka Snuggle-11" nil)
+  (set-fontset-font t 'unicode "Symbola" nil 'prepend)
   (when (string= system-type "gnu/linux")
     (setq x-super-keysym 'meta))
   (setq scroll-step 0)
@@ -107,6 +108,12 @@
   (defun j0ni/enable-truncate-lines ()
     (interactive)
     (setq-local truncate-lines t))
+  (defun j0ni/disable-word-wrap ()
+    (interactive)
+    (setq-local word-wrap nil))
+  (defun j0ni/enable-word-wrap ()
+    (interactive)
+    (setq-local word-wrap t))
   ;; Shamelessly lifted from @zarkone's config, and tweaked
   (defun j0ni/delete-whitespace (&optional backward-only)
     "Replaces all spaces, tabs and newlinesaround point with a single space.
@@ -178,9 +185,10 @@ frames with exactly two windows."
   :bind (("M-[" . beginning-of-buffer)
          ("M-]" . end-of-buffer)
          ("C-x C-b" . ibuffer)
+         ("C-x C-r" . revert-buffer)
+         ("C-x |" . j0ni/toggle-window-split)
          ("C-c ." . j0ni/delete-whitespace)
          ("C-c s" . j0ni/insert-shrug)
-         ("C-x |" . j0ni/toggle-window-split)
          ("C-=" . text-scale-increase)
          ("C--" . text-scale-decrease)))
 
@@ -505,7 +513,7 @@ Info contains the connection type, project name and host:port endpoint."
                (when cider-mode-line-show-connection "✓"))
            "❌"))
   :custom
-  (cider-mode-line '(:eval (format " cider[%s]" (j0ni/cider-modeline-info))))
+  (cider-mode-line '(:eval (format " Cider[%s]" (j0ni/cider-modeline-info))))
   (cider-repl-pop-to-buffer-on-connect t)
   (cider-save-file-on-load t)
   (cider-repl-display-help-banner nil)
@@ -682,6 +690,122 @@ Info contains the connection type, project name and host:port endpoint."
 (use-package lpy
   :commands (lpy-mode)
   :hook (python-mode . lpy-mode))
+
+(use-package haskell-mode
+  :hook ((haskell-mode . electric-pair)))
+
+;; mu4e isn't packaged in the usual way, it gets installed as part of the `mu` system package.
+
+(add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
+(require 'mu4e)
+
+(defun j0ni/mu4e-bookmark (sub-maildir days char)
+  (list (concat "date:" days "d..now AND (maildir:/" sub-maildir "/INBOX OR maildir:/" sub-maildir "/sent-mail) AND NOT flag:trashed")
+        (concat "Last " days " days (" sub-maildir ")")
+        char))
+
+(setq mu4e-decryption-policy t
+      mu4e-update-interval 300
+      mu4e-index-update-in-background nil
+      mu4e-get-mail-command "true"
+      mu4e-hide-index-messages t
+      mu4e-confirm-quit nil
+      mu4e-use-fancy-chars nil ;; they actually look shit
+      mu4e-headers-sort-direction 'ascending
+      mu4e-headers-skip-duplicates t
+      mu4e-change-filenames-when-moving t
+      mu4e-headers-hide-predicate nil
+      mu4e-headers-include-related t
+      mu4e-split-view 'single-window
+      mu4e-headers-fields '((:human-date . 12)
+                            (:flags . 6)
+                            (:mailing-list . 16)
+                            (:from-or-to . 25)
+                            (:thread-subject))
+      mu4e-compose-complete-only-after "2012-01-01"
+      mu4e-view-show-addresses t
+      mu4e-date-format-long "%FT%T%z"
+      mu4e-headers-date-format "%F"
+      mu4e-headers-time-format "%T"
+      mu4e-headers-long-date-format "%FT%T%z"
+      mm-inline-large-images 'resize
+      message-send-mail-function 'smtpmail-send-it
+      message-kill-buffer-on-exit t
+      mail-user-agent 'mu4e-user-agent
+      message-citation-line-function 'message-insert-formatted-citation-line
+      message-citation-line-format "On %e %B %Y %R %Z, %f wrote:\n"
+      message-yank-prefix "  > "
+      message-yank-cited-prefix "  > "
+      message-yank-empty-prefix "  > "
+      message-elide-ellipsis "[... elided ...]"
+      mu4e-personal-addresses '("j@lollyshouse.ca"
+                                "hi@mhcat.ca"
+                                "jonathan.irving@gmail.com"
+                                "jon@xapix.io"
+                                "j0ni@fastmail.com"
+                                "j0ni@protonmail.com"
+                                "jon@arity.ca")
+      mml-secure-openpgp-signers '("D6346AC6D110409636A0DBF4F7F645B8CE3F8FA3")
+      mml-secure-openpgp-sign-with-sender nil
+      mu4e-context-policy 'pick-first
+      mu4e-contexts
+      (list (make-mu4e-context
+             :name "Fastmail"
+             :enter-func (lambda ()
+                           (when (mu4e-running-p)
+                             (mu4e-update-mail-and-index nil))
+                           (mu4e-message "Switching to Fastmail context"))
+             :match-func (lambda (msg)
+                           (when msg
+                             (string-match-p "^/Fastmail" (mu4e-message-field msg :maildir))))
+             :vars `((user-mail-address . "j@lollyshouse.ca")
+                     (user-full-name . "Jon Irving")
+                     (mu4e-sent-messages-behavior . sent)
+                     (mu4e-sent-folder . "/Fastmail/sent-mail")
+                     (mu4e-trash-folder . "/Fastmail/trash")
+                     (mu4e-drafts-folder . "/Fastmail/drafts")
+                     (mu4e-refile-folder . "/Fastmail/all-mail")
+                     (mu4e-maildir-shortcuts . (("/Fastmail/INBOX" . ?i)
+                                                ("/Fastmail/sent-mail" . ?s)
+                                                ("/Fastmail/drafts" . ?d)
+                                                ("/Fastmail/trash" . ?t)))
+                     (mu4e-compose-signature . "https://j0ni.ca ~ https://keybase.io/j0ni")
+                     (mu4e-bookmarks . ,(list (j0ni/mu4e-bookmark "Fastmail" "7" ?w)
+                                              (j0ni/mu4e-bookmark "Fastmail" "30" ?m)))
+                     (smtpmail-smtp-user . "j0ni@fastmail.com")
+                     (smtpmail-smtp-server . "smtp.fastmail.com")
+                     (smtpmail-smtp-service . 587)
+                     (smtpmail-stream-type . starttls)))
+            (make-mu4e-context
+             :name "Xapix"
+             :enter-func (lambda ()
+                           (when (mu4e-running-p)
+                             (mu4e-update-mail-and-index nil))
+                           (mu4e-message "Switching to Xapix context"))
+             :match-func (lambda (msg)
+                           (when msg
+                             (string-match-p "^/Xapix" (mu4e-message-field msg :maildir))))
+             :vars `((user-mail-address . "jon@xapix.io")
+                     (user-full-name . "Jon Irving")
+                     (mu4e-sent-messages-behavior . sent)
+                     (mu4e-sent-folder . "/Xapix/sent-mail")
+                     (mu4e-trash-folder . "/Xapix/trash")
+                     (mu4e-drafts-folder . "/Xapix/drafts")
+                     (mu4e-refile-folder . "/Xapix/all-mail")
+                     (mu4e-maildir-shortcuts . (("/Xapix/INBOX" . ?i)
+                                                ("/Xapix/sent-mail" . ?s)
+                                                ("/Xapix/drafts" . ?d)
+                                                ("/Xapix/trash" . ?t)))
+                     (mu4e-compose-signature . "https://j0ni.ca ~ https://keybase.io/j0ni ~ https://xapix.io")
+                     (mu4e-bookmarks . ,(list (j0ni/mu4e-bookmark "Xapix" "7" ?w)
+                                              (j0ni/mu4e-bookmark "Xapix" "30" ?m)))
+                     (smtpmail-smtp-user . "jon@xapix.io")
+                     (smtpmail-smtp-server . "smtp.gmail.com")
+                     (smtpmail-smtp-service . 587)
+                     (smtpmail-stream-type . starttls)))))
+
+(add-hook 'message-mode-hook #'turn-on-auto-fill)
+(add-hook 'message-mode-hook #'mml-secure-message-sign-pgpmime)
 
 ;; Do this last, since it may contain references to package functions
 (require 'keys)
