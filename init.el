@@ -692,7 +692,10 @@ Info contains the connection type, project name and host:port endpoint."
   :hook (python-mode . lpy-mode))
 
 (use-package haskell-mode
-  :hook ((haskell-mode . electric-pair)))
+  :hook ((haskell-mode . electric-pair-mode))
+  :config
+  (add-to-list 'flycheck-disabled-checkers 'haskell-ghc)
+  (add-to-list 'flycheck-disabled-checkers 'haskell-stack-ghc))
 
 ;; mu4e isn't packaged in the usual way, it gets installed as part of the `mu` system package.
 
