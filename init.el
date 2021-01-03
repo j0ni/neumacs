@@ -591,6 +591,7 @@ Info contains the connection type, project name and host:port endpoint."
   :custom
   (flycheck-indication-mode 'right-fringe)
   (flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+  (flycheck-check-syntax-automatically '(save idle-change mode-enabled))
   :config
   (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
     [16 48 112 240 112 48 16] nil nil 'center))
@@ -692,10 +693,7 @@ Info contains the connection type, project name and host:port endpoint."
   :hook (python-mode . lpy-mode))
 
 (use-package haskell-mode
-  :hook ((haskell-mode . electric-pair-mode))
-  :config
-  (add-to-list 'flycheck-disabled-checkers 'haskell-ghc)
-  (add-to-list 'flycheck-disabled-checkers 'haskell-stack-ghc))
+  :hook ((haskell-mode . electric-pair-mode)))
 
 ;; mu4e isn't packaged in the usual way, it gets installed as part of the `mu` system package.
 
