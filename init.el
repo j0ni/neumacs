@@ -680,7 +680,7 @@ Info contains the connection type, project name and host:port endpoint."
 (use-package telega
   :commands (telega telega-mode-line-mode)
   :bind (("C-x M-t" . telega))
-  :hook (telega-chat-mode . turn-on-auto-fill)
+  :hook (telega-chat-mode . visual-line-mode)
   :config
   (telega-mode-line-mode t))
 
