@@ -499,21 +499,22 @@ frames with exactly two windows."
 
 (use-package cider
   :commands (cider-mode)
-  :hook (cider-mode . turn-on-eldoc-mode)
+  :hook ((cider-mode . turn-on-eldoc-mode)
+         (cider-repl-mode . enable-paredit-mode))
   :init
   (defun j0ni/cider-modeline-info ()
     "Return info for the cider mode modeline.
 Info contains the connection type, project name and host:port endpoint."
-         (if-let* ((current-connection (ignore-errors (cider-current-repl))))
-             (with-current-buffer current-connection
-               (when cider-mode-line-show-connection "✓"))
-           "❌"))
+    (if-let* ((current-connection (ignore-errors (cider-current-repl))))
+        (with-current-buffer current-connection
+          (when cider-mode-line-show-connection "✓"))
+      "❌"))
   :custom
   (cider-mode-line '(:eval (format " Cider[%s]" (j0ni/cider-modeline-info))))
   (cider-repl-pop-to-buffer-on-connect t)
   (cider-save-file-on-load t)
   (cider-repl-display-help-banner nil)
-  (cider-use-overlays t) ; display eval results inline
+  (cider-use-overlays t)                ; display eval results inline
   (cider-use-fringe-indicators nil)
   (cider-stacktrace-default-filters '(project))
   (cider-buffer-name-show-port t)
@@ -524,7 +525,11 @@ Info contains the connection type, project name and host:port endpoint."
   (nrepl-buffer-name-show-port t)
   (cider-prefer-local-resources t)
   (cider-inject-dependencies-at-jack-in t)
-  (cider-eldoc-display-context-dependent-info t))
+  (cider-eldoc-display-context-dependent-info t)
+  :bind
+  (:map cider-repl-mode-map
+   ("RET" . cider-repl-newline-and-indent)
+   ("C-RET" . cider-repl-return)))
 
 (use-package cider-eval-sexp-fu)
 
