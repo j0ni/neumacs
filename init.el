@@ -724,20 +724,12 @@ Info contains the connection type, project name and host:port endpoint."
                             (:thread-subject))
       mu4e-compose-complete-only-after "2012-01-01"
       mu4e-view-show-addresses t
-      mu4e-date-format-long "%FT%T%z"
-      mu4e-headers-date-format "%F"
-      mu4e-headers-time-format "%T"
-      mu4e-headers-long-date-format "%FT%T%z"
       mm-inline-large-images 'resize
       message-send-mail-function 'smtpmail-send-it
       message-kill-buffer-on-exit t
       mail-user-agent 'mu4e-user-agent
       message-citation-line-function 'message-insert-formatted-citation-line
-      message-citation-line-format "On %e %B %Y %R %Z, %f wrote:\n"
-      message-yank-prefix "  > "
-      message-yank-cited-prefix "  > "
-      message-yank-empty-prefix "  > "
-      message-elide-ellipsis "[... elided ...]"
+      message-citation-line-format "On %a, %d %b %Y at %T %z, %f wrote:"
       mu4e-personal-addresses '("j@lollyshouse.ca"
                                 "hi@mhcat.ca"
                                 "jonathan.irving@gmail.com"
