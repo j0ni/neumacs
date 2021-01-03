@@ -615,7 +615,7 @@ Info contains the connection type, project name and host:port endpoint."
   (setq lsp-rust-server 'rust-analyzer)
   (push 'rustic-clippy flycheck-checkers))
 
-(use-package org
+(use-package org-plus-contrib
   :bind (("C-c c" . org-capture)
          ("C-c a" . org-agenda))
   :custom
