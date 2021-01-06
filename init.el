@@ -741,7 +741,7 @@ Info contains the connection type, project name and host:port endpoint."
         char))
 
 (setq mu4e-decryption-policy t
-      mu4e-update-interval 300
+      mu4e-update-interval nil
       mu4e-index-update-in-background nil
       mu4e-get-mail-command "true"
       mu4e-hide-index-messages t
