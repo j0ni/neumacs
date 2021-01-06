@@ -526,6 +526,8 @@ Info contains the connection type, project name and host:port endpoint."
   (cider-prefer-local-resources t)
   (cider-inject-dependencies-at-jack-in t)
   (cider-eldoc-display-context-dependent-info t)
+  :config
+  (add-to-list 'cider-test-defining-forms "defruns")
   :bind
   (:map cider-repl-mode-map
    ("RET" . cider-repl-newline-and-indent)
