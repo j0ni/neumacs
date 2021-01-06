@@ -668,7 +668,7 @@ Info contains the connection type, project name and host:port endpoint."
       "* %T\n** Systolic: %^{systolic}\n** Diastolic: %^{diastolic}\n** Pulse: %^{pulse}\n** Notes\n%?\n")))
   :init
   (defun j0ni/org-mode-hook ()
-    (auto-fill-mode 1)
+    (visual-line-mode 1)
     (add-hook 'before-save-hook 'org-update-all-dblocks nil 'local-only))
   :hook ((org-mode . j0ni/org-mode-hook)
          (org-capture-mode . j0ni/org-mode-hook))
