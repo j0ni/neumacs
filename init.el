@@ -679,6 +679,34 @@ Info contains the connection type, project name and host:port endpoint."
   (require 'org-tempo)
   (org-clock-persistence-insinuate))
 
+(use-package org-roam
+  :diminish
+  :hook ((after-init . org-roam-mode))
+  :custom
+  (org-roam-directory (expand-file-name "org-roam" org-directory))
+  (org-roam-completion-system 'ivy)
+  (org-roam-buffer-position 'bottom)
+  :init
+  (defun j0ni/roam-todo ()
+    "An ad-hoc agenda for `org-roam'. Shamelessly stolen from abo-abo."
+    (interactive)
+    (let* ((regex "^\\* TODO")
+           (b (get-buffer (concat "*ivy-occur counsel-rg \"" regex "\"*"))))
+      (if b
+          (progn
+            (switch-to-buffer b)
+            (ivy-occur-revert-buffer))
+        (setq unread-command-events (listify-key-sequence (kbd "C-c C-o M->")))
+        (counsel-rg regex org-roam-directory "--sort modified"))))
+  (defhydra hydra-org-roam (:exit t :idle 0.8)
+    "Launcher for `org-roam'."
+    ("i" org-roam-insert "insert")
+    ("f" org-roam-find-file "find-file")
+    ("v" org-roam-buffer-activate "backlinks")
+    ("t" j0ni/roam-todo "todo"))
+  :bind
+  (("<f5>" . hydra-org-roam/body)))
+
 (use-package telega
   :commands (telega telega-mode-line-mode)
   :bind (("C-x M-t" . telega))
@@ -697,6 +725,10 @@ Info contains the connection type, project name and host:port endpoint."
 
 (use-package haskell-mode
   :hook ((haskell-mode . electric-pair-mode)))
+
+(use-package olivetti
+  :custom
+  ((olivetti-body-width 120)))
 
 ;; mu4e isn't packaged in the usual way, it gets installed as part of the `mu` system package.
 
