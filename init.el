@@ -180,7 +180,7 @@ frames with exactly two windows."
   (winner-mode 1)
   (global-auto-revert-mode 1)
   (blink-cursor-mode -1)
-  (display-time-mode 1)
+  ;; (display-time-mode 1)
   (remove-hook 'minibuffer-setup-hook 'winner-save-unconditionally)
   :bind (("M-[" . beginning-of-buffer)
          ("M-]" . end-of-buffer)
@@ -670,14 +670,15 @@ Info contains the connection type, project name and host:port endpoint."
   (defun j0ni/org-mode-hook ()
     (visual-line-mode 1)
     (add-hook 'before-save-hook 'org-update-all-dblocks nil 'local-only))
+  (defun j0ni/org-load-hook ()
+    ;; org-capture - for inserting into date based trees
+    (require 'org-datetree)
+    ;; needed for structure templates (<s-TAB etc)
+    (require 'org-tempo)
+    (org-clock-persistence-insinuate))
   :hook ((org-mode . j0ni/org-mode-hook)
-         (org-capture-mode . j0ni/org-mode-hook))
-  :config
-  ;; org-capture - for inserting into date based trees
-  (require 'org-datetree)
-  ;; needed for structure templates (<s-TAB etc)
-  (require 'org-tempo)
-  (org-clock-persistence-insinuate))
+         (org-load . j0ni/org-load-hook)
+         (org-capture-mode . j0ni/org-mode-hook)))
 
 (use-package org-roam
   :diminish
@@ -771,6 +772,7 @@ Info contains the connection type, project name and host:port endpoint."
                                 "jonathan.irving@gmail.com"
                                 "jon@xapix.io"
                                 "j0ni@fastmail.com"
+                                "joni@well.com"
                                 "j0ni@protonmail.com"
                                 "jon@arity.ca")
       mml-secure-openpgp-signers '("D6346AC6D110409636A0DBF4F7F645B8CE3F8FA3")
@@ -829,6 +831,34 @@ Info contains the connection type, project name and host:port endpoint."
                                               (j0ni/mu4e-bookmark "Xapix" "30" ?m)))
                      (smtpmail-smtp-user . "jon@xapix.io")
                      (smtpmail-smtp-server . "smtp.gmail.com")
+                     (smtpmail-smtp-service . 587)
+                     (smtpmail-stream-type . starttls)))
+            (make-mu4e-context
+             :name "Well"
+             :enter-func (lambda ()
+                           (when (mu4e-running-p)
+                             (mu4e-update-mail-and-index nil))
+                           (mu4e-message "Switching to the Well context"))
+             :match-func (lambda (msg)
+                           (when msg
+                             (string-match-p "^/Well" (mu4e-message-field msg :maildir))))
+             :vars `((user-mail-address . "joni@well.com")
+                     (user-full-name . "Jon Irving")
+                     (mu4e-sent-messages-behavior . sent)
+                     (mu4e-sent-folder . "/Well/Sent")
+                     (mu4e-trash-folder . "/Well/Trash")
+                     (mu4e-drafts-folder . "/Well/Drafts")
+                     (mu4e-refile-folder . "/Well/Archive")
+                     (mu4e-maildir-shortcuts . (("/Well/INBOX" . ?i)
+                                                ("/Well/Sent" . ?s)
+                                                ("/Well/Drafts" . ?d)
+                                                ("/Well/Trash" . ?t)
+                                                ("/Well/Archive" . ?a)))
+                     (mu4e-compose-signature . "https://j0ni.ca ~ https://keybase.io/j0ni")
+                     (mu4e-bookmarks . ,(list (j0ni/mu4e-bookmark "Well" "7" ?w)
+                                              (j0ni/mu4e-bookmark "Well" "30" ?m)))
+                     (smtpmail-smtp-user . "joni")
+                     (smtpmail-smtp-server . "iris.well.com")
                      (smtpmail-smtp-service . 587)
                      (smtpmail-stream-type . starttls)))))
 
