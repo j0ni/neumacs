@@ -887,5 +887,8 @@ Info contains the connection type, project name and host:port endpoint."
 (add-hook 'message-mode-hook #'turn-on-auto-fill)
 (add-hook 'message-mode-hook #'mml-secure-message-sign-pgpmime)
 
+(use-package nyan-mode
+  :hook ((after-init . nyan-mode)))
+
 ;; Do this last, since it may contain references to package functions
 (require 'keys)
