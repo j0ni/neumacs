@@ -32,7 +32,7 @@
   (select-enable-primary t)
   (uniquify-buffer-name-style 'forward)
   (save-interprogram-paste-before-kill t)
-  (compilation-always-kill  t)
+  (compilation-always-kill t)
   (compilation-ask-about-save nil)
   (apropos-do-all t)
   (mouse-yank-at-point t)
