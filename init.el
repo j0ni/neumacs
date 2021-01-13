@@ -731,9 +731,11 @@ Info contains the connection type, project name and host:port endpoint."
 (use-package telega
   :commands (telega telega-mode-line-mode)
   :bind (("C-x M-t" . telega))
-  :hook (telega-chat-mode . visual-line-mode)
+  :hook ((telega-chat-mode . visual-line-mode))
   :config
-  (telega-mode-line-mode t))
+  (telega-mode-line-mode t)
+  (defadvice load-theme (after clear-telega-icon-cache activate)
+    (setq telega-mode-line--logo-image-cache nil)))
 
 (use-package markdown-mode
   :hook (markdown-mode . visual-line-mode))
