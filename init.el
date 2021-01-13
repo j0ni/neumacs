@@ -656,6 +656,12 @@ Info contains the connection type, project name and host:port endpoint."
   ;; switch quickly
   (org-use-fast-todo-selection 'auto)
   (org-priority-default ?C)
+  (org-log-done t)
+  (org-log-into-drawer t)
+  (org-special-ctrl-a/e t)
+  (org-special-ctrl-k t)
+  (org-use-speed-commands t)
+  (org-clock-persist t)
   ;; extra indentation
   (org-adapt-indentation t)
   ;; Let's have pretty source code blocks
@@ -686,6 +692,13 @@ Info contains the connection type, project name and host:port endpoint."
   :hook ((org-mode . j0ni/org-mode-hook)
          (org-load . j0ni/org-load-hook)
          (org-capture-mode . j0ni/org-mode-hook)))
+
+(use-package org-super-agenda
+  :after (org-with-contrib)
+  :custom
+  ((org-super-agenda-groups '((:auto-dir-name t))))
+  :hook
+  ((org-agenda-mode . org-super-agenda-mode)))
 
 (use-package org-roam
   :diminish
