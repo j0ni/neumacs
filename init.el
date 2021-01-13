@@ -236,8 +236,11 @@ frames with exactly two windows."
     (unless (eq ibuffer-sorting-mode 'alphabetic)
       (ibuffer-do-sort-by-alphabetic))))
 
-(use-package rainbow-mode)
-(use-package rainbow-delimiters)
+(use-package rainbow-mode
+  :bind (("C-c r" . rainbow-mode)))
+
+(use-package rainbow-delimiters
+  :hook ((paredit-mode . rainbow-delimiters-mode)))
 
 (use-package browse-at-remote)
 
