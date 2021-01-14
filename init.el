@@ -15,7 +15,8 @@
 (use-package emacs
   :hook ((before-save . delete-trailing-whitespace)
          (emacs-lisp-mode . enable-paredit-mode)
-         (prog-mode . whitespace-mode))
+         (prog-mode . whitespace-mode)
+         (whitespace-mode . (lambda () (diminish 'whitespace-mode))))
   :custom
   (flymake-fringe-indicator-position 'right-fringe)
   (inhibit-startup-screen t)
@@ -186,7 +187,6 @@ frames with exactly two windows."
   (blink-cursor-mode -1)
   ;; (display-time-mode 1)
   (remove-hook 'minibuffer-setup-hook 'winner-save-unconditionally)
-  (diminish 'whitespace-mode)
   :bind (("M-[" . beginning-of-buffer)
          ("M-]" . end-of-buffer)
          ("C-x C-b" . ibuffer)
@@ -204,8 +204,6 @@ frames with exactly two windows."
   (when (and j0ni/exec-path-from-shell-completed (memq window-system '(mac ns x)))
     (exec-path-from-shell-initialize)
     (setq j0ni/exec-path-from-shell-completed t)))
-
-(use-package diminish)
 
 (use-package modus-themes
   :init

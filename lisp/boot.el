@@ -27,6 +27,7 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+(straight-use-package 'diminish)
 (straight-use-package 'use-package)
 
 (provide 'boot)
