@@ -198,6 +198,20 @@ frames with exactly two windows."
          ("C-=" . text-scale-increase)
          ("C--" . text-scale-decrease)))
 
+(use-package undo-fu
+  :custom
+  ((undo-fu-allow-undo-in-region t))
+  :bind (("C-_" . undo-fu-only-undo)
+         ("C-/" . undo-fu-only-undo)
+         ("C-z" . undo-fu-only-undo)
+         ("<undo>" . undo-fu-only-undo)
+         ("C-x u" . undo-fu-only-undo)
+         ("M-_" . undo-fu-only-redo)
+         ("C-M-z" . undo-fu-only-redo)))
+
+(use-package undo-fu-session
+  :hook ((after-init . global-undo-fu-session-mode)))
+
 (use-package exec-path-from-shell
   :init
   (defvar j0ni/exec-path-from-shell-completed nil "Stop this happening repeatedly")
