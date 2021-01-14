@@ -660,7 +660,7 @@ Info contains the connection type, project name and host:port endpoint."
   ;; switch quickly
   (org-use-fast-todo-selection 'auto)
   (org-priority-default ?C)
-  (org-log-done t)
+  (org-log-done 'note)
   (org-log-into-drawer t)
   (org-special-ctrl-a/e t)
   (org-special-ctrl-k t)
