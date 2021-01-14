@@ -318,7 +318,7 @@ frames with exactly two windows."
   :diminish
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
-         ;; ("M-y" . counsel-yank-pop)
+         ("C-M-y" . counsel-yank-pop)
          ("<f1> f" . counsel-describe-function)
          ("<f1> v" . counsel-describe-variable)
          ("<f1> l" . counsel-find-library)
@@ -498,7 +498,7 @@ frames with exactly two windows."
   (lsp-signature-render-all t)
   (lsp-keymap-prefix "s-p")
   (lsp-prefer-flymake nil)
-  :bind (("C-c d" . lsp-describe-thing-at-point)
+  :bind (("C-c C-d" . lsp-describe-thing-at-point)
          ("C-c e n" . flymake-goto-next-error)
          ("C-c e p" . flymake-goto-prev-error)
          ("C-c e r" . lsp-find-references)
