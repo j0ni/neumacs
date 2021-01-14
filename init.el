@@ -186,10 +186,12 @@ frames with exactly two windows."
   (blink-cursor-mode -1)
   ;; (display-time-mode 1)
   (remove-hook 'minibuffer-setup-hook 'winner-save-unconditionally)
+  (diminish 'whitespace-mode)
   :bind (("M-[" . beginning-of-buffer)
          ("M-]" . end-of-buffer)
          ("C-x C-b" . ibuffer)
          ("C-x C-r" . revert-buffer)
+         ("C-c C-k" . eval-buffer)
          ("C-x |" . j0ni/toggle-window-split)
          ("C-c ." . j0ni/delete-whitespace)
          ("C-c s" . j0ni/insert-shrug)
@@ -198,8 +200,10 @@ frames with exactly two windows."
 
 (use-package exec-path-from-shell
   :init
-  (when (memq window-system '(mac ns x))
-    (exec-path-from-shell-initialize)))
+  (defvar j0ni/exec-path-from-shell-completed nil "Stop this happening repeatedly")
+  (when (and j0ni/exec-path-from-shell-completed (memq window-system '(mac ns x)))
+    (exec-path-from-shell-initialize)
+    (setq j0ni/exec-path-from-shell-completed t)))
 
 (use-package diminish)
 
