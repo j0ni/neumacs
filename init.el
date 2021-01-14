@@ -14,8 +14,8 @@
 
 (use-package emacs
   :hook ((before-save . delete-trailing-whitespace)
-         (emacs-lisp . enable-paredit-mode)
-         (prog . whitespace-mode))
+         (emacs-lisp-mode . enable-paredit-mode)
+         (prog-mode . whitespace-mode))
   :custom
   (flymake-fringe-indicator-position 'right-fringe)
   (inhibit-startup-screen t)
