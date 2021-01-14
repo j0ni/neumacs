@@ -521,7 +521,7 @@ Info contains the connection type, project name and host:port endpoint."
           (when cider-mode-line-show-connection "✓"))
       "❌"))
   :custom
-  (cider-mode-line '(:eval (format " Cider[%s]" (j0ni/cider-modeline-info))))
+  (cider-mode-line '(:eval (format " CIDER[%s]" (j0ni/cider-modeline-info))))
   (cider-repl-pop-to-buffer-on-connect t)
   (cider-save-file-on-load t)
   (cider-repl-display-help-banner nil)
