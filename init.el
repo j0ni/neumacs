@@ -200,7 +200,7 @@ frames with exactly two windows."
 
 (use-package undo-fu
   :custom
-  ((undo-fu-allow-undo-in-region t))
+  (undo-fu-allow-undo-in-region t)
   :bind (("C-_" . undo-fu-only-undo)
          ("C-/" . undo-fu-only-undo)
          ("C-z" . undo-fu-only-undo)
@@ -427,6 +427,7 @@ frames with exactly two windows."
   :after (ivy)
   :custom
   (projectile-completion-system 'ivy)
+  (projectile-sort-order 'recently-active)
   :bind-keymap ("C-c p" . projectile-command-map))
 
 (use-package ripgrep
@@ -586,7 +587,8 @@ Info contains the connection type, project name and host:port endpoint."
   :hook (ruby-mode . flycheck-mode))
 (use-package inf-ruby)
 (use-package rbenv
-  :custom ((rbenv-show-active-ruby-in-modeline nil))
+  :custom
+  (rbenv-show-active-ruby-in-modeline nil)
   :commands (global-rbenv-mode rbenv-use-corresponding rbenv-use)
   :hook ((after-init . global-rbenv-mode)
          (ruby-mode . rbenv-use-corresponding)))
@@ -712,9 +714,8 @@ Info contains the connection type, project name and host:port endpoint."
 (use-package org-super-agenda
   :after (org-with-contrib)
   :custom
-  ((org-super-agenda-groups '((:auto-dir-name t))))
-  :hook
-  ((org-agenda-mode . org-super-agenda-mode)))
+  (org-super-agenda-groups '((:auto-dir-name t)))
+  :hook ((org-agenda-mode . org-super-agenda-mode)))
 
 (use-package org-roam
   :diminish
@@ -767,7 +768,7 @@ Info contains the connection type, project name and host:port endpoint."
 
 (use-package olivetti
   :custom
-  ((olivetti-body-width 120)))
+  (olivetti-body-width 120))
 
 ;; mu4e isn't packaged in the usual way, it gets installed as part of the `mu` system package.
 
@@ -837,7 +838,7 @@ Info contains the connection type, project name and host:port endpoint."
                                                 ("/Fastmail/sent-mail" . ?s)
                                                 ("/Fastmail/drafts" . ?d)
                                                 ("/Fastmail/trash" . ?t)))
-                     (mu4e-compose-signature . "https://j0ni.ca ~ https://keybase.io/j0ni")
+                     (mu4e-compose-signature . "In this world / we walk on the roof of hell / gazing at flowers\n    - Kobayashi Issa\n\nhttps://j0ni.ca ~ https://keybase.io/j0ni")
                      (mu4e-bookmarks . ,(list (j0ni/mu4e-bookmark "Fastmail" "7" ?w)
                                               (j0ni/mu4e-bookmark "Fastmail" "30" ?m)))
                      (smtpmail-smtp-user . "j0ni@fastmail.com")
