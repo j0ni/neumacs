@@ -13,10 +13,11 @@
 (require 'boot)
 
 (use-package emacs
-  :hook ((before-save . delete-trailing-whitespace)
-         (emacs-lisp-mode . enable-paredit-mode)
-         (prog-mode . whitespace-mode)
-         (whitespace-mode . (lambda () (diminish 'whitespace-mode))))
+  :hook ((before-save-hook . delete-trailing-whitespace)
+         (emacs-lisp-mode-hook . enable-paredit-mode)
+         (prog-mode-hook . whitespace-mode)
+         (whitespace-mode-hook . (lambda () (diminish 'whitespace-mode)))
+         (after-init-hook . recentf-mode))
   :custom
   (flymake-fringe-indicator-position 'right-fringe)
   (inhibit-startup-screen t)
@@ -198,38 +199,19 @@ frames with exactly two windows."
          ("C-=" . text-scale-increase)
          ("C--" . text-scale-decrease)))
 
-(use-package undo-fu
+(use-package ibuffer
+  :bind (("C-x C-b" . ibuffer))
   :custom
-  (undo-fu-allow-undo-in-region t)
-  :bind (("C-_" . undo-fu-only-undo)
-         ("C-/" . undo-fu-only-undo)
-         ("C-z" . undo-fu-only-undo)
-         ("<undo>" . undo-fu-only-undo)
-         ("C-x u" . undo-fu-only-undo)
-         ("M-_" . undo-fu-only-redo)
-         ("C-M-z" . undo-fu-only-redo)))
-
-(use-package undo-fu-session
-  :hook ((after-init . global-undo-fu-session-mode)))
-
-(use-package exec-path-from-shell
-  :init
-  (defvar j0ni/exec-path-from-shell-completed nil "Stop this happening repeatedly")
-  (when (and j0ni/exec-path-from-shell-completed (memq window-system '(mac ns x)))
-    (exec-path-from-shell-initialize)
-    (setq j0ni/exec-path-from-shell-completed t)))
-
-(use-package modus-themes
-  :init
-  (setq modus-themes-mode-line nil)
-  (setq modus-themes-bold-constructs nil)
-  (setq modus-themes-syntax nil)
-  (setq modus-themes-fringes nil)
-  (setq modus-themes-completions nil) ;; or 'moderate, or 'opinionated
-  (setq modus-themes-scale-headings t)
-  :config
-  (load-theme 'modus-vivendi t)
-  (set-face-attribute 'bold nil :weight 'semibold))
+  (ibuffer-expert t)
+  (ibuffer-display-summary nil)
+  (ibuffer-use-other-window nil)
+  (ibuffer-show-empty-filter-groups nil)
+  (ibuffer-movement-cycle nil)
+  (ibuffer-default-sorting-mode 'filename/process)
+  (ibuffer-use-header-line t)
+  (ibuffer-default-shrink-to-minimum-size nil)
+  (ibuffer-saved-filter-groups nil)
+  (ibuffer-old-time 48))
 
 (use-package ibuffer-vc
   :hook ((ibuffer-hook . j0ni/ibuffer-vc-hook))
@@ -252,18 +234,53 @@ frames with exactly two windows."
     (unless (eq ibuffer-sorting-mode 'alphabetic)
       (ibuffer-do-sort-by-alphabetic))))
 
+(use-package undo-fu
+  :custom
+  (undo-fu-allow-undo-in-region t)
+  :bind (("C-_" . undo-fu-only-undo)
+         ("C-/" . undo-fu-only-undo)
+         ("C-z" . undo-fu-only-undo)
+         ("<undo>" . undo-fu-only-undo)
+         ("C-x u" . undo-fu-only-undo)
+         ("M-_" . undo-fu-only-redo)
+         ("C-M-z" . undo-fu-only-redo)))
+
+(use-package undo-fu-session
+  :hook ((after-init-hook . global-undo-fu-session-mode)))
+
+(use-package exec-path-from-shell
+  :init
+  (defvar j0ni/exec-path-from-shell-completed nil "Stop this happening repeatedly")
+  (when (and j0ni/exec-path-from-shell-completed (memq window-system '(mac ns x)))
+    (exec-path-from-shell-initialize)
+    (setq j0ni/exec-path-from-shell-completed t)))
+
+(use-package modus-themes
+  :hook
+  ((after-init-hook . modus-themes-load-themes))
+  :custom
+  (modus-themes-mode-line nil)
+  (modus-themes-bold-constructs nil)
+  (modus-themes-syntax nil)
+  (modus-themes-fringes nil)
+  (modus-themes-completions nil) ;; or 'moderate, or 'opinionated
+  (modus-themes-scale-headings t)
+  :config
+  (load-theme 'modus-vivendi t)
+  (set-face-attribute 'bold nil :weight 'semibold))
+
 (use-package rainbow-mode
   :bind (("C-c r" . rainbow-mode)))
 
 (use-package rainbow-delimiters
-  :hook ((paredit-mode . rainbow-delimiters-mode)))
+  :hook ((paredit-mode-hook . rainbow-delimiters-mode)))
 
 (use-package browse-at-remote)
 
 (use-package diff-hl
   :diminish
-  :hook ((after-init . global-diff-hl-mode)
-         (diff-hl-mode . diff-hl-flydiff-mode))
+  :hook ((after-init-hook . global-diff-hl-mode)
+         (diff-hl-mode-hook . diff-hl-flydiff-mode))
   :config
   (eval-after-load 'magit
     '(progn
@@ -277,7 +294,7 @@ frames with exactly two windows."
   :diminish
   :custom
   (company-global-modes '(not org-mode telega-chat-mode))
-  :hook (after-init . global-company-mode)
+  :hook ((after-init-hook . global-company-mode))
   :config
   (push 'company-elisp company-backends))
 
@@ -285,12 +302,12 @@ frames with exactly two windows."
 
 (use-package prescient
   :commands (prescient-persist-mode)
-  :hook (after-init . prescient-persist-mode))
+  :hook ((after-init-hook . prescient-persist-mode)))
 
 (use-package company-prescient
   :diminish
   :commands (company-prescient-mode)
-  :hook (company-mode . company-prescient-mode))
+  :hook ((company-mode-hook . company-prescient-mode)))
 
 (use-package ivy-prescient
   :diminish
@@ -423,6 +440,7 @@ frames with exactly two windows."
 (use-package browse-at-remote)
 
 (use-package projectile
+  :hook ((after-init-hook . projectile-mode))
   :diminish
   :after (ivy)
   :custom
@@ -466,7 +484,7 @@ frames with exactly two windows."
 
 (use-package which-key
   :diminish
-  :hook (after-init . which-key-mode))
+  :hook (after-init-hook . which-key-mode))
 
 (use-package ace-window
   :custom
@@ -523,8 +541,8 @@ frames with exactly two windows."
 
 (use-package cider
   :commands (cider-mode)
-  :hook ((cider-mode . turn-on-eldoc-mode)
-         (cider-repl-mode . enable-paredit-mode))
+  :hook ((cider-mode-hook . turn-on-eldoc-mode)
+         (cider-repl-mode-hook . enable-paredit-mode))
   :init
   (defun j0ni/cider-modeline-info ()
     "Return info for the cider mode modeline.
@@ -576,31 +594,31 @@ Info contains the connection type, project name and host:port endpoint."
   (cljr-add-keybindings-with-prefix "C-c C-j"))
 
 (use-package clojure-mode
-  :hook ((clojure-mode . cider-mode)
-         (clojure-mode . enable-paredit-mode)
-         (clojure-mode . flycheck-mode)
-         (clojure-mode . clj-refactor-mode))
+  :hook ((clojure-mode-hook . cider-mode)
+         (clojure-mode-hook . enable-paredit-mode)
+         (clojure-mode-hook . flycheck-mode)
+         (clojure-mode-hook . clj-refactor-mode))
   :config
   (require 'flycheck-clj-kondo))
 
 (use-package ruby-mode
-  :hook (ruby-mode . flycheck-mode))
+  :hook (ruby-mode-hook . flycheck-mode))
 (use-package inf-ruby)
 (use-package rbenv
   :custom
   (rbenv-show-active-ruby-in-modeline nil)
   :commands (global-rbenv-mode rbenv-use-corresponding rbenv-use)
-  :hook ((after-init . global-rbenv-mode)
-         (ruby-mode . rbenv-use-corresponding)))
+  :hook ((after-init-hook . global-rbenv-mode)
+         (ruby-mode-hook . rbenv-use-corresponding)))
 
 (use-package json-mode)
 (use-package graphql-mode)
 
 (use-package purescript-mode
-  :hook (purescript-mode . turn-on-purescript-indentation))
+  :hook (purescript-mode-hook . turn-on-purescript-indentation))
 
 (use-package psc-ide
-  :hook (purescript-mode . psc-ide-mode))
+  :hook (purescript-mode-hook . psc-ide-mode))
 
 (use-package tide
   :commands (tide-setup tide-hl-identifier-mode tide-format-before-save)
@@ -609,13 +627,13 @@ Info contains the connection type, project name and host:port endpoint."
   (typescript-indent-level 2))
 
 (use-package typescript-mode
-  :hook ((typescript-mode . tide-setup)
-         (typescript-mode . flycheck-mode)
-         (typescript-mode . tide-hl-identifier-mode)
-         (before-save . tide-format-before-save)))
+  :hook ((typescript-mode-hook . tide-setup)
+         (typescript-mode-hook . flycheck-mode)
+         (typescript-mode-hook . tide-hl-identifier-mode)
+         (before-save-hook . tide-format-before-save)))
 
 (use-package flycheck
-  :hook (prog-mode . flycheck-mode)
+  :hook (prog-mode-hook . flycheck-mode)
   :custom
   (flycheck-indication-mode 'right-fringe)
   (flycheck-disabled-checkers '(emacs-lisp-checkdoc))
@@ -627,11 +645,11 @@ Info contains the connection type, project name and host:port endpoint."
 (use-package cargo)
 (use-package flycheck-rust)
 (use-package rustic
-  :hook ((flycheck-mode . flycheck-rust-setup)
-         (rustic-mode . lsp)
-         (rustic-mode . cargo-minor-mode)
-         (rustic-mode . flycheck-mode)
-         (rustic-mode . electric-pair-mode))
+  :hook ((flycheck-mode-hook . flycheck-rust-setup)
+         (rustic-mode-hook . lsp)
+         (rustic-mode-hook . cargo-minor-mode)
+         (rustic-mode-hook . flycheck-mode)
+         (rustic-mode-hook . electric-pair-mode))
   :custom
   (indent-tabs-mode nil)
   (rustic-format-trigger 'on-save)
@@ -707,19 +725,19 @@ Info contains the connection type, project name and host:port endpoint."
     ;; needed for structure templates (<s-TAB etc)
     (require 'org-tempo)
     (org-clock-persistence-insinuate))
-  :hook ((org-mode . j0ni/org-mode-hook)
-         (org-load . j0ni/org-load-hook)
-         (org-capture-mode . j0ni/org-mode-hook)))
+  :hook ((org-mode-hook . j0ni/org-mode-hook)
+         (org-load-hook . j0ni/org-load-hook)
+         (org-capture-mode-hook . j0ni/org-mode-hook)))
 
 (use-package org-super-agenda
   :after (org-with-contrib)
   :custom
   (org-super-agenda-groups '((:auto-dir-name t)))
-  :hook ((org-agenda-mode . org-super-agenda-mode)))
+  :hook ((org-agenda-mode-hook . org-super-agenda-mode)))
 
 (use-package org-roam
   :diminish
-  :hook ((after-init . org-roam-mode))
+  :hook ((after-init-hook . org-roam-mode))
   :custom
   (org-roam-directory (expand-file-name "org-roam" org-directory))
   (org-roam-completion-system 'ivy)
@@ -748,23 +766,23 @@ Info contains the connection type, project name and host:port endpoint."
 (use-package telega
   :commands (telega telega-mode-line-mode)
   :bind (("C-x M-t" . telega))
-  :hook ((telega-chat-mode . visual-line-mode))
+  :hook ((telega-chat-mode-hook . visual-line-mode))
   :config
   (telega-mode-line-mode t)
   (defadvice load-theme (after clear-telega-icon-cache activate)
     (setq telega-mode-line--logo-image-cache nil)))
 
 (use-package markdown-mode
-  :hook (markdown-mode . visual-line-mode))
+  :hook (markdown-mode-hook . visual-line-mode))
 
 (use-package all-the-icons)
 
 (use-package lpy
   :commands (lpy-mode)
-  :hook (python-mode . lpy-mode))
+  :hook (python-mode-hook . lpy-mode))
 
 (use-package haskell-mode
-  :hook ((haskell-mode . electric-pair-mode)))
+  :hook ((haskell-mode-hook . electric-pair-mode)))
 
 (use-package olivetti
   :custom
@@ -905,7 +923,7 @@ Info contains the connection type, project name and host:port endpoint."
 (add-hook 'message-mode-hook #'mml-secure-message-sign-pgpmime)
 
 (use-package nyan-mode
-  :hook ((after-init . nyan-mode)))
+  :hook ((after-init-hook . nyan-mode)))
 
 ;; Do this last, since it may contain references to package functions
 (require 'keys)
