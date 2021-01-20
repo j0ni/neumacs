@@ -17,7 +17,8 @@
          (emacs-lisp-mode-hook . enable-paredit-mode)
          (prog-mode-hook . whitespace-mode)
          (whitespace-mode-hook . (lambda () (diminish 'whitespace-mode)))
-         (after-init-hook . recentf-mode))
+         (after-init-hook . recentf-mode)
+         (after-init-hook . savehist-mode))
   :custom
   (flymake-fringe-indicator-position 'right-fringe)
   (inhibit-startup-screen t)
@@ -61,10 +62,10 @@
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
-  (set-frame-font "Iosevka Snuggle-11" t t)
-  (set-face-font 'variable-pitch "Lucida Grande-12" nil)
-  (set-face-font 'fixed-pitch "Iosevka Snuggle-11" nil)
-  (set-face-font 'fixed-pitch-serif "Iosevka Snuggle-11" nil)
+  (set-frame-font "Iosevka Snuggle Light-11" t t)
+  (set-face-font 'variable-pitch "Lucida Grande-11" nil)
+  (set-face-font 'fixed-pitch "Iosevka Snuggle Light-11" nil)
+  (set-face-font 'fixed-pitch-serif "Iosevka Snuggle Light-11" nil)
   (set-fontset-font t 'unicode "Symbola" nil 'prepend)
   (when (string= system-type "gnu/linux")
     (setq x-super-keysym 'meta))
@@ -178,7 +179,7 @@ frames with exactly two windows."
     (scroll-bar-mode -1)
     (tool-bar-mode -1)
     (tooltip-mode -1))
-  (electric-indent-mode t)
+  (electric-indent-mode 1)
   (show-paren-mode 1)
   (save-place-mode 1)
   (global-hl-line-mode 1)
@@ -186,11 +187,9 @@ frames with exactly two windows."
   (winner-mode 1)
   (global-auto-revert-mode 1)
   (blink-cursor-mode -1)
-  ;; (display-time-mode 1)
   (remove-hook 'minibuffer-setup-hook 'winner-save-unconditionally)
   :bind (("M-[" . beginning-of-buffer)
          ("M-]" . end-of-buffer)
-         ("C-x C-b" . ibuffer)
          ("C-x C-r" . revert-buffer)
          ("C-c C-k" . eval-buffer)
          ("C-x |" . j0ni/toggle-window-split)
@@ -429,9 +428,9 @@ frames with exactly two windows."
 
 (use-package magit
   :custom
-  (magit-completing-read-function 'ivy-completing-read)
+  (magit-completing-read-function #'ivy-completing-read)
   (magit-diff-refine-hunk t)
-  (magit-bury-buffer-function 'magit-mode-quit-window)
+  (magit-bury-buffer-function #'magit-mode-quit-window)
   :bind (("C-x g" . magit-status)
          ("C-x M-g" . magit-dispatch-popup)))
 
@@ -472,9 +471,9 @@ frames with exactly two windows."
 
 (use-package paredit
   :diminish " ()"
-  :hook ((emacs-lisp-mode . enable-paredit-mode)
-         (lisp-mode . enable-paredit-mode)
-         (scheme-mode . enable-paredit-mode))
+  :hook ((emacs-lisp-mode-hook . enable-paredit-mode)
+         (lisp-mode-hook . enable-paredit-mode)
+         (scheme-mode-hook . enable-paredit-mode))
   :commands (enable-paredit-mode))
 
 (use-package smartparens
@@ -767,9 +766,10 @@ Info contains the connection type, project name and host:port endpoint."
   :commands (telega telega-mode-line-mode)
   :bind (("C-x M-t" . telega))
   :hook ((telega-chat-mode-hook . visual-line-mode))
+  :after (:and modus-themes company)
   :config
   (telega-mode-line-mode t)
-  (defadvice load-theme (after clear-telega-icon-cache activate)
+  (defadvice modus-themes-toggle (after clear-telega-icon-cache activate)
     (setq telega-mode-line--logo-image-cache nil)))
 
 (use-package markdown-mode

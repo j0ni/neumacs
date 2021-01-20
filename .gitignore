@@ -19,3 +19,5 @@
 /org-clock-save.el
 /undo-fu-session
 /.local
+/savehist
+/places
