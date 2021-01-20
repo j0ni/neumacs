@@ -311,11 +311,11 @@ frames with exactly two windows."
 (use-package ivy-prescient
   :diminish
   :after (ivy)
-  :hook (after-init . ivy-prescient-mode))
+  :hook (after-init-hook . ivy-prescient-mode))
 
 (use-package ivy
   :diminish
-  :hook (afer-init . ivy-mode)
+  :hook (afer-init-hook . ivy-mode)
   :custom
   (ivy-height 15)
   (ivy-wrap t)
@@ -370,15 +370,18 @@ frames with exactly two windows."
          ("C-c t" . counsel-load-theme)
          ("C-c F" . counsel-org-file)))
 
+(use-package counsel-jq)
+(use-package counsel-org-clock)
+
 (use-package ivy-rich
   :diminish
   :after (ivy)
-  :hook (after-init . ivy-rich-mode)
+  :hook (after-init-hook . ivy-rich-mode)
   :custom
   (ivy-rich-display-transformers-list
    '(ivy-switch-buffer
      (:columns
-      ((ivy-rich-candidate (:width 40))
+      ((ivy-rich-candidate (:width 60))
        (ivy-rich-switch-buffer-size (:width 7))
        (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
        (ivy-rich-switch-buffer-major-mode (:width 30 :face warning))
@@ -394,15 +397,15 @@ frames with exactly two windows."
        (ivy-rich-counsel-find-file-truename (:face font-lock-doc-face))))
      counsel-M-x
      (:columns
-      ((counsel-M-x-transformer (:width 45))
+      ((counsel-M-x-transformer (:width 60))
        (ivy-rich-counsel-function-docstring (:face font-lock-doc-face))))
      counsel-describe-function
      (:columns
-      ((counsel-describe-function-transformer (:width 40))
+      ((counsel-describe-function-transformer (:width 60))
        (ivy-rich-counsel-function-docstring (:face font-lock-doc-face))))
      counsel-describe-variable
      (:columns
-      ((counsel-describe-variable-transformer (:width 40))
+      ((counsel-describe-variable-transformer (:width 60))
        (ivy-rich-counsel-variable-docstring (:face font-lock-doc-face))))
      counsel-recentf
      (:columns
@@ -410,7 +413,7 @@ frames with exactly two windows."
        (ivy-rich-file-last-modified-time (:face font-lock-comment-face))))
      package-install
      (:columns
-      ((ivy-rich-candidate (:width 40))
+      ((ivy-rich-candidate (:width 60))
        (ivy-rich-package-version (:width 16 :face font-lock-comment-face))
        (ivy-rich-package-archive-summary (:width 7 :face font-lock-builtin-face))
        (ivy-rich-package-install-summary (:face font-lock-doc-face))))))
@@ -420,7 +423,7 @@ frames with exactly two windows."
 (use-package counsel-projectile
   :diminish
   :commands (counsel-projectile-mode)
-  :hook (after-init . counsel-projectile-mode))
+  :hook (after-init-hook . counsel-projectile-mode))
 
 (use-package browse-kill-ring
   :init
@@ -537,6 +540,14 @@ frames with exactly two windows."
          ("C-c e t" . lsp-find-type-definition)))
 
 (use-package lsp-ivy)
+
+(use-package sly
+  :custom
+  (inferior-lisp-program "sbcl"))
+
+(use-package sly-quicklisp)
+(use-package sly-macrostep)
+(use-package sly-asdf)
 
 (use-package cider
   :commands (cider-mode)
