@@ -233,6 +233,11 @@ frames with exactly two windows."
     (unless (eq ibuffer-sorting-mode 'alphabetic)
       (ibuffer-do-sort-by-alphabetic))))
 
+(use-package smart-mode-line
+  :custom
+  (sml/theme 'respectful)
+  :hook ((after-init-hook . sml/setup)))
+
 (use-package undo-fu
   :custom
   (undo-fu-allow-undo-in-region t)
