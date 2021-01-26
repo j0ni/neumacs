@@ -292,7 +292,7 @@ frames with exactly two windows."
        (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))))
 
 (use-package expand-region
-  :bind (("C-x x" . er/expand-region)))
+  :bind (("C-x C-x" . er/expand-region)))
 
 (use-package company
   :diminish
@@ -320,7 +320,6 @@ frames with exactly two windows."
 
 (use-package ivy
   :diminish
-  :hook (afer-init-hook . ivy-mode)
   :custom
   (ivy-height 15)
   (ivy-wrap t)
@@ -328,6 +327,7 @@ frames with exactly two windows."
   (ivy-extra-directories nil)
   (confirm-nonexistent-file-or-buffer t)
   :init
+  (ivy-mode 1)
   (setq ivy-re-builders-alist
         '((read-file-name-internal . ivy--regex-fuzzy)
           (t . ivy--regex-plus)))
@@ -348,6 +348,9 @@ frames with exactly two windows."
          ("C-c u" . swiper-all)))
 
 (use-package counsel
+  :after (ivy)
+  :init
+  (counsel-mode 1)
   :diminish
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
