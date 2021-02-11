@@ -188,6 +188,7 @@ frames with exactly two windows."
   (global-auto-revert-mode 1)
   (blink-cursor-mode -1)
   (remove-hook 'minibuffer-setup-hook 'winner-save-unconditionally)
+  (diminish 'eldoc-mode)
   :bind (("M-[" . beginning-of-buffer)
          ("M-]" . end-of-buffer)
          ("C-x C-r" . revert-buffer)
@@ -196,7 +197,8 @@ frames with exactly two windows."
          ("C-c ." . j0ni/delete-whitespace)
          ("C-c s" . j0ni/insert-shrug)
          ("C-=" . text-scale-increase)
-         ("C--" . text-scale-decrease)))
+         ("C--" . text-scale-decrease)
+         ("C-\\" . completion-at-point)))
 
 (use-package ibuffer
   :bind (("C-x C-b" . ibuffer))
@@ -238,6 +240,8 @@ frames with exactly two windows."
   (sml/theme 'respectful)
   :hook ((after-init-hook . sml/setup)))
 
+(use-package circe)
+
 (use-package undo-fu
   :custom
   (undo-fu-allow-undo-in-region t)
@@ -269,10 +273,12 @@ frames with exactly two windows."
   (modus-themes-fringes nil)
   (modus-themes-completions nil) ;; or 'moderate, or 'opinionated
   (modus-themes-scale-headings t)
+  (modus-themes-mode-line '3d)
   :config
   (load-theme 'modus-vivendi t)
   (set-face-attribute 'bold nil :weight 'semibold))
 
+(use-package doom-themes)
 (use-package rainbow-mode
   :bind (("C-c r" . rainbow-mode)))
 
@@ -282,7 +288,7 @@ frames with exactly two windows."
 (use-package browse-at-remote)
 
 (use-package diff-hl
-  :diminish
+  :diminish ""
   :hook ((after-init-hook . global-diff-hl-mode)
          (diff-hl-mode-hook . diff-hl-flydiff-mode))
   :config
@@ -295,10 +301,23 @@ frames with exactly two windows."
   :bind (("C-x C-x" . er/expand-region)))
 
 (use-package company
-  :diminish
+  :diminish ""
   :custom
-  (company-global-modes '(not org-mode telega-chat-mode))
+  (company-global-modes '(not org-mode))
+  (company-tooltip-align-annotations t)
+  (company-minimum-prefix-length 2)
+  (company-idle-delay 1.0)
+  (company-tooltip-idle-delay 1.0)
+  (company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
+                       company-preview-if-just-one-frontend
+                       company-echo-metadata-frontend))
   :hook ((after-init-hook . global-company-mode))
+  :bind (("M-\\" . company-complete)
+         :map company-active-map
+         ("M-\\" . company-complete-common-or-cycle)
+         ("C-j" . company-complete-selection)
+         ("C-n" . company-select-next)
+         ("C-p" . company-select-previous))
   :config
   (push 'company-elisp company-backends))
 
@@ -309,7 +328,7 @@ frames with exactly two windows."
   :hook ((after-init-hook . prescient-persist-mode)))
 
 (use-package company-prescient
-  :diminish
+  :diminish ""
   :commands (company-prescient-mode)
   :hook ((company-mode-hook . company-prescient-mode)))
 
@@ -436,6 +455,8 @@ frames with exactly two windows."
 (use-package browse-kill-ring
   :init
   (browse-kill-ring-default-keybindings))
+(use-package ctrlf
+  :hook ((after-init-hook . ctrlf-mode)))
 
 (use-package magit
   :custom
@@ -451,8 +472,8 @@ frames with exactly two windows."
 
 (use-package projectile
   :hook ((after-init-hook . projectile-mode))
-  :diminish
   :after (ivy)
+  :diminish ""
   :custom
   (projectile-completion-system 'ivy)
   (projectile-sort-order 'recently-active)
@@ -481,19 +502,19 @@ frames with exactly two windows."
 ;; C-M-SPC mark-sexp Put the mark at the end of the sexp.
 
 (use-package paredit
-  :diminish " ()"
+  :diminish ""
   :hook ((emacs-lisp-mode-hook . enable-paredit-mode)
          (lisp-mode-hook . enable-paredit-mode)
          (scheme-mode-hook . enable-paredit-mode))
   :commands (enable-paredit-mode))
 
 (use-package smartparens
-  :diminish
+  :diminish ""
   :config
   (require 'smartparens-config))
 
 (use-package which-key
-  :diminish
+  :diminish ""
   :hook (after-init-hook . which-key-mode))
 
 (use-package ace-window
@@ -550,8 +571,9 @@ frames with exactly two windows."
 (use-package lsp-ivy)
 
 (use-package sly
-  :custom
-  (inferior-lisp-program "sbcl"))
+  :hook ((sly-mrepl-hook . company-mode))
+  :init
+  (setq inferior-lisp-program "sbcl"))
 
 (use-package sly-quicklisp)
 (use-package sly-macrostep)
@@ -598,7 +620,7 @@ Info contains the connection type, project name and host:port endpoint."
 (use-package flycheck-clj-kondo)
 
 (use-package clj-refactor
-  :diminish
+  :diminish ""
   :commands (clj-refactor-mode)
   :custom
   (cljr-warn-on-eval nil)
@@ -726,7 +748,7 @@ Info contains the connection type, project name and host:port endpoint."
   (org-default-notes-file (concat org-directory "/berlin.org"))
   (org-capture-templates
    `(("j" "Journal" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-      "* %T\n  %?\n\n%a")
+      "* %T\n%?\n\n%a")
      ("s" "Shriek" entry (file+headline ,(concat org-directory "/shrieks.org") "Shrieks")
       "* %T\n%?\n")
      ("t" "Task" entry (file+headline ,(concat org-directory "/berlin.org") "Inbox")
@@ -735,16 +757,14 @@ Info contains the connection type, project name and host:port endpoint."
       "* %T\n** Systolic: %^{systolic}\n** Diastolic: %^{diastolic}\n** Pulse: %^{pulse}\n** Notes\n%?\n")))
   :init
   (defun j0ni/org-mode-hook ()
-    (visual-line-mode 1)
-    (add-hook 'before-save-hook 'org-update-all-dblocks nil 'local-only))
-  (defun j0ni/org-load-hook ()
     ;; org-capture - for inserting into date based trees
     (require 'org-datetree)
     ;; needed for structure templates (<s-TAB etc)
     (require 'org-tempo)
-    (org-clock-persistence-insinuate))
+    (org-clock-persistence-insinuate)
+    (visual-line-mode 1)
+    (add-hook 'before-save-hook 'org-update-all-dblocks nil 'local-only))
   :hook ((org-mode-hook . j0ni/org-mode-hook)
-         (org-load-hook . j0ni/org-load-hook)
          (org-capture-mode-hook . j0ni/org-mode-hook)))
 
 (use-package org-super-agenda
@@ -754,7 +774,7 @@ Info contains the connection type, project name and host:port endpoint."
   :hook ((org-agenda-mode-hook . org-super-agenda-mode)))
 
 (use-package org-roam
-  :diminish
+  :diminish ""
   :hook ((after-init-hook . org-roam-mode))
   :custom
   (org-roam-directory (expand-file-name "org-roam" org-directory))
@@ -782,14 +802,26 @@ Info contains the connection type, project name and host:port endpoint."
   (("<f5>" . hydra-org-roam/body)))
 
 (use-package telega
-  :commands (telega telega-mode-line-mode)
+  :commands (telega
+             telega-mode-line-mode
+             telega-notifications-mode)
   :bind (("C-x M-t" . telega))
   :hook ((telega-chat-mode-hook . visual-line-mode))
   :after (:and modus-themes company)
   :config
   (telega-mode-line-mode t)
+  (telega-notifications-mode t)
   (defadvice modus-themes-toggle (after clear-telega-icon-cache activate)
     (setq telega-mode-line--logo-image-cache nil)))
+
+(use-package smart-mode-line
+  :custom
+  (sml/theme 'respectful)
+  (sml/shorten-directory t)
+  (sml/shorten-modes t)
+  (sml/extra-filler -2)
+  :init
+  (sml/setup))
 
 (use-package markdown-mode
   :hook (markdown-mode-hook . visual-line-mode))
@@ -941,8 +973,7 @@ Info contains the connection type, project name and host:port endpoint."
 (add-hook 'message-mode-hook #'turn-on-auto-fill)
 (add-hook 'message-mode-hook #'mml-secure-message-sign-pgpmime)
 
-(use-package nyan-mode
-  :hook ((after-init-hook . nyan-mode)))
+(use-package 2048-game)
 
 ;; Do this last, since it may contain references to package functions
 (require 'keys)
