@@ -239,6 +239,12 @@ frames with exactly two windows."
   :custom
   (sml/theme 'respectful)
   :hook ((after-init-hook . sml/setup)))
+(use-package find-file-in-project
+  :commands (find-file-in-project-by-selected
+             ffip-get-project-root-directory)
+  :bind (("C-c f" . find-file-in-project-by-selected))
+  :init
+  (setq ffip-use-rust-fd t))
 
 (use-package circe)
 
