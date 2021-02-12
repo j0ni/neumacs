@@ -14,7 +14,6 @@
 
 (use-package emacs
   :hook ((before-save-hook . delete-trailing-whitespace)
-         (emacs-lisp-mode-hook . enable-paredit-mode)
          (prog-mode-hook . whitespace-mode)
          (whitespace-mode-hook . (lambda () (diminish 'whitespace-mode)))
          (after-init-hook . recentf-mode)
@@ -51,7 +50,7 @@
   (custom-safe-themes t)
   (mouse-wheel-scroll-amount '(1 ((shift) . 1))) ; one line at a time
   (mouse-wheel-progressive-speed t)              ; don't accelerate scrolling
-  (shr-color-visible-luminance-min 80)
+  (shr-color-visible-luminance-min 90)
   :init
   (setq-default browse-url-browser-function
                 (cl-case system-type
@@ -62,10 +61,10 @@
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
-  (set-frame-font "Iosevka Snuggle Light-11" t t)
+  (set-frame-font "PragmataPro Liga-12" t t)
   (set-face-font 'variable-pitch "Lucida Grande-11" nil)
-  (set-face-font 'fixed-pitch "Iosevka Snuggle Light-11" nil)
-  (set-face-font 'fixed-pitch-serif "Iosevka Snuggle Light-11" nil)
+  (set-face-font 'fixed-pitch "PragmataPro Liga-12" nil)
+  (set-face-font 'fixed-pitch-serif "PragmataPro Liga-12" nil)
   (set-fontset-font t 'unicode "Symbola" nil 'prepend)
   (when (string= system-type "gnu/linux")
     (setq x-super-keysym 'meta))
@@ -189,6 +188,7 @@ frames with exactly two windows."
   (blink-cursor-mode -1)
   (remove-hook 'minibuffer-setup-hook 'winner-save-unconditionally)
   (diminish 'eldoc-mode)
+  (advice-add #'shr-colorize-region :around (defun shr-no-colorise-region (&rest ignore)))
   :bind (("M-[" . beginning-of-buffer)
          ("M-]" . end-of-buffer)
          ("C-x C-r" . revert-buffer)
@@ -199,6 +199,46 @@ frames with exactly two windows."
          ("C-=" . text-scale-increase)
          ("C--" . text-scale-decrease)
          ("C-\\" . completion-at-point)))
+
+(use-package ligature
+  :commands (ligature-set-ligatures)
+  :straight (ligature :type git :host github :repo "mickeynp/ligature.el")
+  :config
+  ;; use the non-annoying subset of the list found here:
+  ;; https://github.com/fabrizioschiavi/pragmatapro/blob/master/emacs_snippets/pragmatapro-prettify-symbols-v0.828.el
+  (ligature-set-ligatures 'prog-mode
+                          '("!!" "!=" "!==" "!!!" "!≡" "!≡≡" "!>" "!=<" "#(" "#_" "#{"
+                            "#?" "#>" "##" "#_(" "%=" "%>" "%>%" "%<%" "&%" "&&" "&*"
+                            "&+" "&-" "&/" "&=" "&&&" "&>" "$>" "***" "*=" "*/" "*>"
+                            "++" "+++" "+=" "+>" "++=" "--" "-<" "-<<" "-=" "->" "->>"
+                            "---" "-->" "-+-" "-\\/" "-|>" "-<|" ".." "..." "..<" ".>"
+                            ".~" ".=" "/*" "//" "/>" "/=" "/==" "///" "/**" ":::" "::"
+                            ":=" ":≡" ":>" ":=>" ":(" ":-(" ":)" ":-)" ":/" ":\\" ":3"
+                            ":D" ":P" ":>:" ":<:" "<$>" "<*" "<*>" "<+>" "<-" "<<" "<<<"
+                            "<<=" "<=" "<=>" "<>" "<|>" "<<-" "<|" "<=<" "<~" "<~~" "<<~"
+                            "<$" "<+" "<!>" "<@>" "<#>" "<%>" "<^>" "<&>" "<?>" "<.>"
+                            "</>" "<\\>" "<\">" "<:>" "<~>" "<**>" "<<^" "<!" "<@" "<#"
+                            "<%" "<^" "<&" "<?" "<." "</" "<\\" "<\"" "<:" "<->" "<!--"
+                            "<--" "<~<" "<==>" "<|-" "<<|" "<-<" "<-->" "<<==" "<=="
+                            "=<<" "==" "===" "==>" "=>" "=~" "=>>" "=/=" "=~=" "==>>"
+                            "≡≡" "≡≡≡" "≡:≡" ">-" ">=" ">>" ">>-" ">>=" ">>>" ">=>"
+                            ">>^" ">>|" ">!=" ">->" "??" "?~" "?=" "?>" "???" "?." "^="
+                            "^." "^?" "^.." "^<<" "^>>" "^>" "\\\\" "\\>" "\\/-" "@>"
+                            "|=" "||" "|>" "|||" "|+|" "|->" "|-->" "|=>" "|==>" "|>-"
+                            "|<<" "||>" "|>>" "|-" "||-" "~=" "~>" "~~>" "~>>" "[[" "]]"
+                            "\">" "_|_"))
+  ;; Iosevka
+  ;; (ligature-set-ligatures 'prog-mode
+  ;;                         '("<---" "<--"  "<<-" "<-" "->" "-->" "--->" "<->" "<-->"
+  ;;                           "<--->" "<---->" "<!--" "<==" "<===" "<=" "=>" "=>>" "==>"
+  ;;                           "===>" ">=" "<=>" "<==>" "<===>" "<====>" "<!---" "<~~" "<~"
+  ;;                           "~>" "~~>" "::" ":::" "==" "!=" "===" "!==" ":=" ":-" ":+"
+  ;;                           "<*" "<*>" "*>" "<|" "<|>" "|>" "+:" "-:" "=:" "<******>"
+  ;;                           "++" "+++"))
+
+
+  :hook ((prog-mode-hook . ligature-mode)))
+
 
 (use-package ibuffer
   :bind (("C-x C-b" . ibuffer))
@@ -235,10 +275,6 @@ frames with exactly two windows."
     (unless (eq ibuffer-sorting-mode 'alphabetic)
       (ibuffer-do-sort-by-alphabetic))))
 
-(use-package smart-mode-line
-  :custom
-  (sml/theme 'respectful)
-  :hook ((after-init-hook . sml/setup)))
 (use-package find-file-in-project
   :commands (find-file-in-project-by-selected
              ffip-get-project-root-directory)
@@ -270,26 +306,28 @@ frames with exactly two windows."
     (setq j0ni/exec-path-from-shell-completed t)))
 
 (use-package modus-themes
-  :hook
-  ((after-init-hook . modus-themes-load-themes))
+  :hook ((after-init-hook . modus-themes-load-themes))
   :custom
   (modus-themes-mode-line nil)
   (modus-themes-bold-constructs nil)
-  (modus-themes-syntax nil)
-  (modus-themes-fringes nil)
-  (modus-themes-completions nil) ;; or 'moderate, or 'opinionated
+  (modus-themes-syntax 'faint)
+  (modus-themes-fringes 'subtle)
+  (modus-themes-completions 'opinionated)
   (modus-themes-scale-headings t)
-  (modus-themes-mode-line '3d)
+  (modus-themes-mode-line nil)
+  (modus-themes-paren-match 'intense-bold)
   :config
   (load-theme 'modus-vivendi t)
   (set-face-attribute 'bold nil :weight 'semibold))
 
 (use-package doom-themes)
+(use-package almost-mono-themes)
+
 (use-package rainbow-mode
   :bind (("C-c r" . rainbow-mode)))
 
 (use-package rainbow-delimiters
-  :hook ((paredit-mode-hook . rainbow-delimiters-mode)))
+  :hook ((lispy-mode-hook . rainbow-delimiters-mode)))
 
 (use-package browse-at-remote)
 
@@ -461,8 +499,9 @@ frames with exactly two windows."
 (use-package browse-kill-ring
   :init
   (browse-kill-ring-default-keybindings))
-(use-package ctrlf
-  :hook ((after-init-hook . ctrlf-mode)))
+
+;; (use-package ctrlf
+;;   :hook ((after-init-hook . ctrlf-mode)))
 
 (use-package magit
   :custom
@@ -507,12 +546,18 @@ frames with exactly two windows."
 
 ;; C-M-SPC mark-sexp Put the mark at the end of the sexp.
 
-(use-package paredit
+;; (use-package paredit
+;;   :diminish ""
+;;   :hook ((emacs-lisp-mode-hook . enable-paredit-mode)
+;;          (lisp-mode-hook . enable-paredit-mode)
+;;          (scheme-mode-hook . enable-paredit-mode))
+;;   :commands (enable-paredit-mode))
+
+(use-package lispy
   :diminish ""
-  :hook ((emacs-lisp-mode-hook . enable-paredit-mode)
-         (lisp-mode-hook . enable-paredit-mode)
-         (scheme-mode-hook . enable-paredit-mode))
-  :commands (enable-paredit-mode))
+  :hook ((emacs-lisp-mode-hook . lispy-mode)
+         (lisp-mode-hook . lispy-mode)
+         (scheme-mode-hook . lispy-mode)))
 
 (use-package smartparens
   :diminish ""
@@ -588,7 +633,7 @@ frames with exactly two windows."
 (use-package cider
   :commands (cider-mode)
   :hook ((cider-mode-hook . turn-on-eldoc-mode)
-         (cider-repl-mode-hook . enable-paredit-mode))
+         (cider-repl-mode-hook . lispy-mode))
   :init
   (defun j0ni/cider-modeline-info ()
     "Return info for the cider mode modeline.
@@ -641,7 +686,7 @@ Info contains the connection type, project name and host:port endpoint."
 
 (use-package clojure-mode
   :hook ((clojure-mode-hook . cider-mode)
-         (clojure-mode-hook . enable-paredit-mode)
+         (clojure-mode-hook . lispy-mode)
          (clojure-mode-hook . flycheck-mode)
          (clojure-mode-hook . clj-refactor-mode))
   :config
@@ -820,14 +865,21 @@ Info contains the connection type, project name and host:port endpoint."
   (defadvice modus-themes-toggle (after clear-telega-icon-cache activate)
     (setq telega-mode-line--logo-image-cache nil)))
 
-(use-package smart-mode-line
-  :custom
-  (sml/theme 'respectful)
-  (sml/shorten-directory t)
-  (sml/shorten-modes t)
-  (sml/extra-filler -2)
+;; (use-package smart-mode-line
+;;   :custom
+;;   (sml/theme 'respectful)
+;;   (sml/shorten-directory t)
+;;   (sml/shorten-modes t)
+;;   (sml/extra-filler -2)
+;;   :init
+;;   (sml/setup))
+
+(use-package doom-modeline
   :init
-  (sml/setup))
+  (setq image-scaling-factor 1.5)
+  :custom
+  (doom-modeline-icon nil)
+  :hook ((after-init-hook . doom-modeline-mode)))
 
 (use-package markdown-mode
   :hook (markdown-mode-hook . visual-line-mode))
