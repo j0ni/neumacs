@@ -61,10 +61,10 @@
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
-  (set-frame-font "PragmataPro Liga-12" t t)
-  (set-face-font 'variable-pitch "Lucida Grande-11" nil)
-  (set-face-font 'fixed-pitch "PragmataPro Liga-12" nil)
-  (set-face-font 'fixed-pitch-serif "PragmataPro Liga-12" nil)
+  (set-frame-font "Iosevka Snuggle Light-11" t t)
+  (set-face-font 'variable-pitch "Lucida Grande-10" nil)
+  (set-face-font 'fixed-pitch "Iosevka Snuggle Light-11" nil)
+  (set-face-font 'fixed-pitch-serif "Iosevka Snuggle Light-11" nil)
   (set-fontset-font t 'unicode "Symbola" nil 'prepend)
   (when (string= system-type "gnu/linux")
     (setq x-super-keysym 'meta))
@@ -322,22 +322,24 @@ frames with exactly two windows."
   (set-face-attribute 'bold nil :weight 'semibold))
 
 (use-package doom-themes)
-(use-package almost-mono-themes
-  :config
-  (set-face-attribute 'bold nil :weight 'semibold)
-  (eval-after-load 'diff-hl
-    '(let ((highlight "#fda50f")
-           (warning "#ff0000")
-           (success "#00ff00"))
-       (set-face-attribute 'diff-hl-insert nil :background success :foreground success)
-       (set-face-attribute 'diff-hl-delete nil :background warning :foreground warning)
-       (set-face-attribute 'diff-hl-change nil :background highlight :foreground highlight))))
+;; (use-package almost-mono-themes
+;;   ;; :hook ((after-init-hook . (lambda () (load-theme 'almost-mono-black t))))
+;;   :config
+;;   (set-face-attribute 'bold nil :weight 'semibold)
+;;   (eval-after-load 'diff-hl
+;;     ;; colors from all 4 almost-mono-themes
+;;     '(let ((highlight "#fda50f")
+;;            (warning "#ff0000")
+;;            (success "#00ff00"))
+;;        (set-face-attribute 'diff-hl-insert nil :background success :foreground success)
+;;        (set-face-attribute 'diff-hl-delete nil :background warning :foreground warning)
+;;        (set-face-attribute 'diff-hl-change nil :background highlight :foreground highlight))))
 
 (use-package rainbow-mode
   :bind (("C-c r" . rainbow-mode)))
 
 (use-package rainbow-delimiters
-  :hook ((lispy-mode-hook . rainbow-delimiters-mode)))
+  :hook ((paredit-mode-hook . rainbow-delimiters-mode)))
 
 (use-package browse-at-remote)
 
@@ -434,7 +436,7 @@ frames with exactly two windows."
          ("<f2> i" . counsel-info-lookup-symbol)
          ("<f2> u" . counsel-unicode-char)
          ("<f2> j" . counsel-set-variable)
-         ("C-c C" . counsel-compile)
+         ;; ("C-c C" . counsel-compile)
          ("C-c g" . counsel-git)
          ("C-c i" . counsel-imenu)
          ("C-c j" . counsel-git-grep)
@@ -750,6 +752,8 @@ Info contains the connection type, project name and host:port endpoint."
   (indent-tabs-mode nil)
   (rustic-format-trigger 'on-save)
   (rustic-lsp-server 'rust-analyzer)
+  (rustic-lsp-format t)
+  (rustic-indent-method-chain nil)
   :config
   (require 'lsp-rust)
   (setq lsp-rust-server 'rust-analyzer)
@@ -836,25 +840,15 @@ Info contains the connection type, project name and host:port endpoint."
   (org-roam-completion-system 'ivy)
   (org-roam-buffer-position 'bottom)
   :init
-  (defun j0ni/roam-todo ()
-    "An ad-hoc agenda for `org-roam'. Shamelessly stolen from abo-abo."
-    (interactive)
-    (let* ((regex "^\\* TODO")
-           (b (get-buffer (concat "*ivy-occur counsel-rg \"" regex "\"*"))))
-      (if b
-          (progn
-            (switch-to-buffer b)
-            (ivy-occur-revert-buffer))
-        (setq unread-command-events (listify-key-sequence (kbd "C-c C-o M->")))
-        (counsel-rg regex org-roam-directory "--sort modified"))))
   (defhydra hydra-org-roam (:exit t :idle 0.8)
     "Launcher for `org-roam'."
+    ("c" org-roam-capture "capture")
     ("i" org-roam-insert "insert")
     ("f" org-roam-find-file "find-file")
-    ("v" org-roam-buffer-activate "backlinks")
-    ("t" j0ni/roam-todo "todo"))
+    ("v" org-roam-buffer-activate "backlinks"))
   :bind
-  (("<f5>" . hydra-org-roam/body)))
+  (("<f5>" . hydra-org-roam/body)
+   ("C-c C" . org-roam-capture)))
 
 (use-package telega
   :commands (telega
