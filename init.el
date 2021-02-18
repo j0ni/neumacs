@@ -310,6 +310,7 @@ frames with exactly two windows."
   :custom
   (modus-themes-mode-line nil)
   (modus-themes-bold-constructs nil)
+  (modus-themes-slanted-constructs t)
   (modus-themes-syntax 'faint)
   (modus-themes-fringes 'subtle)
   (modus-themes-completions 'opinionated)
@@ -321,7 +322,16 @@ frames with exactly two windows."
   (set-face-attribute 'bold nil :weight 'semibold))
 
 (use-package doom-themes)
-(use-package almost-mono-themes)
+(use-package almost-mono-themes
+  :config
+  (set-face-attribute 'bold nil :weight 'semibold)
+  (eval-after-load 'diff-hl
+    '(let ((highlight "#fda50f")
+           (warning "#ff0000")
+           (success "#00ff00"))
+       (set-face-attribute 'diff-hl-insert nil :background success :foreground success)
+       (set-face-attribute 'diff-hl-delete nil :background warning :foreground warning)
+       (set-face-attribute 'diff-hl-change nil :background highlight :foreground highlight))))
 
 (use-package rainbow-mode
   :bind (("C-c r" . rainbow-mode)))
@@ -339,7 +349,7 @@ frames with exactly two windows."
   (eval-after-load 'magit
     '(progn
        (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
-       (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))))
+       (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))))
 
 (use-package expand-region
   :bind (("C-x C-x" . er/expand-region)))
@@ -426,6 +436,7 @@ frames with exactly two windows."
          ("<f2> j" . counsel-set-variable)
          ("C-c C" . counsel-compile)
          ("C-c g" . counsel-git)
+         ("C-c i" . counsel-imenu)
          ("C-c j" . counsel-git-grep)
          ("C-c L" . counsel-git-log)
          ("C-c k" . counsel-rg)
@@ -546,18 +557,18 @@ frames with exactly two windows."
 
 ;; C-M-SPC mark-sexp Put the mark at the end of the sexp.
 
-;; (use-package paredit
-;;   :diminish ""
-;;   :hook ((emacs-lisp-mode-hook . enable-paredit-mode)
-;;          (lisp-mode-hook . enable-paredit-mode)
-;;          (scheme-mode-hook . enable-paredit-mode))
-;;   :commands (enable-paredit-mode))
-
-(use-package lispy
+(use-package paredit
   :diminish ""
-  :hook ((emacs-lisp-mode-hook . lispy-mode)
-         (lisp-mode-hook . lispy-mode)
-         (scheme-mode-hook . lispy-mode)))
+  :hook ((emacs-lisp-mode-hook . enable-paredit-mode)
+         (lisp-mode-hook . enable-paredit-mode)
+         (scheme-mode-hook . enable-paredit-mode))
+  :commands (enable-paredit-mode))
+
+;; (use-package lispy
+;;   :diminish ""
+;;   :hook ((emacs-lisp-mode-hook . lispy-mode)
+;;          (lisp-mode-hook . lispy-mode)
+;;          (scheme-mode-hook . lispy-mode)))
 
 (use-package smartparens
   :diminish ""
@@ -607,13 +618,12 @@ frames with exactly two windows."
   (lsp-enable-xref t)
   (lsp-enable-snippet nil)
   (lsp-auto-guess-root t)
-  (lsp-eldoc-render-all t)
+  (lsp-eldoc-render-all nil)
   (lsp-signature-render-all t)
-  (lsp-keymap-prefix "s-p")
+  (lsp-enable-symbol-highlighting t)
+  (lsp-idle-delay 0.8)
   (lsp-prefer-flymake nil)
   :bind (("C-c C-d" . lsp-describe-thing-at-point)
-         ("C-c e n" . flymake-goto-next-error)
-         ("C-c e p" . flymake-goto-prev-error)
          ("C-c e r" . lsp-find-references)
          ("C-c e R" . lsp-rename)
          ("C-c e i" . lsp-find-implementation)
@@ -633,7 +643,7 @@ frames with exactly two windows."
 (use-package cider
   :commands (cider-mode)
   :hook ((cider-mode-hook . turn-on-eldoc-mode)
-         (cider-repl-mode-hook . lispy-mode))
+         (cider-repl-mode-hook . enable-paredit-mode))
   :init
   (defun j0ni/cider-modeline-info ()
     "Return info for the cider mode modeline.
@@ -686,7 +696,7 @@ Info contains the connection type, project name and host:port endpoint."
 
 (use-package clojure-mode
   :hook ((clojure-mode-hook . cider-mode)
-         (clojure-mode-hook . lispy-mode)
+         (clojure-mode-hook . enable-paredit-mode)
          (clojure-mode-hook . flycheck-mode)
          (clojure-mode-hook . clj-refactor-mode))
   :config
@@ -733,19 +743,13 @@ Info contains the connection type, project name and host:port endpoint."
   (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
     [16 48 112 240 112 48 16] nil nil 'center))
 
-(use-package cargo)
-(use-package flycheck-rust)
 (use-package rustic
-  :hook ((flycheck-mode-hook . flycheck-rust-setup)
-         (rustic-mode-hook . lsp)
-         (rustic-mode-hook . cargo-minor-mode)
-         (rustic-mode-hook . flycheck-mode)
+  :hook ((rustic-mode-hook . lsp)
          (rustic-mode-hook . electric-pair-mode))
   :custom
   (indent-tabs-mode nil)
   (rustic-format-trigger 'on-save)
   (rustic-lsp-server 'rust-analyzer)
-  ;;(rustic-compile-command "cargo build")
   :config
   (require 'lsp-rust)
   (setq lsp-rust-server 'rust-analyzer)
@@ -876,7 +880,7 @@ Info contains the connection type, project name and host:port endpoint."
 
 (use-package doom-modeline
   :init
-  (setq image-scaling-factor 1.5)
+  (setq image-scaling-factor 1.2)
   :custom
   (doom-modeline-icon nil)
   :hook ((after-init-hook . doom-modeline-mode)))
