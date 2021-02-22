@@ -620,7 +620,7 @@ frames with exactly two windows."
   (lsp-enable-xref t)
   (lsp-enable-snippet nil)
   (lsp-auto-guess-root t)
-  (lsp-eldoc-render-all nil)
+  (lsp-eldoc-render-all t)
   (lsp-signature-render-all t)
   (lsp-enable-symbol-highlighting t)
   (lsp-idle-delay 0.8)
@@ -749,12 +749,13 @@ Info contains the connection type, project name and host:port endpoint."
   :hook ((rustic-mode-hook . lsp)
          (rustic-mode-hook . electric-pair-mode))
   :custom
-  (indent-tabs-mode nil)
   (rustic-format-trigger 'on-save)
+  (rustic-indent-method-chain t)
   (rustic-lsp-server 'rust-analyzer)
   (rustic-lsp-format t)
   (rustic-indent-method-chain nil)
   :config
+  (setq-local indent-tabs-mode nil)
   (require 'lsp-rust)
   (setq lsp-rust-server 'rust-analyzer)
   (push 'rustic-clippy flycheck-checkers))
