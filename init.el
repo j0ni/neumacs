@@ -61,10 +61,16 @@
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
-  (set-frame-font "Iosevka Snuggle Light-11" t t)
   (set-face-font 'variable-pitch "Lucida Grande-10" nil)
-  (set-face-font 'fixed-pitch "Iosevka Snuggle Light-11" nil)
-  (set-face-font 'fixed-pitch-serif "Iosevka Snuggle Light-11" nil)
+  ;; (set-frame-font "Iosevka Snuggle Light-11" t t)
+  ;; (set-face-font 'fixed-pitch "Iosevka Snuggle Light-11" nil)
+  ;; (set-face-font 'fixed-pitch-serif "Iosevka Snuggle Light-11" nil)
+  ;; (set-frame-font "PragmataPro Liga-12" t t)
+  ;; (set-face-font 'fixed-pitch "PragmataPro Liga-12" nil)
+  ;; (set-face-font 'fixed-pitch-serif "PragmataPro Liga-12" nil)
+  (set-frame-font "Monoid-9" t t)
+  (set-face-font 'fixed-pitch "Monoid-9" nil)
+  (set-face-font 'fixed-pitch-serif "Monoid-9" nil)
   (set-fontset-font t 'unicode "Symbola" nil 'prepend)
   (when (string= system-type "gnu/linux")
     (setq x-super-keysym 'meta))
@@ -102,7 +108,7 @@
   (setq-default word-wrap nil)
   (setq-default indicate-buffer-boundaries 'left)
   (setq-default fill-column 80)
-  (setq-default line-spacing 0)
+  (setq-default line-spacing 2)
   (setq-default truncate-lines t)
   (defun j0ni/disable-truncate-lines ()
     (interactive)
@@ -308,18 +314,20 @@ frames with exactly two windows."
 (use-package modus-themes
   :hook ((after-init-hook . modus-themes-load-themes))
   :custom
-  (modus-themes-mode-line nil)
   (modus-themes-bold-constructs nil)
   (modus-themes-slanted-constructs t)
   (modus-themes-syntax 'faint)
   (modus-themes-fringes 'subtle)
   (modus-themes-completions 'opinionated)
   (modus-themes-scale-headings t)
-  (modus-themes-mode-line nil)
+  (modus-themes-mode-line '3d)
   (modus-themes-paren-match 'intense-bold)
   :config
-  (load-theme 'modus-vivendi t)
+  ;; (load-theme 'modus-vivendi t)
   (set-face-attribute 'bold nil :weight 'semibold))
+
+(use-package cyberpunk-theme
+  :init (load-theme 'cyberpunk t))
 
 (use-package doom-themes)
 ;; (use-package almost-mono-themes
@@ -574,8 +582,9 @@ frames with exactly two windows."
 
 (use-package smartparens
   :diminish ""
-  :config
-  (require 'smartparens-config))
+  ;; :config
+  ;; (require 'smartparens-config)
+  )
 
 (use-package which-key
   :diminish ""
@@ -875,7 +884,7 @@ Info contains the connection type, project name and host:port endpoint."
 
 (use-package doom-modeline
   :init
-  (setq image-scaling-factor 1.2)
+  (setq image-scaling-factor 1.4)
   :custom
   (doom-modeline-icon nil)
   :hook ((after-init-hook . doom-modeline-mode)))
