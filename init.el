@@ -80,7 +80,7 @@
   ;; be sure to set this to 0 in any auto-scrolling buffers
   (setq scroll-conservatively 100000)
   (setq scroll-preserve-screen-position t)
-  (setq gc-cons-threshold (* 20 1024 1024))
+  (setq gc-cons-threshold (* 50 1024 1024))
   (setq auto-revert-verbose nil)
   (setq create-lockfiles nil)
   (setq redisplay-dont-pause t)
@@ -88,6 +88,7 @@
   (setq ring-bell-function 'ignore)
   (setq next-screen-context-lines 5)
   (setq read-buffer-completion-ignore-case t)
+  (setq-default indent-tabs-mode nil)
   (setq indent-tabs-mode nil)
   (setq load-prefer-newer t)
   (setq highlight-nonselected-windows nil)
@@ -203,8 +204,7 @@ frames with exactly two windows."
          ("C-c ." . j0ni/delete-whitespace)
          ("C-c s" . j0ni/insert-shrug)
          ("C-=" . text-scale-increase)
-         ("C--" . text-scale-decrease)
-         ("C-\\" . completion-at-point)))
+         ("C--" . text-scale-decrease)))
 
 (use-package ligature
   :commands (ligature-set-ligatures)
@@ -314,22 +314,27 @@ frames with exactly two windows."
 (use-package modus-themes
   :hook ((after-init-hook . modus-themes-load-themes))
   :custom
-  (modus-themes-bold-constructs nil)
+  (modus-themes-bold-constructs t)
   (modus-themes-slanted-constructs t)
-  (modus-themes-syntax 'faint)
+  (modus-themes-syntax nil) ;; 'faint
   (modus-themes-fringes 'subtle)
   (modus-themes-completions 'opinionated)
   (modus-themes-scale-headings t)
   (modus-themes-mode-line '3d)
   (modus-themes-paren-match 'intense-bold)
   :config
+  ;; (load-theme 'modus-operandi t)
   ;; (load-theme 'modus-vivendi t)
   (set-face-attribute 'bold nil :weight 'semibold))
 
-(use-package cyberpunk-theme
-  :init (load-theme 'cyberpunk t))
+(use-package hl-todo
+  :hook ((after-init-hook . global-hl-todo-mode)))
 
+(use-package gruvbox-theme)
+(use-package cyberpunk-theme)
+(use-package zerodark-theme)
 (use-package doom-themes)
+
 ;; (use-package almost-mono-themes
 ;;   ;; :hook ((after-init-hook . (lambda () (load-theme 'almost-mono-black t))))
 ;;   :config
@@ -353,8 +358,7 @@ frames with exactly two windows."
 
 (use-package diff-hl
   :diminish ""
-  :hook ((after-init-hook . global-diff-hl-mode)
-         (diff-hl-mode-hook . diff-hl-flydiff-mode))
+  :hook ((after-init-hook . global-diff-hl-mode))
   :config
   (eval-after-load 'magit
     '(progn
@@ -377,8 +381,10 @@ frames with exactly two windows."
                        company-echo-metadata-frontend))
   :hook ((after-init-hook . global-company-mode))
   :bind (("M-\\" . company-complete)
+         ("C-\\" . company-complete)
          :map company-active-map
          ("M-\\" . company-complete-common-or-cycle)
+         ("C-\\" . company-complete-common-or-cycle)
          ("C-j" . company-complete-selection)
          ("C-n" . company-select-next)
          ("C-p" . company-select-previous))
@@ -420,8 +426,21 @@ frames with exactly two windows."
          ("C-c C-r" . ivy-resume)))
 
 (use-package hydra
-  :commands (hydra-add-imenu)
-  :hook (emacs-lisp-mode . hydra-add-imenu))
+  :commands (hydra-add-imenu defhydra)
+  :hook (emacs-lisp-mode . hydra-add-imenu)
+  :init
+  (defhydra j0ni/hydra-navigate ()
+    "Navigate in a buffer more vimmily."
+    ("j" next-line "next line")
+    ("k" previous-line "previous line")
+    ("h" backward-char "backward char")
+    ("l" forward-char "forward char")
+    ("u" scroll-up-command "scroll up")
+    ("d" scroll-down-command "scroll down")
+    ("$" move-end-of-line "end of line")
+    ("#" goto-line "goto line")
+    ("x" nil "exit" :exit t))
+  :bind (("C-c h n" . j0ni/hydra-navigate/body)))
 
 (use-package ivy-hydra
   :commands (hydra-ivy/body))
@@ -536,6 +555,9 @@ frames with exactly two windows."
 (use-package gitconfig-mode)
 (use-package browse-at-remote)
 
+(use-package auto-highlight-symbol
+  :hook ((after-init-hook . global-auto-highlight-symbol-mode)))
+
 (use-package projectile
   :hook ((after-init-hook . projectile-mode))
   :after (ivy)
@@ -574,11 +596,14 @@ frames with exactly two windows."
          (scheme-mode-hook . enable-paredit-mode))
   :commands (enable-paredit-mode))
 
-;; (use-package lispy
-;;   :diminish ""
-;;   :hook ((emacs-lisp-mode-hook . lispy-mode)
-;;          (lisp-mode-hook . lispy-mode)
-;;          (scheme-mode-hook . lispy-mode)))
+(use-package geiser
+  :commands (turn-on-geiser-mode)
+  :hook ((scheme-mode-hook . turn-on-geiser-mode)
+         (racket-mode-hook . turn-on-geiser-mode)
+         (geiser-repl-mode-hook . enable-paredit-mode)))
+
+(use-package racket-mode
+  :hook ((racket-mode-hook . enable-paredit-mode)))
 
 (use-package smartparens
   :diminish ""
@@ -622,23 +647,63 @@ frames with exactly two windows."
 (use-package restclient)
 
 (use-package lsp-mode
+  :hook ((clojure-mode-hook . lsp)
+         (clojurescript-mode-hook . lsp)
+         (clojurec-mode-hook . lsp))
   :commands (lsp lsp-register-custom-settings lsp-deferred)
+  :config
+  (setq cljr-add-ns-to-blank-clj-files nil)
+  (dolist (m '(clojure-mode
+               clojurec-mode
+               clojurescript-mode
+               clojurex-mode))
+    (add-to-list 'lsp-language-id-configuration `(,m . "clojure")))
   :custom
-  (lsp-enable-indentation nil)
+  (lsp-enable-indentation t)
+  (lsp-enable-completion-at-point t)
   (lsp-auto-configure t)
   (lsp-enable-xref t)
   (lsp-enable-snippet nil)
-  (lsp-auto-guess-root t)
-  (lsp-eldoc-render-all t)
+  (lsp-auto-guess-root nil)
+  (lsp-eldoc-enable-hover nil)
+  (lsp-eldoc-render-all nil)
   (lsp-signature-render-all t)
   (lsp-enable-symbol-highlighting t)
   (lsp-idle-delay 0.8)
+  ;; (lsp-lens-enable t)
   (lsp-prefer-flymake nil)
-  :bind (("C-c C-d" . lsp-describe-thing-at-point)
-         ("C-c e r" . lsp-find-references)
-         ("C-c e R" . lsp-rename)
-         ("C-c e i" . lsp-find-implementation)
-         ("C-c e t" . lsp-find-type-definition)))
+  (lsp-file-watch-threshold 10000)
+  (lsp-signature-auto-activate nil)
+  (lsp-completion-provider :capf)
+  :bind (:map lsp-mode-map
+              ("C-c C-l d" . lsp-describe-thing-at-point)
+              ("C-c C-l r" . lsp-rename)
+              ("C-c C-l i" . lsp-find-implementation)
+              ("C-c C-l ." . lsp-find-type-definition)))
+
+(use-package lsp-ui
+  :config
+  (require 'lsp-ui-imenu)
+  :custom
+  (lsp-ui-autoconfigure t)
+  (lsp-ui-sideline-enable nil)
+  (lsp-ui-doc-enable nil)
+  (lsp-ui-peek-enable t)
+  (lsp-ui-peek-always-show nil)
+  (lsp-ui-imenu-autorefresh t)
+  (lsp-ui-doc-show-with-cursor t)
+  (lsp-ui-doc-show-with-mouse nil)
+  :bind
+  (:map lsp-ui-mode-map
+        ("C-c l I" . lsp-ui-imenu)
+        ("C-c l ." . lsp-ui-peek-find-definitions)
+        ("C-c l ?" . lsp-ui-peek-find-references)
+        ("C-c l r" . lsp-rename)
+        ("C-c l x" . lsp-workspace-restart)
+        ("C-c l w" . lsp-ui-peek-find-workspace-symbol)
+        ("C-c l i" . lsp-ui-peek-find-implementation)
+        ("C-c l d" . lsp-describe-thing-at-point)
+        ("C-c l e" . lsp-execute-code-action)))
 
 (use-package lsp-ivy)
 
@@ -689,7 +754,7 @@ Info contains the connection type, project name and host:port endpoint."
 
 (use-package cider-eval-sexp-fu)
 
-(use-package flycheck-clj-kondo)
+;; (use-package flycheck-clj-kondo)
 
 (use-package clj-refactor
   :diminish ""
@@ -706,12 +771,13 @@ Info contains the connection type, project name and host:port endpoint."
   (cljr-add-keybindings-with-prefix "C-c C-j"))
 
 (use-package clojure-mode
-  :hook ((clojure-mode-hook . cider-mode)
-         (clojure-mode-hook . enable-paredit-mode)
-         (clojure-mode-hook . flycheck-mode)
-         (clojure-mode-hook . clj-refactor-mode))
-  :config
-  (require 'flycheck-clj-kondo))
+  ;; :config
+  ;; (require 'flycheck-clj-kondo)
+  :hook ((clojure-mode-hook . enable-paredit-mode)
+         (clojure-mode-hook . subword-mode)
+         (clojure-mode-hook . cider-mode)
+         ;; (clojure-mode-hook . flycheck-mode)
+         (clojure-mode-hook . clj-refactor-mode)))
 
 (use-package ruby-mode
   :hook (ruby-mode-hook . flycheck-mode))
@@ -727,25 +793,16 @@ Info contains the connection type, project name and host:port endpoint."
 (use-package graphql-mode)
 
 (use-package purescript-mode
-  :hook (purescript-mode-hook . turn-on-purescript-indentation))
+  :hook ((purescript-mode-hook . turn-on-purescript-indentation)))
 
 (use-package psc-ide
-  :hook (purescript-mode-hook . psc-ide-mode))
-
-(use-package tide
-  :commands (tide-setup tide-hl-identifier-mode tide-format-before-save)
-  :after (typescript-mode company flycheck)
-  :custom
-  (typescript-indent-level 2))
+  :hook ((purescript-mode-hook . psc-ide-mode)))
 
 (use-package typescript-mode
-  :hook ((typescript-mode-hook . tide-setup)
-         (typescript-mode-hook . flycheck-mode)
-         (typescript-mode-hook . tide-hl-identifier-mode)
-         (before-save-hook . tide-format-before-save)))
+  :hook ((typescript-mode-hook . lsp)))
 
 (use-package flycheck
-  :hook (prog-mode-hook . flycheck-mode)
+  :hook ((prog-mode-hook . flycheck-mode))
   :custom
   (flycheck-indication-mode 'right-fringe)
   (flycheck-disabled-checkers '(emacs-lisp-checkdoc))
@@ -755,6 +812,7 @@ Info contains the connection type, project name and host:port endpoint."
     [16 48 112 240 112 48 16] nil nil 'center))
 
 (use-package rustic
+  :commands (rustic-mode)
   :hook ((rustic-mode-hook . lsp)
          (rustic-mode-hook . electric-pair-mode))
   :custom
@@ -762,9 +820,10 @@ Info contains the connection type, project name and host:port endpoint."
   (rustic-indent-method-chain t)
   (rustic-lsp-server 'rust-analyzer)
   (rustic-lsp-format t)
+  (rustic-lsp-client 'lsp)
   (rustic-indent-method-chain nil)
   :config
-  (setq-local indent-tabs-mode nil)
+  (setq indent-tabs-mode nil)
   (require 'lsp-rust)
   (setq lsp-rust-server 'rust-analyzer)
   (push 'rustic-clippy flycheck-checkers))
@@ -860,18 +919,22 @@ Info contains the connection type, project name and host:port endpoint."
   (("<f5>" . hydra-org-roam/body)
    ("C-c C" . org-roam-capture)))
 
+(use-package elfeed
+  :custom
+  (elfeed-feeds '("https://pluralistic.net/feed/")))
+
 (use-package telega
   :commands (telega
              telega-mode-line-mode
              telega-notifications-mode)
   :bind (("C-x M-t" . telega))
   :hook ((telega-chat-mode-hook . visual-line-mode))
-  :after (:and modus-themes company)
   :config
   (telega-mode-line-mode t)
   (telega-notifications-mode t)
-  (defadvice modus-themes-toggle (after clear-telega-icon-cache activate)
-    (setq telega-mode-line--logo-image-cache nil)))
+  (eval-after-load 'modus-themes
+    '(defadvice modus-themes-toggle (after clear-telega-icon-cache activate)
+       (setq telega-mode-line--logo-image-cache nil))))
 
 ;; (use-package smart-mode-line
 ;;   :custom
@@ -890,13 +953,13 @@ Info contains the connection type, project name and host:port endpoint."
   :hook ((after-init-hook . doom-modeline-mode)))
 
 (use-package markdown-mode
-  :hook (markdown-mode-hook . visual-line-mode))
+  :hook ((markdown-mode-hook . visual-line-mode)))
 
 (use-package all-the-icons)
 
 (use-package lpy
   :commands (lpy-mode)
-  :hook (python-mode-hook . lpy-mode))
+  :hook ((python-mode-hook . lpy-mode)))
 
 (use-package haskell-mode
   :hook ((haskell-mode-hook . electric-pair-mode)))

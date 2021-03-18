@@ -8,9 +8,7 @@
 ;;;
 ;;; Code:
 
-;; (setq comp-async-report-warnings-errors nil)
-;; (setq comp-bootstrap-deny-list '((regexp "sly.*\.el")))
-;; (setq byte-compile-warnings nil)
+(setq comp-async-report-warnings-errors nil)
 
 (setq straight-repository-branch "develop")
 (setq straight-vc-git-default-protocol 'ssh)
