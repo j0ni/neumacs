@@ -316,7 +316,7 @@ frames with exactly two windows."
   :custom
   (modus-themes-bold-constructs t)
   (modus-themes-slanted-constructs t)
-  (modus-themes-syntax nil) ;; 'faint
+  (modus-themes-syntax 'faint) ;; 'faint
   (modus-themes-fringes 'subtle)
   (modus-themes-completions 'opinionated)
   (modus-themes-scale-headings t)
@@ -333,20 +333,16 @@ frames with exactly two windows."
 (use-package gruvbox-theme)
 (use-package cyberpunk-theme)
 (use-package zerodark-theme)
-(use-package doom-themes)
+(use-package doom-themes
+  ;; :init
+  ;; (load-theme 'doom-old-hope t)
+  ;; (set-face-attribute 'default nil :background "#000000")
+  )
 
-;; (use-package almost-mono-themes
-;;   ;; :hook ((after-init-hook . (lambda () (load-theme 'almost-mono-black t))))
-;;   :config
-;;   (set-face-attribute 'bold nil :weight 'semibold)
-;;   (eval-after-load 'diff-hl
-;;     ;; colors from all 4 almost-mono-themes
-;;     '(let ((highlight "#fda50f")
-;;            (warning "#ff0000")
-;;            (success "#00ff00"))
-;;        (set-face-attribute 'diff-hl-insert nil :background success :foreground success)
-;;        (set-face-attribute 'diff-hl-delete nil :background warning :foreground warning)
-;;        (set-face-attribute 'diff-hl-change nil :background highlight :foreground highlight))))
+(use-package almost-mono-themes
+  :hook ((after-init-hook . (lambda () (load-theme 'almost-mono-black t))))
+  :config
+  (set-face-attribute 'bold nil :weight 'semibold))
 
 (use-package rainbow-mode
   :bind (("C-c r" . rainbow-mode)))
@@ -715,6 +711,11 @@ frames with exactly two windows."
 (use-package sly-quicklisp)
 (use-package sly-macrostep)
 (use-package sly-asdf)
+
+;; (use-package inf-clojure
+;;   :hook ((clojure-mode-hook . inf-clojure-minor-mode)
+;;          (inf-clojure-mode-hook . eldoc-mode)
+;;          (inf-clojure-mode-hook . enable-paredit-mode)))
 
 (use-package cider
   :commands (cider-mode)
