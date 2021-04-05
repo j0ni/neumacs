@@ -9,6 +9,8 @@
 ;;;
 ;;; Code:
 
+;; (debug-watch 'indent-tabs-mode)
+
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
 (require 'boot)
 
@@ -60,17 +62,18 @@
   (set-language-environment "UTF-8")
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
+  ;;(set-default-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
   (set-face-font 'variable-pitch "Lucida Grande-10" nil)
-  ;; (set-frame-font "Iosevka Snuggle Light-11" t t)
-  ;; (set-face-font 'fixed-pitch "Iosevka Snuggle Light-11" nil)
-  ;; (set-face-font 'fixed-pitch-serif "Iosevka Snuggle Light-11" nil)
-  ;; (set-frame-font "PragmataPro Liga-12" t t)
-  ;; (set-face-font 'fixed-pitch "PragmataPro Liga-12" nil)
-  ;; (set-face-font 'fixed-pitch-serif "PragmataPro Liga-12" nil)
-  (set-frame-font "Monoid-9" t t)
-  (set-face-font 'fixed-pitch "Monoid-9" nil)
-  (set-face-font 'fixed-pitch-serif "Monoid-9" nil)
+  (set-frame-font "Iosevka Snuggle Light-15" t t)
+  (set-face-font 'fixed-pitch "Iosevka Snuggle Light-15" nil)
+  (set-face-font 'fixed-pitch-serif "Iosevka Snuggle Light-15" nil)
+  ;; (set-frame-font "PragmataPro Liga-11" t t)
+  ;; (set-face-font 'fixed-pitch "PragmataPro Liga-11" nil)
+  ;; (set-face-font 'fixed-pitch-serif "PragmataPro Liga-11" nil)
+  (set-frame-font "Monoid-10" t t)
+  (set-face-font 'fixed-pitch "Monoid-10" nil)
+  (set-face-font 'fixed-pitch-serif "Monoid-10" nil)
   (set-fontset-font t 'unicode "Symbola" nil 'prepend)
   (when (string= system-type "gnu/linux")
     (setq x-super-keysym 'meta))
@@ -109,7 +112,7 @@
   (setq-default word-wrap nil)
   (setq-default indicate-buffer-boundaries 'left)
   (setq-default fill-column 80)
-  (setq-default line-spacing 2)
+  (setq-default line-spacing 1)
   (setq-default truncate-lines t)
   (defun j0ni/disable-truncate-lines ()
     (interactive)
@@ -316,22 +319,32 @@ frames with exactly two windows."
   :custom
   (modus-themes-bold-constructs t)
   (modus-themes-slanted-constructs t)
-  (modus-themes-syntax 'faint) ;; 'faint
+  (modus-themes-syntax nil) ;; 'faint
   (modus-themes-fringes 'subtle)
   (modus-themes-completions 'opinionated)
   (modus-themes-scale-headings t)
-  (modus-themes-mode-line '3d)
+  (modus-themes-mode-line nil)
   (modus-themes-paren-match 'intense-bold)
   :config
   ;; (load-theme 'modus-operandi t)
-  ;; (load-theme 'modus-vivendi t)
+  (load-theme 'modus-vivendi t)
   (set-face-attribute 'bold nil :weight 'semibold))
 
 (use-package hl-todo
   :hook ((after-init-hook . global-hl-todo-mode)))
 
+(use-package volatile-highlights
+  :ensure t
+  :config
+  (volatile-highlights-mode +1)
+  (diminish 'volatile-highlights-mode))
+
 (use-package gruvbox-theme)
-(use-package cyberpunk-theme)
+(use-package cyberpunk-theme
+  :init
+  ;; (load-theme 'cyberpunk t)
+  ;; (set-face-attribute 'default nil :background "#000000")
+  )
 (use-package zerodark-theme)
 (use-package doom-themes
   ;; :init
@@ -339,16 +352,27 @@ frames with exactly two windows."
   ;; (set-face-attribute 'default nil :background "#000000")
   )
 
+(use-package zenburn-theme)
+(use-package dracula-theme
+  ;; :init
+  ;; (load-theme 'dracula t)
+  ;; (set-face-attribute 'bold nil :weight 'semibold)
+  ;; (set-face-attribute 'default nil :background "#000000")
+  )
+
 (use-package almost-mono-themes
-  :hook ((after-init-hook . (lambda () (load-theme 'almost-mono-black t))))
-  :config
-  (set-face-attribute 'bold nil :weight 'semibold))
+  ;; :hook ((after-init-hook . (lambda () (load-theme 'almost-mono-black t))))
+  ;; :init
+  ;; (load-theme 'almost-mono-black t)
+  ;; (set-face-attribute 'bold nil :weight 'semibold)
+  )
 
 (use-package rainbow-mode
   :bind (("C-c r" . rainbow-mode)))
 
 (use-package rainbow-delimiters
-  :hook ((paredit-mode-hook . rainbow-delimiters-mode)))
+  ;; :hook ((paredit-mode-hook . rainbow-delimiters-mode))
+  )
 
 (use-package browse-at-remote)
 
@@ -389,6 +413,9 @@ frames with exactly two windows."
 
 (use-package dockerfile-mode)
 
+(use-package anzu
+  :hook ((after-init-mode . anzu-mode)))
+
 (use-package prescient
   :commands (prescient-persist-mode)
   :hook ((after-init-hook . prescient-persist-mode)))
@@ -398,150 +425,116 @@ frames with exactly two windows."
   :commands (company-prescient-mode)
   :hook ((company-mode-hook . company-prescient-mode)))
 
-(use-package ivy-prescient
-  :diminish
-  :after (ivy)
-  :hook (after-init-hook . ivy-prescient-mode))
-
-(use-package ivy
-  :diminish
+(use-package selectrum
+  ;; :hook ((after-init-hook . selectrum-mode))
+  :bind (:map selectrum-minibuffer-map
+              ("C-j" . selectrum-select-current-candidate))
   :custom
-  (ivy-height 15)
-  (ivy-wrap t)
-  (ivy-use-virtual-buffers t)
-  (ivy-extra-directories nil)
-  (confirm-nonexistent-file-or-buffer t)
-  :init
-  (ivy-mode 1)
-  (setq ivy-re-builders-alist
-        '((read-file-name-internal . ivy--regex-fuzzy)
-          (t . ivy--regex-plus)))
-  :bind (("C-x b" . ivy-switch-buffer)
-         ("C-c v" . ivy-push-view)
-         ("C-c V" . ivy-pop-view)
-         ("C-c C-r" . ivy-resume)))
+  (selectrum-max-window-height 15))
 
-(use-package hydra
-  :commands (hydra-add-imenu defhydra)
-  :hook (emacs-lisp-mode . hydra-add-imenu)
-  :init
-  (defhydra j0ni/hydra-navigate ()
-    "Navigate in a buffer more vimmily."
-    ("j" next-line "next line")
-    ("k" previous-line "previous line")
-    ("h" backward-char "backward char")
-    ("l" forward-char "forward char")
-    ("u" scroll-up-command "scroll up")
-    ("d" scroll-down-command "scroll down")
-    ("$" move-end-of-line "end of line")
-    ("#" goto-line "goto line")
-    ("x" nil "exit" :exit t))
-  :bind (("C-c h n" . j0ni/hydra-navigate/body)))
+(use-package orderless)
 
-(use-package ivy-hydra
-  :commands (hydra-ivy/body))
-
-(use-package swiper
-  :bind (("C-s" . swiper-isearch)
-         ("C-c u" . swiper-all)))
-
-(use-package counsel
-  :after (ivy)
-  :init
-  (counsel-mode 1)
-  :diminish
-  :bind (("M-x" . counsel-M-x)
-         ("C-x C-f" . counsel-find-file)
-         ("C-M-y" . counsel-yank-pop)
-         ("<f1> f" . counsel-describe-function)
-         ("<f1> v" . counsel-describe-variable)
-         ("<f1> l" . counsel-find-library)
-         ("<f2> i" . counsel-info-lookup-symbol)
-         ("<f2> u" . counsel-unicode-char)
-         ("<f2> j" . counsel-set-variable)
-         ;; ("C-c C" . counsel-compile)
-         ("C-c g" . counsel-git)
-         ("C-c i" . counsel-imenu)
-         ("C-c j" . counsel-git-grep)
-         ("C-c L" . counsel-git-log)
-         ("C-c k" . counsel-rg)
-         ;; ("C-c m" 'counsel-linux-app)
-         ("C-c n" . counsel-fzf)
-         ("C-x l" . counsel-locate)
-         ("C-c J" . counsel-file-jump)
-         ;; ("C-S-o" . counsel-rhythmbox)
-         ("C-c w" . counsel-wmctrl)
-         ("C-c b" . counsel-bookmark)
-         ("C-c d" . counsel-descbinds)
-         ("C-c o" . counsel-outline)
-         ("C-c t" . counsel-load-theme)
-         ("C-c F" . counsel-org-file)))
-
-(use-package counsel-jq)
-(use-package counsel-org-clock)
-
-(use-package ivy-rich
-  :diminish
-  :after (ivy)
-  :hook (after-init-hook . ivy-rich-mode)
+(use-package emacs
   :custom
-  (ivy-rich-display-transformers-list
-   '(ivy-switch-buffer
-     (:columns
-      ((ivy-rich-candidate (:width 60))
-       (ivy-rich-switch-buffer-size (:width 7))
-       (ivy-rich-switch-buffer-indicators (:width 4 :face error :align right))
-       (ivy-rich-switch-buffer-major-mode (:width 30 :face warning))
-       (ivy-rich-switch-buffer-project (:width 20 :face success))
-       (ivy-rich-switch-buffer-path
-        (:width (lambda (x) (ivy-rich-switch-buffer-shorten-path
-                             x (ivy-rich-minibuffer-width 0.4))))))
-      :predicate
-      (lambda (cand) (get-buffer cand)))
-     counsel-find-file
-     (:columns
-      ((ivy-read-file-transformer)
-       (ivy-rich-counsel-find-file-truename (:face font-lock-doc-face))))
-     counsel-M-x
-     (:columns
-      ((counsel-M-x-transformer (:width 60))
-       (ivy-rich-counsel-function-docstring (:face font-lock-doc-face))))
-     counsel-describe-function
-     (:columns
-      ((counsel-describe-function-transformer (:width 60))
-       (ivy-rich-counsel-function-docstring (:face font-lock-doc-face))))
-     counsel-describe-variable
-     (:columns
-      ((counsel-describe-variable-transformer (:width 60))
-       (ivy-rich-counsel-variable-docstring (:face font-lock-doc-face))))
-     counsel-recentf
-     (:columns
-      ((ivy-rich-candidate (:width 0.8))
-       (ivy-rich-file-last-modified-time (:face font-lock-comment-face))))
-     package-install
-     (:columns
-      ((ivy-rich-candidate (:width 60))
-       (ivy-rich-package-version (:width 16 :face font-lock-comment-face))
-       (ivy-rich-package-archive-summary (:width 7 :face font-lock-builtin-face))
-       (ivy-rich-package-install-summary (:face font-lock-doc-face))))))
-  :config
-  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
+  (completion-styles '(orderless partial-completion))
+  (completion-cycle-threshold 3)
+  (completion-flex-nospace nil)
+  (completion-pcm-complete-word-inserts-delimiters t)
+  (completion-pcm-word-delimiters "-_./:| ")
+  (completion-show-help nil)
+  (completion-auto-help nil)
+  ;; The following two are updated in Emacs 28.  They concern the
+  ;; *Completions* buffer.  Note that I actually do not use that buffer,
+  ;; because I rely on Embark's version of it.
+  (completions-format 'one-column)
+  (completions-detailed t)
+  (read-file-name-completion-ignore-case t)
+  (read-answer-short t)
+  :init
+  (setq completion-category-defaults nil)
+  (setq completion-ignore-case t)
+  (setq-default case-fold-search t)     ; For general regexp
+  (setq read-buffer-completion-ignore-case t)
+  (setq enable-recursive-minibuffers t)
+  (setq resize-mini-windows t)
+  (setq minibuffer-eldef-shorten-default t)
+  (setq echo-keystrokes 0.25)           ; from the C source code
 
-(use-package counsel-projectile
-  :diminish
-  :commands (counsel-projectile-mode)
-  :hook (after-init-hook . counsel-projectile-mode))
+  (file-name-shadow-mode 1)
+  (minibuffer-depth-indicate-mode 1)
+  (minibuffer-electric-default-mode 1))
+
+(use-package selectrum-prescient
+  ;; :hook ((after-init-hook . selectrum-prescient-mode))
+  )
+
+(use-package consult
+  :bind
+  (("C-x b" . consult-buffer)
+   ("C-s" . consult-line)
+   ("C-r" . consult-isearch)
+   ("C-c i" . consult-imenu))
+  :custom
+  (xref-show-xrefs-function #'consult-xref)
+  (xref-show-definitions-function #'consult-xref))
+
+(use-package marginalia
+  :hook ((after-init-hook . marginalia-mode))
+  :custom
+  (marginalia-annotators
+   '(marginalia-annotators-heavy marginalia-annotators-light)))
+
+(use-package embark
+  :custom
+  (embark-collect-initial-view-alist
+   '((file . list)
+     (buffer . list)
+     (symbol . list)
+     (line . list)
+     (xref-location . list)
+     (kill-ring . zebra)
+     (t . list)))
+  (embark-quit-after-action t)          ; XXX: Read the doc string!
+  (embark-collect-live-update-delay 0.5)
+  (embark-collect-live-initial-delay 1.5)
+  :init
+  (defun j0ni/switch-to-minibuffer ()
+    "Switch to minibuffer window."
+    (interactive)
+    (if (active-minibuffer-window)
+        (select-window (active-minibuffer-window))
+      (error "Minibuffer is not active")))
+  :hook ((minibuffer-setup-hook . embark-collect-completions-after-input)
+         (embark-post-action-hook . embark-collect--update-linked))
+  :bind (("C-," . embark-act)
+         :map minibuffer-local-completion-map
+         ("C-," . embark-act)
+         ("C->" . embark-become)
+         ("M-q" . embark-collect-toggle-view)
+         ("M-v" . embark-switch-to-collect-completions)
+         :map embark-collect-mode-map
+         ("C-," . embark-act)
+         ("," . embark-act)
+         ("M-q" . embark-collect-toggle-view)
+         ("C-c q" . j0ni/switch-to-minibuffer)
+         :map embark-region-map
+         ("i" . epa-import-keys-region)
+         ("s" . sort-lines)
+         :map embark-symbol-map
+         ("." . embark-find-definition)
+         ("k" . describe-keymap)))
+
+(use-package embark-consult
+  :hook ((embark-collect-mode-hook . embark-consult-preview-minor-mode)))
 
 (use-package browse-kill-ring
   :init
   (browse-kill-ring-default-keybindings))
 
-;; (use-package ctrlf
-;;   :hook ((after-init-hook . ctrlf-mode)))
-
 (use-package magit
   :custom
-  (magit-completing-read-function #'ivy-completing-read)
+  ;;(magit-completing-read-function #'ivy-completing-read)
+  ;;(magit-completing-read-function #'selectrum-completing-read)
   (magit-diff-refine-hunk t)
   (magit-bury-buffer-function #'magit-mode-quit-window)
   :bind (("C-x g" . magit-status)
@@ -551,15 +544,13 @@ frames with exactly two windows."
 (use-package gitconfig-mode)
 (use-package browse-at-remote)
 
-(use-package auto-highlight-symbol
-  :hook ((after-init-hook . global-auto-highlight-symbol-mode)))
+(use-package highlight-symbol
+  :hook ((prog-mode-hook . highlight-symbol-mode)))
 
 (use-package projectile
   :hook ((after-init-hook . projectile-mode))
-  :after (ivy)
   :diminish ""
   :custom
-  (projectile-completion-system 'ivy)
   (projectile-sort-order 'recently-active)
   :bind-keymap ("C-c p" . projectile-command-map))
 
@@ -569,7 +560,7 @@ frames with exactly two windows."
    'grep-find-command
    '("rg -n -H --no-heading -e '' $(git rev-parse --show-toplevel || pwd)" . 27)))
 
-(use-package projectile-ripgrep)
+;; (use-package projectile-ripgrep)
 
 ;; Useful knowledge, might deserve some extra binds
 
@@ -666,7 +657,7 @@ frames with exactly two windows."
   (lsp-signature-render-all t)
   (lsp-enable-symbol-highlighting t)
   (lsp-idle-delay 0.8)
-  ;; (lsp-lens-enable t)
+  (lsp-lens-enable t)
   (lsp-prefer-flymake nil)
   (lsp-file-watch-threshold 10000)
   (lsp-signature-auto-activate nil)
@@ -700,8 +691,6 @@ frames with exactly two windows."
         ("C-c l i" . lsp-ui-peek-find-implementation)
         ("C-c l d" . lsp-describe-thing-at-point)
         ("C-c l e" . lsp-execute-code-action)))
-
-(use-package lsp-ivy)
 
 (use-package sly
   :hook ((sly-mrepl-hook . company-mode))
@@ -750,8 +739,8 @@ Info contains the connection type, project name and host:port endpoint."
   (add-to-list 'cider-test-defining-forms "defruns")
   :bind
   (:map cider-repl-mode-map
-   ("RET" . cider-repl-newline-and-indent)
-   ("C-RET" . cider-repl-return)))
+        ("RET" . cider-repl-newline-and-indent)
+        ("C-RET" . cider-repl-return)))
 
 (use-package cider-eval-sexp-fu)
 
@@ -800,7 +789,10 @@ Info contains the connection type, project name and host:port endpoint."
   :hook ((purescript-mode-hook . psc-ide-mode)))
 
 (use-package typescript-mode
-  :hook ((typescript-mode-hook . lsp)))
+  :hook ((typescript-mode-hook . lsp-mode)))
+
+(use-package eros
+  :hook ((after-init-hook . eros-mode)))
 
 (use-package flycheck
   :hook ((prog-mode-hook . flycheck-mode))
@@ -814,7 +806,7 @@ Info contains the connection type, project name and host:port endpoint."
 
 (use-package rustic
   :commands (rustic-mode)
-  :hook ((rustic-mode-hook . lsp)
+  :hook ((rustic-mode-hook . lsp-mode)
          (rustic-mode-hook . electric-pair-mode))
   :custom
   (rustic-format-trigger 'on-save)
@@ -909,16 +901,17 @@ Info contains the connection type, project name and host:port endpoint."
   (org-roam-directory (expand-file-name "org-roam" org-directory))
   (org-roam-completion-system 'ivy)
   (org-roam-buffer-position 'bottom)
-  :init
-  (defhydra hydra-org-roam (:exit t :idle 0.8)
-    "Launcher for `org-roam'."
-    ("c" org-roam-capture "capture")
-    ("i" org-roam-insert "insert")
-    ("f" org-roam-find-file "find-file")
-    ("v" org-roam-buffer-activate "backlinks"))
-  :bind
-  (("<f5>" . hydra-org-roam/body)
-   ("C-c C" . org-roam-capture)))
+  ;; :init
+  ;; (defhydra hydra-org-roam (:exit t :idle 0.8)
+  ;;   "Launcher for `org-roam'."
+  ;;   ("c" org-roam-capture "capture")
+  ;;   ("i" org-roam-insert "insert")
+  ;;   ("f" org-roam-find-file "find-file")
+  ;;   ("v" org-roam-buffer-activate "backlinks"))
+  ;; :bind
+  ;; (("<f5>" . hydra-org-roam/body)
+  ;;  ("C-c C" . org-roam-capture))
+  )
 
 (use-package elfeed
   :custom
@@ -936,15 +929,6 @@ Info contains the connection type, project name and host:port endpoint."
   (eval-after-load 'modus-themes
     '(defadvice modus-themes-toggle (after clear-telega-icon-cache activate)
        (setq telega-mode-line--logo-image-cache nil))))
-
-;; (use-package smart-mode-line
-;;   :custom
-;;   (sml/theme 'respectful)
-;;   (sml/shorten-directory t)
-;;   (sml/shorten-modes t)
-;;   (sml/extra-filler -2)
-;;   :init
-;;   (sml/setup))
 
 (use-package doom-modeline
   :init
