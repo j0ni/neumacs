@@ -327,7 +327,7 @@ frames with exactly two windows."
   (modus-themes-paren-match 'intense-bold)
   :config
   ;; (load-theme 'modus-operandi t)
-  (load-theme 'modus-vivendi t)
+  ;; (load-theme 'modus-vivendi t)
   (set-face-attribute 'bold nil :weight 'semibold))
 
 (use-package hl-todo
@@ -354,11 +354,10 @@ frames with exactly two windows."
 
 (use-package zenburn-theme)
 (use-package dracula-theme
-  ;; :init
-  ;; (load-theme 'dracula t)
-  ;; (set-face-attribute 'bold nil :weight 'semibold)
-  ;; (set-face-attribute 'default nil :background "#000000")
-  )
+  :init
+  (load-theme 'dracula t)
+  (set-face-attribute 'bold nil :weight 'semibold)
+  (set-face-attribute 'default nil :background "#000000"))
 
 (use-package almost-mono-themes
   ;; :hook ((after-init-hook . (lambda () (load-theme 'almost-mono-black t))))
@@ -426,17 +425,14 @@ frames with exactly two windows."
   :hook ((company-mode-hook . company-prescient-mode)))
 
 (use-package selectrum
-  ;; :hook ((after-init-hook . selectrum-mode))
+  :hook ((after-init-hook . selectrum-mode))
   :bind (:map selectrum-minibuffer-map
               ("C-j" . selectrum-select-current-candidate))
   :custom
   (selectrum-max-window-height 15))
 
-(use-package orderless)
-
 (use-package emacs
   :custom
-  (completion-styles '(orderless partial-completion))
   (completion-cycle-threshold 3)
   (completion-flex-nospace nil)
   (completion-pcm-complete-word-inserts-delimiters t)
@@ -444,8 +440,7 @@ frames with exactly two windows."
   (completion-show-help nil)
   (completion-auto-help nil)
   ;; The following two are updated in Emacs 28.  They concern the
-  ;; *Completions* buffer.  Note that I actually do not use that buffer,
-  ;; because I rely on Embark's version of it.
+  ;; *Completions* buffer.
   (completions-format 'one-column)
   (completions-detailed t)
   (read-file-name-completion-ignore-case t)
@@ -465,8 +460,7 @@ frames with exactly two windows."
   (minibuffer-electric-default-mode 1))
 
 (use-package selectrum-prescient
-  ;; :hook ((after-init-hook . selectrum-prescient-mode))
-  )
+  :hook ((after-init-hook . selectrum-prescient-mode)))
 
 (use-package consult
   :bind
@@ -496,30 +490,18 @@ frames with exactly two windows."
      (t . list)))
   (embark-quit-after-action t)          ; XXX: Read the doc string!
   (embark-collect-live-update-delay 0.5)
-  (embark-collect-live-initial-delay 1.5)
-  :init
-  (defun j0ni/switch-to-minibuffer ()
-    "Switch to minibuffer window."
-    (interactive)
-    (if (active-minibuffer-window)
-        (select-window (active-minibuffer-window))
-      (error "Minibuffer is not active")))
-  :hook ((minibuffer-setup-hook . embark-collect-completions-after-input)
-         (embark-post-action-hook . embark-collect--update-linked))
+  (embark-collect-live-initial-delay 5.0)
+  ;; :hook ((minibuffer-setup-hook . embark-collect-completions-after-input)
+  ;;        (embark-post-action-hook . embark-collect--update-linked))
   :bind (("C-," . embark-act)
          :map minibuffer-local-completion-map
          ("C-," . embark-act)
          ("C->" . embark-become)
-         ("M-q" . embark-collect-toggle-view)
          ("M-v" . embark-switch-to-collect-completions)
          :map embark-collect-mode-map
          ("C-," . embark-act)
          ("," . embark-act)
          ("M-q" . embark-collect-toggle-view)
-         ("C-c q" . j0ni/switch-to-minibuffer)
-         :map embark-region-map
-         ("i" . epa-import-keys-region)
-         ("s" . sort-lines)
          :map embark-symbol-map
          ("." . embark-find-definition)
          ("k" . describe-keymap)))
@@ -534,7 +516,7 @@ frames with exactly two windows."
 (use-package magit
   :custom
   ;;(magit-completing-read-function #'ivy-completing-read)
-  ;;(magit-completing-read-function #'selectrum-completing-read)
+  (magit-completing-read-function #'selectrum-completing-read)
   (magit-diff-refine-hunk t)
   (magit-bury-buffer-function #'magit-mode-quit-window)
   :bind (("C-x g" . magit-status)
@@ -634,17 +616,7 @@ frames with exactly two windows."
 (use-package restclient)
 
 (use-package lsp-mode
-  :hook ((clojure-mode-hook . lsp)
-         (clojurescript-mode-hook . lsp)
-         (clojurec-mode-hook . lsp))
   :commands (lsp lsp-register-custom-settings lsp-deferred)
-  :config
-  (setq cljr-add-ns-to-blank-clj-files nil)
-  (dolist (m '(clojure-mode
-               clojurec-mode
-               clojurescript-mode
-               clojurex-mode))
-    (add-to-list 'lsp-language-id-configuration `(,m . "clojure")))
   :custom
   (lsp-enable-indentation t)
   (lsp-enable-completion-at-point t)
@@ -761,8 +733,16 @@ Info contains the connection type, project name and host:port endpoint."
   (cljr-add-keybindings-with-prefix "C-c C-j"))
 
 (use-package clojure-mode
-  ;; :config
-  ;; (require 'flycheck-clj-kondo)
+  :init
+  (require 'lsp-mode)
+  (setq cljr-add-ns-to-blank-clj-files nil)
+  (dolist (m '(clojure-mode
+               clojurec-mode
+               clojurescript-mode
+               clojurex-mode))
+    ;; should be loaded because :after (lsp-mode)
+    (add-to-list 'lsp-language-id-configuration `(,m . "clojure"))
+    (add-hook (make-symbol (concat (symbol-name m) "-hook")) 'lsp))
   :hook ((clojure-mode-hook . enable-paredit-mode)
          (clojure-mode-hook . subword-mode)
          (clojure-mode-hook . cider-mode)
@@ -789,7 +769,8 @@ Info contains the connection type, project name and host:port endpoint."
   :hook ((purescript-mode-hook . psc-ide-mode)))
 
 (use-package typescript-mode
-  :hook ((typescript-mode-hook . lsp-mode)))
+  :after (lsp-mode)
+  :hook ((typescript-mode-hook . lsp)))
 
 (use-package eros
   :hook ((after-init-hook . eros-mode)))
@@ -806,7 +787,7 @@ Info contains the connection type, project name and host:port endpoint."
 
 (use-package rustic
   :commands (rustic-mode)
-  :hook ((rustic-mode-hook . lsp-mode)
+  :hook ((rustic-mode-hook . lsp)
          (rustic-mode-hook . electric-pair-mode))
   :custom
   (rustic-format-trigger 'on-save)
