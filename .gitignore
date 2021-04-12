@@ -24,3 +24,7 @@
 /history
 /semanticdb
 /eshell
+.cache/
+/amx-items
+/session.*
+/smex-items
