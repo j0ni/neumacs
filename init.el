@@ -14,6 +14,8 @@
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
 (require 'boot)
 
+(defvar j0ni/font nil "Should be a string like \"Fira Code-11\" or such.")
+
 (use-package emacs
   :hook ((before-save-hook . delete-trailing-whitespace)
          (prog-mode-hook . whitespace-mode)
@@ -57,23 +59,26 @@
   (setq-default browse-url-browser-function
                 (cl-case system-type
                   ((darwin macos) 'browse-url-default-macosx-browser)
-                  (t 'browse-url-firefox)))
+                  (t 'browse-url-default-browser)))
   (defalias 'yes-or-no-p 'y-or-n-p)
   (set-language-environment "UTF-8")
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
   ;;(set-default-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
+  (setq j0ni/font "Monoid-10")
+  (setq j0ni/font "PT Mono-11")
+  (setq j0ni/font "Monoisome-10")
+  ;; (setq j0ni/font "Lucida Grande Mono-11")
+  ;; (setq j0ni/font "Lucida Console Patched-11")
+  ;; (setq j0ni/font "Iosevka Snuggle Light-11")
+;;  (setq j0ni/font "PragmataPro Liga-11")
+  ;; (setq j0ni/font "Fira Code-10")
   (set-face-font 'variable-pitch "Lucida Grande-10" nil)
-  (set-frame-font "Iosevka Snuggle Light-15" t t)
-  (set-face-font 'fixed-pitch "Iosevka Snuggle Light-15" nil)
-  (set-face-font 'fixed-pitch-serif "Iosevka Snuggle Light-15" nil)
-  ;; (set-frame-font "PragmataPro Liga-11" t t)
-  ;; (set-face-font 'fixed-pitch "PragmataPro Liga-11" nil)
-  ;; (set-face-font 'fixed-pitch-serif "PragmataPro Liga-11" nil)
-  (set-frame-font "Monoid-10" t t)
-  (set-face-font 'fixed-pitch "Monoid-10" nil)
-  (set-face-font 'fixed-pitch-serif "Monoid-10" nil)
+  (set-frame-font j0ni/font t t)
+  (set-face-font 'fixed-pitch j0ni/font nil)
+  (set-face-font 'fixed-pitch-serif j0ni/font nil)
+  (setq line-spacing 0)
   (set-fontset-font t 'unicode "Symbola" nil 'prepend)
   (when (string= system-type "gnu/linux")
     (setq x-super-keysym 'meta))
@@ -212,45 +217,264 @@ frames with exactly two windows."
          ("C-=" . text-scale-increase)
          ("C--" . text-scale-decrease)))
 
+(defvar pragmata-pro-ligatures
+  (mapcar #'car
+          '(("[ERROR]"    #XE2C0)
+            ("[DEBUG]"    #XE2C1)
+            ("[INFO]"     #XE2C2)
+            ("[WARN]"     #XE2C3)
+            ("[WARNING]"  #XE2C4)
+            ("[ERR]"      #XE2C5)
+            ("[FATAL]"    #XE2C6)
+            ("[TRACE]"    #XE2C7)
+            ("[FIXME]"    #XE2C8)
+            ("[TODO]"     #XE2C9)
+            ("[BUG]"      #XE2CA)
+            ("[NOTE]"     #XE2CB)
+            ("[HACK]"     #XE2CC)
+            ("[MARK]"     #XE2CD)
+            ("# ERROR"    #XE2F0)
+            ("# DEBUG"    #XE2F1)
+            ("# INFO"     #XE2F2)
+            ("# WARN"     #XE2F3)
+            ("# WARNING"  #XE2F4)
+            ("# ERR"      #XE2F5)
+            ("# FATAL"    #XE2F6)
+            ("# TRACE"    #XE2F7)
+            ("# FIXME"    #XE2F8)
+            ("# TODO"     #XE2F9)
+            ("# BUG"      #XE2FA)
+            ("# NOTE"     #XE2FB)
+            ("# HACK"     #XE2FC)
+            ("# MARK"     #XE2FD)
+            ("// ERROR"   #XE2E0)
+            ("// DEBUG"   #XE2E1)
+            ("// INFO"    #XE2E2)
+            ("// WARN"    #XE2E3)
+            ("// WARNING" #XE2E4)
+            ("// ERR"     #XE2E5)
+            ("// FATAL"   #XE2E6)
+            ("// TRACE"   #XE2E7)
+            ("// FIXME"   #XE2E8)
+            ("// TODO"    #XE2E9)
+            ("// BUG"     #XE2EA)
+            ("// NOTE"    #XE2EB)
+            ("// HACK"    #XE2EC)
+            ("// MARK"    #XE2ED)
+            ("!!"         #XE900)
+            ("!="         #XE901)
+            ("!=="        #XE902)
+            ("!!!"        #XE903)
+            ("!≡"         #XE904)
+            ("!≡≡"        #XE905)
+            ("!>"         #XE906)
+            ("!=<"        #XE907)
+            ("#("         #XE920)
+            ("#_"         #XE921)
+            ("#{"         #XE922)
+            ("#?"         #XE923)
+            ("#>"         #XE924)
+            ("##"         #XE925)
+            ("#_("        #XE926)
+            ("%="         #XE930)
+            ("%>"         #XE931)
+            ("%>%"        #XE932)
+            ("%<%"        #XE933)
+            ("&%"         #XE940)
+            ("&&"         #XE941)
+            ("&*"         #XE942)
+            ("&+"         #XE943)
+            ("&-"         #XE944)
+            ("&/"         #XE945)
+            ("&="         #XE946)
+            ("&&&"        #XE947)
+            ("&>"         #XE948)
+            ("$>"         #XE955)
+            ("***"        #XE960)
+            ("*="         #XE961)
+            ("*/"         #XE962)
+            ("*>"         #XE963)
+            ("++"         #XE970)
+            ("+++"        #XE971)
+            ("+="         #XE972)
+            ("+>"         #XE973)
+            ("++="        #XE974)
+            ("--"         #XE980)
+            ("-<"         #XE981)
+            ("-<<"        #XE982)
+            ("-="         #XE983)
+            ("->"         #XE984)
+            ("->>"        #XE985)
+            ("---"        #XE986)
+            ("-->"        #XE987)
+            ("-+-"        #XE988)
+            ("-\\/"       #XE989)
+            ("-|>"        #XE98A)
+            ("-<|"        #XE98B)
+            (".."         #XE990)
+            ("..."        #XE991)
+            ("..<"        #XE992)
+            (".>"         #XE993)
+            (".~"         #XE994)
+            (".="         #XE995)
+            ("/*"         #XE9A0)
+            ("//"         #XE9A1)
+            ("/>"         #XE9A2)
+            ("/="         #XE9A3)
+            ("/=="        #XE9A4)
+            ("///"        #XE9A5)
+            ("/**"        #XE9A6)
+            (":::"        #XE9AF)
+            ("::"         #XE9B0)
+            (":="         #XE9B1)
+            (":≡"         #XE9B2)
+            (":>"         #XE9B3)
+            (":=>"        #XE9B4)
+            (":("         #XE9B5)
+            (":-("        #XE9B6)
+            (":)"         #XE9B7)
+            (":-)"        #XE9B8)
+            (":/"         #XE9B9)
+            (":\\"        #XE9BA)
+            (":3"         #XE9BB)
+            (":D"         #XE9BC)
+            (":P"         #XE9BD)
+            (":>:"        #XE9BE)
+            (":<:"        #XE9BF)
+            ("<$>"        #XE9C0)
+            ("<*"         #XE9C1)
+            ("<*>"        #XE9C2)
+            ("<+>"        #XE9C3)
+            ("<-"         #XE9C4)
+            ("<<"         #XE9C5)
+            ("<<<"        #XE9C6)
+            ("<<="        #XE9C7)
+            ("<="         #XE9C8)
+            ("<=>"        #XE9C9)
+            ("<>"         #XE9CA)
+            ("<|>"        #XE9CB)
+            ("<<-"        #XE9CC)
+            ("<|"         #XE9CD)
+            ("<=<"        #XE9CE)
+            ("<~"         #XE9CF)
+            ("<~~"        #XE9D0)
+            ("<<~"        #XE9D1)
+            ("<$"         #XE9D2)
+            ("<+"         #XE9D3)
+            ("<!>"        #XE9D4)
+            ("<@>"        #XE9D5)
+            ("<#>"        #XE9D6)
+            ("<%>"        #XE9D7)
+            ("<^>"        #XE9D8)
+            ("<&>"        #XE9D9)
+            ("<?>"        #XE9DA)
+            ("<.>"        #XE9DB)
+            ("</>"        #XE9DC)
+            ("<\\>"       #XE9DD)
+            ("<\">"       #XE9DE)
+            ("<:>"        #XE9DF)
+            ("<~>"        #XE9E0)
+            ("<**>"       #XE9E1)
+            ("<<^"        #XE9E2)
+            ("<!"         #XE9E3)
+            ("<@"         #XE9E4)
+            ("<#"         #XE9E5)
+            ("<%"         #XE9E6)
+            ("<^"         #XE9E7)
+            ("<&"         #XE9E8)
+            ("<?"         #XE9E9)
+            ("<."         #XE9EA)
+            ("</"         #XE9EB)
+            ("<\\"        #XE9EC)
+            ("<\""        #XE9ED)
+            ("<:"         #XE9EE)
+            ("<->"        #XE9EF)
+            ("<!--"       #XE9F0)
+            ("<--"        #XE9F1)
+            ("<~<"        #XE9F2)
+            ("<==>"       #XE9F3)
+            ("<|-"        #XE9F4)
+            ("<<|"        #XE9F5)
+            ("<-<"        #XE9F7)
+            ("<-->"       #XE9F8)
+            ("<<=="       #XE9F9)
+            ("<=="        #XE9FA)
+            ("=<<"        #XEA00)
+            ("=="         #XEA01)
+            ("==="        #XEA02)
+            ("==>"        #XEA03)
+            ("=>"         #XEA04)
+            ("=~"         #XEA05)
+            ("=>>"        #XEA06)
+            ("=/="        #XEA07)
+            ("=~="        #XEA08)
+            ("==>>"       #XEA09)
+            ("≡≡"         #XEA10)
+            ("≡≡≡"        #XEA11)
+            ("≡:≡"        #XEA12)
+            (">-"         #XEA20)
+            (">="         #XEA21)
+            (">>"         #XEA22)
+            (">>-"        #XEA23)
+            (">>="        #XEA24)
+            (">>>"        #XEA25)
+            (">=>"        #XEA26)
+            (">>^"        #XEA27)
+            (">>|"        #XEA28)
+            (">!="        #XEA29)
+            (">->"        #XEA2A)
+            ("??"         #XEA40)
+            ("?~"         #XEA41)
+            ("?="         #XEA42)
+            ("?>"         #XEA43)
+            ("???"        #XEA44)
+            ("?."         #XEA45)
+            ("^="         #XEA48)
+            ("^."         #XEA49)
+            ("^?"         #XEA4A)
+            ("^.."        #XEA4B)
+            ("^<<"        #XEA4C)
+            ("^>>"        #XEA4D)
+            ("^>"         #XEA4E)
+            ("\\\\"       #XEA50)
+            ("\\>"        #XEA51)
+            ("\\/-"       #XEA52)
+            ("@>"         #XEA57)
+            ("|="         #XEA60)
+            ("||"         #XEA61)
+            ("|>"         #XEA62)
+            ("|||"        #XEA63)
+            ("|+|"        #XEA64)
+            ("|->"        #XEA65)
+            ("|-->"       #XEA66)
+            ("|=>"        #XEA67)
+            ("|==>"       #XEA68)
+            ("|>-"        #XEA69)
+            ("|<<"        #XEA6A)
+            ("||>"        #XEA6B)
+            ("|>>"        #XEA6C)
+            ("|-"         #XEA6D)
+            ("||-"        #XEA6E)
+            ("~="         #XEA70)
+            ("~>"         #XEA71)
+            ("~~>"        #XEA72)
+            ("~>>"        #XEA73)
+            ("[["         #XEA80)
+            ("]]"         #XEA81)
+            ("\">"        #XEA90)
+            ("_|_"        #XEA97))))
+
 (use-package ligature
   :commands (ligature-set-ligatures)
   :straight (ligature :type git :host github :repo "mickeynp/ligature.el")
   :config
-  ;; use the non-annoying subset of the list found here:
-  ;; https://github.com/fabrizioschiavi/pragmatapro/blob/master/emacs_snippets/pragmatapro-prettify-symbols-v0.828.el
-  (ligature-set-ligatures 'prog-mode
-                          '("!!" "!=" "!==" "!!!" "!≡" "!≡≡" "!>" "!=<" "#(" "#_" "#{"
-                            "#?" "#>" "##" "#_(" "%=" "%>" "%>%" "%<%" "&%" "&&" "&*"
-                            "&+" "&-" "&/" "&=" "&&&" "&>" "$>" "***" "*=" "*/" "*>"
-                            "++" "+++" "+=" "+>" "++=" "--" "-<" "-<<" "-=" "->" "->>"
-                            "---" "-->" "-+-" "-\\/" "-|>" "-<|" ".." "..." "..<" ".>"
-                            ".~" ".=" "/*" "//" "/>" "/=" "/==" "///" "/**" ":::" "::"
-                            ":=" ":≡" ":>" ":=>" ":(" ":-(" ":)" ":-)" ":/" ":\\" ":3"
-                            ":D" ":P" ":>:" ":<:" "<$>" "<*" "<*>" "<+>" "<-" "<<" "<<<"
-                            "<<=" "<=" "<=>" "<>" "<|>" "<<-" "<|" "<=<" "<~" "<~~" "<<~"
-                            "<$" "<+" "<!>" "<@>" "<#>" "<%>" "<^>" "<&>" "<?>" "<.>"
-                            "</>" "<\\>" "<\">" "<:>" "<~>" "<**>" "<<^" "<!" "<@" "<#"
-                            "<%" "<^" "<&" "<?" "<." "</" "<\\" "<\"" "<:" "<->" "<!--"
-                            "<--" "<~<" "<==>" "<|-" "<<|" "<-<" "<-->" "<<==" "<=="
-                            "=<<" "==" "===" "==>" "=>" "=~" "=>>" "=/=" "=~=" "==>>"
-                            "≡≡" "≡≡≡" "≡:≡" ">-" ">=" ">>" ">>-" ">>=" ">>>" ">=>"
-                            ">>^" ">>|" ">!=" ">->" "??" "?~" "?=" "?>" "???" "?." "^="
-                            "^." "^?" "^.." "^<<" "^>>" "^>" "\\\\" "\\>" "\\/-" "@>"
-                            "|=" "||" "|>" "|||" "|+|" "|->" "|-->" "|=>" "|==>" "|>-"
-                            "|<<" "||>" "|>>" "|-" "||-" "~=" "~>" "~~>" "~>>" "[[" "]]"
-                            "\">" "_|_"))
-  ;; Iosevka
-  ;; (ligature-set-ligatures 'prog-mode
-  ;;                         '("<---" "<--"  "<<-" "<-" "->" "-->" "--->" "<->" "<-->"
-  ;;                           "<--->" "<---->" "<!--" "<==" "<===" "<=" "=>" "=>>" "==>"
-  ;;                           "===>" ">=" "<=>" "<==>" "<===>" "<====>" "<!---" "<~~" "<~"
-  ;;                           "~>" "~~>" "::" ":::" "==" "!=" "===" "!==" ":=" ":-" ":+"
-  ;;                           "<*" "<*>" "*>" "<|" "<|>" "|>" "+:" "-:" "=:" "<******>"
-  ;;                           "++" "+++"))
-
-
+  ;; Cascadia Code
+  ;; (ligature-set-ligatures
+  ;;  'prog-mode '("=:=" "==>" "=<<" "!!." ">>=" "->>" "-->"
+  ;;               "<==" "<=>" "<--" "<<-" "::" ":=" "=>" "!="
+  ;;               "--" ">=" ">>" "->" "<=" "<-" "<<" ".." "/*" "//" "__"))
+  (ligature-set-ligatures 'prog-mode pragmata-pro-ligatures)
   :hook ((prog-mode-hook . ligature-mode)))
-
 
 (use-package ibuffer
   :bind (("C-x C-b" . ibuffer))
@@ -345,7 +569,7 @@ frames with exactly two windows."
 
 (use-package gruvbox-theme)
 (use-package cyberpunk-theme
-  :init
+  ;; :init
   ;; (load-theme 'cyberpunk t)
   ;; (set-face-attribute 'default nil :background "#000000")
   )
@@ -407,7 +631,7 @@ frames with exactly two windows."
   :custom
   (company-global-modes '(not org-mode))
   (company-tooltip-align-annotations t)
-  (company-minimum-prefix-length 2)
+  (company-minimum-prefix-length 1)
   (company-idle-delay 1.0)
   (company-tooltip-idle-delay 1.0)
   (company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
@@ -424,169 +648,166 @@ frames with exactly two windows."
   :config
   (push 'company-elisp company-backends))
 
-;; (use-package prescient :diminish "")
-;; (use-package company-prescient :diminish "")
+(use-package prescient :diminish "")
+(use-package company-prescient :diminish "")
 
-(use-package orderless
-  :diminish ""
-  :custom
-  (orderless-component-separator " +"))
-
-(use-package ivy
-  :diminish
-  :custom
-  (ivy-height 15)
-  (ivy-wrap t)
-  (ivy-use-virtual-buffers t)
-  (ivy-extra-directories nil)
-  (confirm-nonexistent-file-or-buffer t)
-  :init
-  (ivy-mode 1)
-  (setq ivy-re-builders-alist
-        '((read-file-name-internal . ivy--regex-fuzzy)
-          (t . ivy--regex-plus)))
-  (setq completion-styles '(orderless partial-completion))
-  (setq completion-category-overrides
-        '((buffer (styles . (substring flex orderless)))
-          (file (styles . (partial-completion orderless)))))
-  (setq completion-cycle-threshold 3)
-  (setq completion-flex-nospace nil)
-  (setq completion-pcm-complete-word-inserts-delimiters t)
-  (setq completion-pcm-word-delimiters "-_./:| ")
-  (setq completion-show-help nil)
-  (setq completion-auto-help nil)
-  (setq completions-format 'one-column)
-  (setq completions-detailed t)
-  (setq read-file-name-completion-ignore-case t)
-  (setq read-answer-short t)
-  (setq completion-category-defaults nil)
-  (setq completion-ignore-case t)
-  (setq-default case-fold-search t)     ; For general regexp
-  (setq read-buffer-completion-ignore-case t)
-  (setq enable-recursive-minibuffers t)
-  (setq resize-mini-windows t)
-  (setq minibuffer-eldef-shorten-default t)
-  (setq echo-keystrokes 0.25)           ; from the C source code
-  :bind (("C-x b" . ivy-switch-buffer)
-         ("C-c v" . ivy-push-view)
-         ("C-c V" . ivy-pop-view)
-         ("C-c C-r" . ivy-resume)))
-
-(use-package hydra
-  :commands (hydra-add-imenu)
-  :hook (emacs-lisp-mode . hydra-add-imenu))
-
-(use-package ivy-hydra
-  :commands (hydra-ivy/body))
-
-(use-package swiper
-  :bind (("C-s" . swiper-isearch)
-         ("C-c u" . swiper-all)))
-
-(use-package counsel
-  :after (ivy)
-  :init
-  (counsel-mode 1)
-  :diminish
-  :bind (("M-x" . counsel-M-x)
-         ("C-x C-f" . counsel-find-file)
-         ("C-M-y" . counsel-yank-pop)
-         ("<f1> f" . counsel-describe-function)
-         ("<f1> v" . counsel-describe-variable)
-         ("<f1> l" . counsel-find-library)
-         ("<f2> i" . counsel-info-lookup-symbol)
-         ("<f2> u" . counsel-unicode-char)
-         ("<f2> j" . counsel-set-variable)
-         ("C-c C" . counsel-compile)
-         ("C-c g" . counsel-git)
-         ("C-c j" . counsel-git-grep)
-         ("C-c L" . counsel-git-log)
-         ("C-c k" . counsel-rg)
-         ;; ("C-c m" 'counsel-linux-app)
-         ("C-c n" . counsel-fzf)
-         ("C-x l" . counsel-locate)
-         ("C-c J" . counsel-file-jump)
-         ;; ("C-S-o" . counsel-rhythmbox)
-         ("C-c w" . counsel-wmctrl)
-         ("C-c b" . counsel-bookmark)
-         ("C-c d" . counsel-descbinds)
-         ("C-c o" . counsel-outline)
-         ("C-c t" . counsel-load-theme)
-         ("C-c F" . counsel-org-file)))
-
-(use-package counsel-jq)
-(use-package counsel-org-clock)
-
-(use-package counsel-projectile
-  :diminish
-  :commands (counsel-projectile-mode)
-  :hook (after-init-hook . counsel-projectile-mode))
-
-;; (use-package selectrum
-;;   :init
-;;   (defun j0ni/selectrum-display-action (buf alist)
-;;     "Display BUF in a temporary buffer.
-;; Can be used as `selectrum-display-action' to display candidates
-;; vin a single window spanning the current frame:
-
-;;     (setq selectrum-display-action
-;;         \\='(selectrum-display-full-frame)."
-;;     (let ((alist (->> alist
-;;                    (cons '(direction . bottom))
-;;                    (cons '(window . main)))))
-;;       (display-buffer-in-direction buf alist)))
-;;   ;; (setq display-buffer-alist nil)
-;;   ;; (setq display-buffer-alist
-;;   ;;       (cons '("\*selectrum\*" display-buffer-at-bottom) display-buffer-alist))
+;; (use-package orderless
 ;;   :diminish ""
-;;   :bind (:map selectrum-minibuffer-map
-;;               ("C-j" . selectrum-select-current-candidate))
 ;;   :custom
-;;   ;; (selectrum-display-action #'j0ni/selectrum-display-action)
-;;   (selectrum-max-window-height 15)
-;;   (selectrum-extend-current-candidate-highlight t))
+;;   (orderless-component-separator " +"))
 
-;; ;; (use-package selectrum-prescient :diminish "")
-
-;; (use-package consult
-;;   :bind
-;;   (("C-x b" . consult-buffer)
-;;    ("C-s" . consult-line)
-;;    ("C-r" . consult-isearch)
-;;    ("C-c i" . consult-imenu)
-;;    ("C-c C-s" . consult-ripgrep)
-;;    :map projectile-command-map
-;;    ("s r" . consult-ripgrep))
+;; (use-package ivy
+;;   :diminish
 ;;   :custom
-;;   ;; disable preview
-;;   (consult-project-root-function #'ffip-get-project-root-directory)
-;;   (consult-preview-key nil)
-;;   (xref-show-xrefs-function #'consult-xref)
-;;   (xref-show-definitions-function #'consult-xref))
+;;   (ivy-height 15)
+;;   (ivy-wrap t)
+;;   (ivy-use-virtual-buffers t)
+;;   (ivy-extra-directories nil)
+;;   (confirm-nonexistent-file-or-buffer t)
+;;   :init
+;;   (ivy-mode 1)
+;;   (setq ivy-re-builders-alist
+;;         '((read-file-name-internal . ivy--regex-fuzzy)
+;;           (t . ivy--regex-plus)))
+;;   (setq completion-cycle-threshold 3)
+;;   (setq completion-flex-nospace nil)
+;;   (setq completion-pcm-complete-word-inserts-delimiters t)
+;;   (setq completion-pcm-word-delimiters "-_./:| ")
+;;   (setq completion-show-help nil)
+;;   (setq completion-auto-help nil)
+;;   (setq completions-format 'one-column)
+;;   (setq completions-detailed t)
+;;   (setq read-file-name-completion-ignore-case t)
+;;   (setq read-answer-short t)
+;;   (setq completion-category-defaults nil)
+;;   (setq completion-ignore-case t)
+;;   (setq-default case-fold-search t)     ; For general regexp
+;;   (setq read-buffer-completion-ignore-case t)
+;;   (setq enable-recursive-minibuffers t)
+;;   (setq resize-mini-windows t)
+;;   (setq minibuffer-eldef-shorten-default t)
+;;   (setq echo-keystrokes 0.25)           ; from the C source code
+;;   :bind (("C-x b" . ivy-switch-buffer)
+;;          ("C-c v" . ivy-push-view)
+;;          ("C-c V" . ivy-pop-view)
+;;          ("C-c C-r" . ivy-resume)))
+
+;; (use-package hydra
+;;   :commands (hydra-add-imenu)
+;;   :hook (emacs-lisp-mode . hydra-add-imenu))
+
+;; (use-package ivy-hydra
+;;   :commands (hydra-ivy/body))
+
+;; (use-package swiper
+;;   :bind (("C-s" . swiper-isearch)
+;;          ("C-c u" . swiper-all)))
+
+;; (use-package counsel
+;;   :after (ivy)
+;;   :init
+;;   (counsel-mode 1)
+;;   :diminish
+;;   :bind (
+;;          ;; ("M-x" . counsel-M-x)
+;;          ("C-x C-f" . counsel-find-file)
+;;          ("C-M-y" . counsel-yank-pop)
+;;          ("<f1> f" . counsel-describe-function)
+;;          ("<f1> v" . counsel-describe-variable)
+;;          ("<f1> l" . counsel-find-library)
+;;          ("<f2> i" . counsel-info-lookup-symbol)
+;;          ("<f2> u" . counsel-unicode-char)
+;;          ("<f2> j" . counsel-set-variable)
+;;          ("C-c C" . counsel-compile)
+;;          ("C-c g" . counsel-git)
+;;          ("C-c j" . counsel-git-grep)
+;;          ("C-c L" . counsel-git-log)
+;;          ("C-c k" . counsel-rg)
+;;          ;; ("C-c m" 'counsel-linux-app)
+;;          ("C-c n" . counsel-fzf)
+;;          ("C-x l" . counsel-locate)
+;;          ("C-c J" . counsel-file-jump)
+;;          ;; ("C-S-o" . counsel-rhythmbox)
+;;          ("C-c w" . counsel-wmctrl)
+;;          ("C-c b" . counsel-bookmark)
+;;          ("C-c d" . counsel-descbinds)
+;;          ("C-c o" . counsel-outline)
+;;          ("C-c t" . counsel-load-theme)
+;;          ("C-c F" . counsel-org-file)))
+
+;; (use-package counsel-jq)
+;; (use-package counsel-org-clock)
+
+;; (use-package counsel-projectile
+;;   :diminish
+;;   :commands (counsel-projectile-mode)
+;;   :hook (after-init-hook . counsel-projectile-mode))
+
+(use-package selectrum
+  :init
+  (defun j0ni/selectrum-display-action (buf alist)
+    "Display BUF in a temporary buffer.
+Can be used as `selectrum-display-action' to display candidates
+vin a single window spanning the current frame:
+
+    (setq selectrum-display-action
+        \\='(selectrum-display-full-frame)."
+    (let ((alist (->> alist
+                   (cons '(direction . bottom))
+                   (cons '(window . main)))))
+      (display-buffer-in-direction buf alist)))
+  (setq display-buffer-alist nil)
+  (setq display-buffer-alist
+        (cons '("\*selectrum\*" display-buffer-at-bottom) display-buffer-alist))
+  :diminish ""
+  :bind (:map selectrum-minibuffer-map
+              ("C-j" . selectrum-select-current-candidate))
+  :custom
+  (selectrum-display-action #'j0ni/selectrum-display-action)
+  (selectrum-max-window-height 15)
+  (selectrum-num-candidates-displayed 'auto)
+  (selectrum-extend-current-candidate-highlight t))
+
+(use-package selectrum-prescient :diminish "")
+
+(use-package consult
+  :bind
+  (("C-x b" . consult-buffer)
+   ("C-s" . consult-line)
+   ("C-r" . consult-isearch)
+   ("C-c i" . consult-imenu)
+   ("C-c C-s" . consult-ripgrep)
+   :map projectile-command-map
+   ("s r" . consult-ripgrep))
+  :custom
+  (consult-project-root-function #'ffip-get-project-root-directory)
+  (consult-preview-key 'any)
+  (xref-show-xrefs-function #'consult-xref)
+  (xref-show-definitions-function #'consult-xref))
 
 ;; (setq completion-styles '(orderless partial-completion))
 ;; (setq completion-category-overrides
 ;;       '((buffer (styles . (substring flex orderless)))
 ;;         (file (styles . (partial-completion orderless)))))
-;; ;; Optional performance optimization
-;; ;; by highlighting only the visible candidates.
+;; Optional performance optimization
+;; by highlighting only the visible candidates.
 ;; (setq orderless-skip-highlighting (lambda () selectrum-is-active))
 ;; (setq selectrum-highlight-candidates-function #'orderless-highlight-matches)
 
 ;; The following two are updated in Emacs 28.  They concern the
 ;; *Completions* buffer.
-;; (setq completions-format 'one-column)
-;; (setq completions-detailed t)
-;; (setq read-file-name-completion-ignore-case t)
-;; (setq read-answer-short t)
-;; (setq completion-category-defaults nil)
-;; (setq completion-ignore-case t)
-;; (setq-default case-fold-search t)     ; For general regexp
-;; (setq read-buffer-completion-ignore-case t)
-;; (setq enable-recursive-minibuffers t)
-;; (setq resize-mini-windows t)
-;; (setq minibuffer-eldef-shorten-default t)
-;; (setq echo-keystrokes 0.25)           ; from the C source code
+(setq completions-format 'one-column)
+(setq completions-detailed t)
+(setq read-file-name-completion-ignore-case t)
+(setq read-answer-short t)
+(setq completion-category-defaults nil)
+(setq completion-ignore-case t)
+(setq-default case-fold-search t)     ; For general regexp
+(setq read-buffer-completion-ignore-case t)
+(setq enable-recursive-minibuffers t)
+(setq resize-mini-windows t)
+(setq minibuffer-eldef-shorten-default t)
+(setq echo-keystrokes 0.25)           ; from the C source code
 
 (use-package marginalia
   :hook ((after-init-hook . marginalia-mode))
@@ -596,12 +817,12 @@ frames with exactly two windows."
 
 ;; Hook it all up
 
-;; (add-hook 'after-init-hook #'global-company-mode)
-;; (add-hook 'after-init-hook #'prescient-persist-mode)
-;; (add-hook 'after-init-hook #'ivy-mode)
-;; (add-hook 'after-init-hook #'marginalia-mode)
-;; (add-hook 'company-mode-hook #'company-prescient-mode)
-;; (add-hook 'selectrum-mode-hook #'selectrum-prescient-mode)
+(add-hook 'after-init-hook #'global-company-mode)
+(add-hook 'after-init-hook #'prescient-persist-mode)
+(add-hook 'after-init-hook #'selectrum-mode)
+(add-hook 'selectrum-mode-hook #'selectrum-prescient-mode)
+(add-hook 'after-init-hook #'marginalia-mode)
+(add-hook 'company-mode-hook #'company-prescient-mode)
 
 ;; finished setting up completion
 
@@ -633,8 +854,8 @@ frames with exactly two windows."
          ("." . embark-find-definition)
          ("k" . describe-keymap)))
 
-;; (use-package embark-consult
-;;   :hook ((embark-collect-mode-hook . embark-consult-preview-minor-mode)))
+(use-package embark-consult
+  :hook ((embark-collect-mode-hook . embark-consult-preview-minor-mode)))
 
 (use-package browse-kill-ring
   :init
@@ -642,8 +863,8 @@ frames with exactly two windows."
 
 (use-package magit
   :custom
-  (magit-completing-read-function #'ivy-completing-read)
-  ;; (magit-completing-read-function #'selectrum-completing-read)
+  ;; (magit-completing-read-function #'ivy-completing-read)
+  (magit-completing-read-function #'selectrum-completing-read)
   (magit-diff-refine-hunk t)
   (magit-bury-buffer-function #'magit-mode-quit-window)
   :bind (("C-x g" . magit-status)
@@ -660,7 +881,8 @@ frames with exactly two windows."
   :hook ((after-init-hook . projectile-mode))
   :diminish ""
   :custom
-  (projectile-completion-system 'ivy)
+  ;; (projectile-completion-system 'ivy)
+  (projectile-completion-system 'default)
   (projectile-sort-order 'recently-active)
   :bind-keymap ("C-c p" . projectile-command-map))
 
@@ -762,35 +984,44 @@ frames with exactly two windows."
   (lsp-file-watch-threshold 10000)
   (lsp-signature-auto-activate nil)
   (lsp-completion-provider :capf)
+  (lsp-keymap-prefix "C-c l")
   :bind (:map lsp-mode-map
               ("C-c C-l d" . lsp-describe-thing-at-point)
+              ("C-c C-l e" . lsp-execute-code-action)
               ("C-c C-l r" . lsp-rename)
               ("C-c C-l i" . lsp-find-implementation)
-              ("C-c C-l ." . lsp-find-type-definition)))
+              ("C-c C-l ." . lsp-find-type-definition)
+              ("C-c C-l x" . lsp-workspace-restart)))
 
-(use-package lsp-ui
-  :config
-  (require 'lsp-ui-imenu)
+;; (use-package lsp-ui
+;;   :config
+;;   (require 'lsp-ui-imenu)
+;;   :custom
+;;   (lsp-ui-autoconfigure t)
+;;   (lsp-ui-sideline-enable nil)
+;;   (lsp-ui-doc-enable nil)
+;;   (lsp-ui-peek-enable t)
+;;   (lsp-ui-peek-always-show nil)
+;;   (lsp-ui-imenu-autorefresh t)
+;;   (lsp-ui-doc-show-with-cursor t)
+;;   (lsp-ui-doc-show-with-mouse nil)
+;;   :bind
+;;   (:map lsp-ui-mode-map
+;;         ("C-c l I" . lsp-ui-imenu)
+;;         ("C-c l ." . lsp-ui-peek-find-definitions)
+;;         ("C-c l ?" . lsp-ui-peek-find-references)
+;;         ("C-c l r" . lsp-rename)
+;;         ("C-c l x" . lsp-workspace-restart)
+;;         ("C-c l w" . lsp-ui-peek-find-workspace-symbol)
+;;         ("C-c l i" . lsp-ui-peek-find-implementation)
+;;         ("C-c l d" . lsp-describe-thing-at-point)
+;;         ("C-c l e" . lsp-execute-code-action)))
+
+(use-package treemacs
   :custom
-  (lsp-ui-autoconfigure t)
-  (lsp-ui-sideline-enable nil)
-  (lsp-ui-doc-enable nil)
-  (lsp-ui-peek-enable t)
-  (lsp-ui-peek-always-show nil)
-  (lsp-ui-imenu-autorefresh t)
-  (lsp-ui-doc-show-with-cursor t)
-  (lsp-ui-doc-show-with-mouse nil)
-  :bind
-  (:map lsp-ui-mode-map
-        ("C-c l I" . lsp-ui-imenu)
-        ("C-c l ." . lsp-ui-peek-find-definitions)
-        ("C-c l ?" . lsp-ui-peek-find-references)
-        ("C-c l r" . lsp-rename)
-        ("C-c l x" . lsp-workspace-restart)
-        ("C-c l w" . lsp-ui-peek-find-workspace-symbol)
-        ("C-c l i" . lsp-ui-peek-find-implementation)
-        ("C-c l d" . lsp-describe-thing-at-point)
-        ("C-c l e" . lsp-execute-code-action)))
+  (treemacs-space-between-root-nodes nil))
+
+(use-package lsp-treemacs)
 
 (use-package sly
   :hook ((sly-mrepl-hook . company-mode))
@@ -802,8 +1033,11 @@ frames with exactly two windows."
 (use-package sly-asdf)
 
 ;; (use-package inf-clojure
+;;   ;; :config
+;;   ;; (inf-clojure-update-feature 'clojure 'completion
+;;   ;;                             "(compliment.core/completions \"%s\")")
 ;;   :hook ((clojure-mode-hook . inf-clojure-minor-mode)
-;;          (inf-clojure-mode-hook . eldoc-mode)
+;;          (inf-clojure-mode-hook . turn-on-eldoc-mode)
 ;;          (inf-clojure-mode-hook . enable-paredit-mode)))
 
 (use-package cider
@@ -825,16 +1059,15 @@ Info contains the connection type, project name and host:port endpoint."
   (cider-repl-display-help-banner nil)
   (cider-use-overlays t)                ; display eval results inline
   (cider-use-fringe-indicators nil)
-  (cider-stacktrace-default-filters '(project))
-  (cider-buffer-name-show-port t)
+  (cider-stacktrace-default-filters '(tooling dup))
   (cider-repl-history-size 10000)
   (cider-prompt-for-symbol nil)
   (cider-known-endpoints nil)
   (cider-repl-history-file (concat user-emacs-directory ".cider-repl-history"))
-  (nrepl-buffer-name-show-port t)
   (cider-prefer-local-resources t)
   (cider-inject-dependencies-at-jack-in t)
   (cider-eldoc-display-context-dependent-info t)
+  (cider-auto-mode t)
   :config
   (add-to-list 'cider-test-defining-forms "defruns")
   :bind
@@ -850,6 +1083,7 @@ Info contains the connection type, project name and host:port endpoint."
   :diminish ""
   :commands (clj-refactor-mode)
   :custom
+  (cljr-add-ns-to-blank-clj-files t)
   (cljr-warn-on-eval nil)
   (cljr-suppress-middleware-warnings t)
   (cljr-favor-prefix-notation nil)
@@ -861,21 +1095,16 @@ Info contains the connection type, project name and host:port endpoint."
   (cljr-add-keybindings-with-prefix "C-c C-j"))
 
 (use-package clojure-mode
+  :hook
+  (((clojure-mode-hook clojurec-mode-hook clojurescript-mode-hook clojurex-mode-hook) . lsp)
+   ((clojure-mode-hook clojurec-mode-hook clojurescript-mode-hook clojurex-mode-hook) . cider-mode)
+   ((clojure-mode-hook clojurec-mode-hook clojurescript-mode-hook clojurex-mode-hook) . clj-refactor-mode)
+   ((clojure-mode-hook clojurec-mode-hook clojurescript-mode-hook clojurex-mode-hook) . enable-paredit-mode)
+   ((clojure-mode-hook clojurec-mode-hook clojurescript-mode-hook clojurex-mode-hook) . flycheck-mode)
+   ((clojure-mode-hook clojurec-mode-hook clojurescript-mode-hook clojurex-mode-hook) . subword-mode))
   :init
-  (require 'lsp-mode)
-  (setq cljr-add-ns-to-blank-clj-files nil)
-  (dolist (m '(clojure-mode
-               clojurec-mode
-               clojurescript-mode
-               clojurex-mode))
-    ;; should be loaded because :after (lsp-mode)
-    (add-to-list 'lsp-language-id-configuration `(,m . "clojure"))
-    (add-hook (make-symbol (concat (symbol-name m) "-hook")) 'lsp))
-  :hook ((clojure-mode-hook . enable-paredit-mode)
-         (clojure-mode-hook . subword-mode)
-         (clojure-mode-hook . cider-mode)
-         ;; (clojure-mode-hook . flycheck-mode)
-         (clojure-mode-hook . clj-refactor-mode)))
+  (dolist (m '(clojure-mode clojurec-mode clojurescript-mode clojurex-mode))
+    (add-to-list 'lsp-language-id-configuration `(,m . "clojure"))))
 
 (use-package ruby-mode
   :hook (ruby-mode-hook . flycheck-mode))
@@ -1201,3 +1430,6 @@ Info contains the connection type, project name and host:port endpoint."
 
 ;; Do this last, since it may contain references to package functions
 (require 'keys)
+
+;; everything is now loaded...
+(server-start)
