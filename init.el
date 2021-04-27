@@ -620,6 +620,7 @@ frames with exactly two windows."
 (use-package rainbow-mode
   :bind (("C-c r" . rainbow-mode)))
 
+;; (remove-hook 'paredit-mode-hook 'rainbow-delimiters-mode)
 (use-package rainbow-delimiters
   ;; :hook ((paredit-mode-hook . rainbow-delimiters-mode))
   )
@@ -786,7 +787,8 @@ vin a single window spanning the current frame:
               ("C-j" . selectrum-select-current-candidate))
   :custom
   (selectrum-display-action #'j0ni/selectrum-display-action)
-  (selectrum-max-window-height 15)
+  (selectrum-max-window-height 25)
+  (selectrum-fix-vertical-window-height t)
   (selectrum-num-candidates-displayed 'auto)
   (selectrum-extend-current-candidate-highlight t))
 
@@ -837,17 +839,6 @@ vin a single window spanning the current frame:
   (marginalia-annotators
    '(marginalia-annotators-heavy marginalia-annotators-light)))
 
-;; Hook it all up
-
-(add-hook 'after-init-hook #'global-company-mode)
-(add-hook 'after-init-hook #'prescient-persist-mode)
-(add-hook 'after-init-hook #'selectrum-mode)
-(add-hook 'selectrum-mode-hook #'selectrum-prescient-mode)
-(add-hook 'after-init-hook #'marginalia-mode)
-(add-hook 'company-mode-hook #'company-prescient-mode)
-
-;; finished setting up completion
-
 (use-package embark
   :custom
   (embark-collect-initial-view-alist
@@ -860,9 +851,7 @@ vin a single window spanning the current frame:
      (t . list)))
   (embark-quit-after-action t)          ; XXX: Read the doc string!
   (embark-collect-live-update-delay 0.5)
-  (embark-collect-live-initial-delay 5.0)
-  ;; :hook ((minibuffer-setup-hook . embark-collect-completions-after-input)
-  ;;        (embark-post-action-hook . embark-collect--update-linked))
+  (embark-collect-live-initial-delay 0.8)
   :bind (("C-," . embark-act)
          :map minibuffer-local-completion-map
          ("C-," . embark-act)
@@ -878,6 +867,21 @@ vin a single window spanning the current frame:
 
 (use-package embark-consult
   :hook ((embark-collect-mode-hook . embark-consult-preview-minor-mode)))
+
+;; Hook it all up
+
+(add-hook 'after-init-hook #'global-company-mode)
+(add-hook 'after-init-hook #'prescient-persist-mode)
+(add-hook 'after-init-hook #'selectrum-mode)
+(add-hook 'selectrum-mode-hook #'selectrum-prescient-mode)
+(add-hook 'after-init-hook #'marginalia-mode)
+(add-hook 'company-mode-hook #'company-prescient-mode)
+;; (add-hook 'after-init-hook #'icomplete-mode)
+;; (add-hook 'icomplete-mode-hook #'icomplete-vertical-mode)
+;; (add-hook 'minibuffer-setup-hook #'embark-collect-completions-after-input)
+;; (add-hook 'embark-post-action-hook #'embark-collect--update-linked)
+
+;; finished setting up completion
 
 (use-package browse-kill-ring
   :init
