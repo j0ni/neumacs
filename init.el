@@ -15,6 +15,7 @@
 (require 'boot)
 
 (defvar j0ni/font nil "Should be a string like \"Fira Code-11\" or such.")
+(defvar j0ni/is-mac (memq window-system '(mac ns x)))
 
 (use-package emacs
   :hook ((before-save-hook . delete-trailing-whitespace)
@@ -56,6 +57,22 @@
   (mouse-wheel-progressive-speed t)              ; don't accelerate scrolling
   (shr-color-visible-luminance-min 90)
   :init
+  (when j0ni/is-mac
+    ;; The left and right Option or Alt keys.
+    (setq ns-alternate-modifier 'alt)
+    ;; (setq ns-right-alternate-modifier 'left)
+
+    ;; The left and right Command keys.
+    (setq ns-command-modifier 'meta)
+    (setq ns-right-command-modifier 'super)
+
+    ;; The left and right Control keys.
+    ;; (setq ns-control-modifier 'control)
+    ;; (setq ns-right-control-modifier 'control)
+
+    ;; The Function (fn) key.
+    (setq ns-function-modifier 'none))
+
   (setq-default browse-url-browser-function
                 (cl-case system-type
                   ((darwin macos) 'browse-url-default-macosx-browser)
@@ -66,14 +83,14 @@
   (set-keyboard-coding-system 'utf-8)
   ;;(set-default-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
-  (setq j0ni/font "Monoid-10")
-  (setq j0ni/font "PT Mono-11")
-  (setq j0ni/font "Monoisome-10")
+  (setq j0ni/font "Monoid-12")
+  ;; (setq j0ni/font "PT Mono-11")
+  ;; (setq j0ni/font "Monoisome-10")
   ;; (setq j0ni/font "Lucida Grande Mono-11")
   ;; (setq j0ni/font "Lucida Console Patched-11")
   ;; (setq j0ni/font "Iosevka Snuggle Light-11")
-;;  (setq j0ni/font "PragmataPro Liga-11")
-  ;; (setq j0ni/font "Fira Code-10")
+  ;; (setq j0ni/font "PragmataPro Liga-14")
+  ;; (setq j0ni/font "Fira Code-13")
   (set-face-font 'variable-pitch "Lucida Grande-10" nil)
   (set-frame-font j0ni/font t t)
   (set-face-font 'fixed-pitch j0ni/font nil)
@@ -537,7 +554,8 @@ frames with exactly two windows."
 (use-package exec-path-from-shell
   :init
   (defvar j0ni/exec-path-from-shell-completed nil "Stop this happening repeatedly")
-  (when (and j0ni/exec-path-from-shell-completed (memq window-system '(mac ns x)))
+  (when (and (not j0ni/exec-path-from-shell-completed)
+             (memq window-system '(mac ns x)))
     (exec-path-from-shell-initialize)
     (setq j0ni/exec-path-from-shell-completed t)))
 
@@ -548,14 +566,17 @@ frames with exactly two windows."
   (modus-themes-slanted-constructs t)
   (modus-themes-syntax nil) ;; 'faint
   (modus-themes-fringes nil)
+  (modus-themes-hl-line 'underline-neutral)
   (modus-themes-completions 'opinionated)
   (modus-themes-scale-headings t)
-  (modus-themes-mode-line nil)
+  (modus-themes-mode-line '3d)
   (modus-themes-paren-match 'intense-bold)
   :config
+  (setq x-underline-at-descent-line t)
   ;; (load-theme 'modus-operandi t)
   (load-theme 'modus-vivendi t)
   ;; if the font is paying attention ¯\_(ツ)_/¯
+  (set-face-attribute 'default nil :weight 'light)
   (set-face-attribute 'bold nil :weight 'semibold))
 
 (use-package hl-todo
@@ -600,7 +621,8 @@ frames with exactly two windows."
   :bind (("C-c r" . rainbow-mode)))
 
 (use-package rainbow-delimiters
-  :hook ((paredit-mode-hook . rainbow-delimiters-mode)))
+  ;; :hook ((paredit-mode-hook . rainbow-delimiters-mode))
+  )
 
 (use-package fish-mode)
 
@@ -872,7 +894,6 @@ vin a single window spanning the current frame:
 
 (use-package gitignore-mode)
 (use-package gitconfig-mode)
-(use-package browse-at-remote)
 
 (use-package highlight-symbol
   :hook ((prog-mode-hook . highlight-symbol-mode)))
@@ -968,6 +989,9 @@ vin a single window spanning the current frame:
 (use-package lsp-mode
   :commands (lsp lsp-register-custom-settings lsp-deferred)
   :custom
+  (lsp-modeline-code-actions-enable nil)
+  (lsp-modeline-diagnostics-enable t)
+  (lsp-modeline-workspace-status-enable nil)
   (lsp-enable-indentation t)
   (lsp-enable-completion-at-point t)
   (lsp-auto-configure t)
@@ -1096,12 +1120,17 @@ Info contains the connection type, project name and host:port endpoint."
 
 (use-package clojure-mode
   :hook
-  (((clojure-mode-hook clojurec-mode-hook clojurescript-mode-hook clojurex-mode-hook) . lsp)
-   ((clojure-mode-hook clojurec-mode-hook clojurescript-mode-hook clojurex-mode-hook) . cider-mode)
-   ((clojure-mode-hook clojurec-mode-hook clojurescript-mode-hook clojurex-mode-hook) . clj-refactor-mode)
-   ((clojure-mode-hook clojurec-mode-hook clojurescript-mode-hook clojurex-mode-hook) . enable-paredit-mode)
-   ((clojure-mode-hook clojurec-mode-hook clojurescript-mode-hook clojurex-mode-hook) . flycheck-mode)
-   ((clojure-mode-hook clojurec-mode-hook clojurescript-mode-hook clojurex-mode-hook) . subword-mode))
+  (((clojure-mode-hook
+     clojurec-mode-hook
+     clojurescript-mode-hook
+     clojurex-mode-hook)
+    . (lambda ()
+        (lsp)
+        (cider-mode 1)
+        (clj-refactor-mode 1)
+        (enable-paredit-mode)
+        (flycheck-mode 1)
+        (subword-mode 1))))
   :init
   (dolist (m '(clojure-mode clojurec-mode clojurescript-mode clojurex-mode))
     (add-to-list 'lsp-language-id-configuration `(,m . "clojure"))))
@@ -1261,6 +1290,9 @@ Info contains the connection type, project name and host:port endpoint."
              telega-notifications-mode)
   :bind (("C-x M-t" . telega))
   :hook ((telega-chat-mode-hook . visual-line-mode))
+  :custom
+  (when j0ni/is-mac
+    (telega-server-libs-prefix "/opt/homebrew"))
   :config
   (telega-mode-line-mode t)
   (telega-notifications-mode t)
@@ -1280,9 +1312,9 @@ Info contains the connection type, project name and host:port endpoint."
 
 (use-package all-the-icons)
 
-(use-package lpy
-  :commands (lpy-mode)
-  :hook ((python-mode-hook . lpy-mode)))
+;; (use-package lpy
+;;   :commands (lpy-mode)
+;;   :hook ((python-mode-hook . lpy-mode)))
 
 (use-package haskell-mode
   :hook ((haskell-mode-hook . electric-pair-mode)))
