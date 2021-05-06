@@ -15,7 +15,7 @@
 (require 'boot)
 
 (defvar j0ni/font nil "Should be a string like \"Fira Code-11\" or such.")
-(defvar j0ni/is-mac (memq window-system '(mac ns x)))
+(defvar j0ni/is-mac (memq window-system '(mac ns)))
 
 (use-package emacs
   :hook ((before-save-hook . delete-trailing-whitespace)
@@ -24,6 +24,7 @@
          (after-init-hook . recentf-mode)
          (after-init-hook . savehist-mode))
   :custom
+  (epa-pinentry-mode 'loopback)
   (flymake-fringe-indicator-position 'right-fringe)
   (inhibit-startup-screen t)
   (vc-follow-symlinks t)
@@ -59,7 +60,7 @@
   :init
   (when j0ni/is-mac
     ;; The left and right Option or Alt keys.
-    (setq ns-alternate-modifier 'alt)
+    (setq ns-alternate-modifier 'meta)
     ;; (setq ns-right-alternate-modifier 'left)
 
     ;; The left and right Command keys.
@@ -784,11 +785,13 @@ vin a single window spanning the current frame:
         (cons '("\*selectrum\*" display-buffer-at-bottom) display-buffer-alist))
   :diminish ""
   :bind (:map selectrum-minibuffer-map
-              ("C-j" . selectrum-select-current-candidate))
+              ("C-j" . selectrum-select-current-candidate)
+              ("C-s" . selectrum-previous-candidate))
   :custom
-  (selectrum-display-action #'j0ni/selectrum-display-action)
-  (selectrum-max-window-height 25)
-  (selectrum-fix-vertical-window-height t)
+  ;; (selectrum-display-action #'j0ni/selectrum-display-action)
+  (selectrum-display-action nil)
+  (selectrum-max-window-height 20)
+  (selectrum-fix-vertical-window-height nil)
   (selectrum-num-candidates-displayed 'auto)
   (selectrum-extend-current-candidate-highlight t))
 
@@ -1192,7 +1195,7 @@ Info contains the connection type, project name and host:port endpoint."
   (setq lsp-rust-server 'rust-analyzer)
   (push 'rustic-clippy flycheck-checkers))
 
-(use-package org-plus-contrib
+(use-package org
   :bind (("C-c c" . org-capture)
          ("C-c a" . org-agenda))
   :custom
@@ -1270,7 +1273,7 @@ Info contains the connection type, project name and host:port endpoint."
   :hook ((after-init-hook . org-roam-mode))
   :custom
   (org-roam-directory (expand-file-name "org-roam" org-directory))
-  (org-roam-completion-system 'ivy)
+  (org-roam-completion-system 'default)
   (org-roam-buffer-position 'bottom)
   ;; :init
   ;; (defhydra hydra-org-roam (:exit t :idle 0.8)
@@ -1329,7 +1332,14 @@ Info contains the connection type, project name and host:port endpoint."
 
 ;; mu4e isn't packaged in the usual way, it gets installed as part of the `mu` system package.
 
-(add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
+(defvar j0ni/mu4e-path)
+
+(if j0ni/is-mac
+    (setq j0ni/mu4e-path "/opt/homebrew/share/emacs/site-lisp/mu/mu4e")
+  (setq j0ni/mu4e-path "/usr/share/emacs/site-lisp/mu4e"))
+
+(add-to-list 'load-path j0ni/mu4e-path)
+
 (require 'mu4e)
 
 (defun j0ni/mu4e-bookmark (sub-maildir days char)
