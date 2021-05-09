@@ -100,6 +100,7 @@
   (set-fontset-font t 'unicode "Symbola" nil 'prepend)
   (when (string= system-type "gnu/linux")
     (setq x-super-keysym 'meta))
+  (setq x-underline-at-descent-line t)
   (setq scroll-step 0)
   (setq scroll-margin 2)
   (setq auto-window-vscroll nil)
@@ -570,10 +571,9 @@ frames with exactly two windows."
   (modus-themes-hl-line 'underline-neutral)
   (modus-themes-completions 'opinionated)
   (modus-themes-scale-headings t)
-  (modus-themes-mode-line '3d)
+  (modus-themes-mode-line nil)
   (modus-themes-paren-match 'intense-bold)
   :config
-  (setq x-underline-at-descent-line t)
   ;; (load-theme 'modus-operandi t)
   (load-theme 'modus-vivendi t)
   ;; if the font is paying attention ¯\_(ツ)_/¯
@@ -590,41 +590,19 @@ frames with exactly two windows."
   (diminish 'volatile-highlights-mode))
 
 (use-package gruvbox-theme)
-(use-package cyberpunk-theme
-  ;; :init
-  ;; (load-theme 'cyberpunk t)
-  ;; (set-face-attribute 'default nil :background "#000000")
-  )
+(use-package cyberpunk-theme)
 (use-package zerodark-theme)
-(use-package doom-themes
-  ;; :init
-  ;; (load-theme 'doom-old-hope t)
-  ;; (set-face-attribute 'default nil :background "#000000")
-  )
-
+(use-package doom-themes)
 (use-package zenburn-theme)
-(use-package dracula-theme
-  :init
-  ;; (load-theme 'dracula t)
-  ;; (set-face-attribute 'bold nil :weight 'semibold)
-  ;; (set-face-attribute 'default nil :background "#000000")
-  ;; (set-face-attribute 'highlight nil :foreground "#e2e2dc" :background "#262626" :extend t)
-  )
-
-(use-package almost-mono-themes
-  ;; :hook ((after-init-hook . (lambda () (load-theme 'almost-mono-black t))))
-  ;; :init
-  ;; (load-theme 'almost-mono-black t)
-  ;; (set-face-attribute 'bold nil :weight 'semibold)
-  )
+(use-package dracula-theme)
+(use-package almost-mono-themes)
 
 (use-package rainbow-mode
   :bind (("C-c r" . rainbow-mode)))
 
 ;; (remove-hook 'paredit-mode-hook 'rainbow-delimiters-mode)
 (use-package rainbow-delimiters
-  ;; :hook ((paredit-mode-hook . rainbow-delimiters-mode))
-  )
+  :hook ((paredit-mode-hook . rainbow-delimiters-mode)))
 
 (use-package fish-mode)
 
@@ -672,219 +650,109 @@ frames with exactly two windows."
   :config
   (push 'company-elisp company-backends))
 
-(use-package prescient :diminish "")
+(use-package prescient
+  :diminish
+  :init
+  (prescient-persist-mode 1))
+
 (use-package company-prescient :diminish "")
 
-;; (use-package orderless
-;;   :diminish ""
-;;   :custom
-;;   (orderless-component-separator " +"))
-
-;; (use-package ivy
-;;   :diminish
-;;   :custom
-;;   (ivy-height 15)
-;;   (ivy-wrap t)
-;;   (ivy-use-virtual-buffers t)
-;;   (ivy-extra-directories nil)
-;;   (confirm-nonexistent-file-or-buffer t)
-;;   :init
-;;   (ivy-mode 1)
-;;   (setq ivy-re-builders-alist
-;;         '((read-file-name-internal . ivy--regex-fuzzy)
-;;           (t . ivy--regex-plus)))
-;;   (setq completion-cycle-threshold 3)
-;;   (setq completion-flex-nospace nil)
-;;   (setq completion-pcm-complete-word-inserts-delimiters t)
-;;   (setq completion-pcm-word-delimiters "-_./:| ")
-;;   (setq completion-show-help nil)
-;;   (setq completion-auto-help nil)
-;;   (setq completions-format 'one-column)
-;;   (setq completions-detailed t)
-;;   (setq read-file-name-completion-ignore-case t)
-;;   (setq read-answer-short t)
-;;   (setq completion-category-defaults nil)
-;;   (setq completion-ignore-case t)
-;;   (setq-default case-fold-search t)     ; For general regexp
-;;   (setq read-buffer-completion-ignore-case t)
-;;   (setq enable-recursive-minibuffers t)
-;;   (setq resize-mini-windows t)
-;;   (setq minibuffer-eldef-shorten-default t)
-;;   (setq echo-keystrokes 0.25)           ; from the C source code
-;;   :bind (("C-x b" . ivy-switch-buffer)
-;;          ("C-c v" . ivy-push-view)
-;;          ("C-c V" . ivy-pop-view)
-;;          ("C-c C-r" . ivy-resume)))
-
-;; (use-package hydra
-;;   :commands (hydra-add-imenu)
-;;   :hook (emacs-lisp-mode . hydra-add-imenu))
-
-;; (use-package ivy-hydra
-;;   :commands (hydra-ivy/body))
-
-;; (use-package swiper
-;;   :bind (("C-s" . swiper-isearch)
-;;          ("C-c u" . swiper-all)))
-
-;; (use-package counsel
-;;   :after (ivy)
-;;   :init
-;;   (counsel-mode 1)
-;;   :diminish
-;;   :bind (
-;;          ;; ("M-x" . counsel-M-x)
-;;          ("C-x C-f" . counsel-find-file)
-;;          ("C-M-y" . counsel-yank-pop)
-;;          ("<f1> f" . counsel-describe-function)
-;;          ("<f1> v" . counsel-describe-variable)
-;;          ("<f1> l" . counsel-find-library)
-;;          ("<f2> i" . counsel-info-lookup-symbol)
-;;          ("<f2> u" . counsel-unicode-char)
-;;          ("<f2> j" . counsel-set-variable)
-;;          ("C-c C" . counsel-compile)
-;;          ("C-c g" . counsel-git)
-;;          ("C-c j" . counsel-git-grep)
-;;          ("C-c L" . counsel-git-log)
-;;          ("C-c k" . counsel-rg)
-;;          ;; ("C-c m" 'counsel-linux-app)
-;;          ("C-c n" . counsel-fzf)
-;;          ("C-x l" . counsel-locate)
-;;          ("C-c J" . counsel-file-jump)
-;;          ;; ("C-S-o" . counsel-rhythmbox)
-;;          ("C-c w" . counsel-wmctrl)
-;;          ("C-c b" . counsel-bookmark)
-;;          ("C-c d" . counsel-descbinds)
-;;          ("C-c o" . counsel-outline)
-;;          ("C-c t" . counsel-load-theme)
-;;          ("C-c F" . counsel-org-file)))
-
-;; (use-package counsel-jq)
-;; (use-package counsel-org-clock)
-
-;; (use-package counsel-projectile
-;;   :diminish
-;;   :commands (counsel-projectile-mode)
-;;   :hook (after-init-hook . counsel-projectile-mode))
-
-(use-package selectrum
+(use-package ivy
+  :diminish
+  :custom
+  (ivy-height 15)
+  (ivy-wrap t)
+  (ivy-use-virtual-buffers t)
+  (ivy-extra-directories nil)
+  (confirm-nonexistent-file-or-buffer t)
   :init
-  (defun j0ni/selectrum-display-action (buf alist)
-    "Display BUF in a temporary buffer.
-Can be used as `selectrum-display-action' to display candidates
-vin a single window spanning the current frame:
+  (ivy-mode 1)
+  (setq ivy-re-builders-alist
+        '((read-file-name-internal . ivy--regex-fuzzy)
+          (t . ivy--regex-plus)))
+  (setq completion-cycle-threshold 3)
+  (setq completion-flex-nospace nil)
+  (setq completion-pcm-complete-word-inserts-delimiters t)
+  (setq completion-pcm-word-delimiters "-_./:| ")
+  (setq completion-show-help nil)
+  (setq completion-auto-help nil)
+  (setq completions-format 'one-column)
+  (setq completions-detailed t)
+  (setq read-file-name-completion-ignore-case t)
+  (setq read-answer-short t)
+  (setq completion-category-defaults nil)
+  (setq completion-ignore-case t)
+  (setq-default case-fold-search t)     ; For general regexp
+  (setq read-buffer-completion-ignore-case t)
+  (setq enable-recursive-minibuffers t)
+  (setq resize-mini-windows t)
+  (setq minibuffer-eldef-shorten-default t)
+  (setq echo-keystrokes 0.25)           ; from the C source code
+  :bind (("C-x b" . ivy-switch-buffer)
+         ("C-c v" . ivy-push-view)
+         ("C-c V" . ivy-pop-view)
+         ("C-c C-r" . ivy-resume)))
 
-    (setq selectrum-display-action
-        \\='(selectrum-display-full-frame)."
-    (let ((alist (->> alist
-                   (cons '(direction . bottom))
-                   (cons '(window . main)))))
-      (display-buffer-in-direction buf alist)))
-  (setq display-buffer-alist nil)
-  (setq display-buffer-alist
-        (cons '("\*selectrum\*" display-buffer-at-bottom) display-buffer-alist))
-  :diminish ""
-  :bind (:map selectrum-minibuffer-map
-              ("C-j" . selectrum-select-current-candidate)
-              ("C-s" . selectrum-previous-candidate))
-  :custom
-  ;; (selectrum-display-action #'j0ni/selectrum-display-action)
-  (selectrum-display-action nil)
-  (selectrum-max-window-height 20)
-  (selectrum-fix-vertical-window-height nil)
-  (selectrum-num-candidates-displayed 'auto)
-  (selectrum-extend-current-candidate-highlight t))
+(use-package ivy-prescient
+  :commands (ivy-presient-mode)
+  :init
+  (ivy-prescient-mode 1))
 
-(use-package selectrum-prescient :diminish "")
+(use-package ivy-rich
+  :commands (ivy-rich-mode)
+  :after (ivy counsel)
+  :init
+  (ivy-rich-mode 1))
 
-(use-package consult
-  :bind
-  (("C-x b" . consult-buffer)
-   ("C-s" . consult-line)
-   ("C-r" . consult-isearch)
-   ("C-c i" . consult-imenu)
-   ("C-c C-s" . consult-ripgrep)
-   :map projectile-command-map
-   ("s r" . consult-ripgrep))
-  :custom
-  (consult-project-root-function #'ffip-get-project-root-directory)
-  (consult-preview-key 'any)
-  (xref-show-xrefs-function #'consult-xref)
-  (xref-show-definitions-function #'consult-xref))
+(use-package hydra
+  :commands (hydra-add-imenu)
+  :hook (emacs-lisp-mode . hydra-add-imenu))
 
-;; (setq completion-styles '(orderless partial-completion))
-;; (setq completion-category-overrides
-;;       '((buffer (styles . (substring flex orderless)))
-;;         (file (styles . (partial-completion orderless)))))
-;; Optional performance optimization
-;; by highlighting only the visible candidates.
-;; (setq orderless-skip-highlighting (lambda () selectrum-is-active))
-;; (setq selectrum-highlight-candidates-function #'orderless-highlight-matches)
+(use-package ivy-hydra
+  :commands (hydra-ivy/body))
 
-;; The following two are updated in Emacs 28.  They concern the
-;; *Completions* buffer.
-(setq completions-format 'one-column)
-(setq completions-detailed t)
-(setq read-file-name-completion-ignore-case t)
-(setq read-answer-short t)
-(setq completion-category-defaults nil)
-(setq completion-ignore-case t)
-(setq-default case-fold-search t)     ; For general regexp
-(setq read-buffer-completion-ignore-case t)
-(setq enable-recursive-minibuffers t)
-(setq resize-mini-windows t)
-(setq minibuffer-eldef-shorten-default t)
-(setq echo-keystrokes 0.25)           ; from the C source code
+(use-package swiper
+  :bind (("C-s" . swiper-isearch)
+         ("C-c u" . swiper-all)))
 
-(use-package marginalia
-  :hook ((after-init-hook . marginalia-mode))
-  :custom
-  (marginalia-annotators
-   '(marginalia-annotators-heavy marginalia-annotators-light)))
+(use-package counsel
+  :after (ivy)
+  :init
+  (counsel-mode 1)
+  :diminish
+  :bind (("M-x" . counsel-M-x)
+         ("C-x C-f" . counsel-find-file)
+         ("C-M-y" . counsel-yank-pop)
+         ("<f1> f" . counsel-describe-function)
+         ("<f1> v" . counsel-describe-variable)
+         ("<f1> l" . counsel-find-library)
+         ("<f2> i" . counsel-info-lookup-symbol)
+         ("<f2> u" . counsel-unicode-char)
+         ("<f2> j" . counsel-set-variable)
+         ("C-c C" . counsel-compile)
+         ("C-c g" . counsel-git)
+         ("C-c j" . counsel-git-grep)
+         ("C-c L" . counsel-git-log)
+         ("C-c k" . counsel-rg)
+         ;; ("C-c m" 'counsel-linux-app)
+         ("C-c n" . counsel-fzf)
+         ("C-x l" . counsel-locate)
+         ("C-c J" . counsel-file-jump)
+         ;; ("C-S-o" . counsel-rhythmbox)
+         ("C-c w" . counsel-wmctrl)
+         ("C-c b" . counsel-bookmark)
+         ("C-c d" . counsel-descbinds)
+         ("C-c o" . counsel-outline)
+         ("C-c t" . counsel-load-theme)
+         ("C-c F" . counsel-org-file)))
 
-(use-package embark
-  :custom
-  (embark-collect-initial-view-alist
-   '((file . list)
-     (buffer . list)
-     (symbol . list)
-     (line . list)
-     (xref-location . list)
-     (kill-ring . zebra)
-     (t . list)))
-  (embark-quit-after-action t)          ; XXX: Read the doc string!
-  (embark-collect-live-update-delay 0.5)
-  (embark-collect-live-initial-delay 0.8)
-  :bind (("C-," . embark-act)
-         :map minibuffer-local-completion-map
-         ("C-," . embark-act)
-         ("C->" . embark-become)
-         ("M-v" . embark-switch-to-collect-completions)
-         :map embark-collect-mode-map
-         ("C-," . embark-act)
-         ("," . embark-act)
-         ("M-q" . embark-collect-toggle-view)
-         :map embark-symbol-map
-         ("." . embark-find-definition)
-         ("k" . describe-keymap)))
+(use-package counsel-jq)
+(use-package counsel-org-clock)
 
-(use-package embark-consult
-  :hook ((embark-collect-mode-hook . embark-consult-preview-minor-mode)))
-
-;; Hook it all up
-
-(add-hook 'after-init-hook #'global-company-mode)
-(add-hook 'after-init-hook #'prescient-persist-mode)
-(add-hook 'after-init-hook #'selectrum-mode)
-(add-hook 'selectrum-mode-hook #'selectrum-prescient-mode)
-(add-hook 'after-init-hook #'marginalia-mode)
-(add-hook 'company-mode-hook #'company-prescient-mode)
-;; (add-hook 'after-init-hook #'icomplete-mode)
-;; (add-hook 'icomplete-mode-hook #'icomplete-vertical-mode)
-;; (add-hook 'minibuffer-setup-hook #'embark-collect-completions-after-input)
-;; (add-hook 'embark-post-action-hook #'embark-collect--update-linked)
-
-;; finished setting up completion
+(use-package counsel-projectile
+  :diminish
+  :commands (counsel-projectile-mode)
+  :hook (after-init-hook . counsel-projectile-mode))
 
 (use-package browse-kill-ring
   :init
@@ -892,8 +760,8 @@ vin a single window spanning the current frame:
 
 (use-package magit
   :custom
-  ;; (magit-completing-read-function #'ivy-completing-read)
-  (magit-completing-read-function #'selectrum-completing-read)
+  (magit-completing-read-function #'ivy-completing-read)
+  ;; (magit-completing-read-function #'selectrum-completing-read)
   (magit-diff-refine-hunk t)
   (magit-bury-buffer-function #'magit-mode-quit-window)
   :bind (("C-x g" . magit-status)
@@ -909,8 +777,8 @@ vin a single window spanning the current frame:
   :hook ((after-init-hook . projectile-mode))
   :diminish ""
   :custom
-  ;; (projectile-completion-system 'ivy)
-  (projectile-completion-system 'default)
+  (projectile-completion-system 'ivy)
+  ;; (projectile-completion-system 'default)
   (projectile-sort-order 'recently-active)
   :bind-keymap ("C-c p" . projectile-command-map))
 
@@ -1010,7 +878,7 @@ vin a single window spanning the current frame:
   (lsp-signature-render-all t)
   (lsp-enable-symbol-highlighting t)
   (lsp-idle-delay 0.8)
-  (lsp-lens-enable t)
+  (lsp-lens-enable nil)
   (lsp-prefer-flymake nil)
   (lsp-file-watch-threshold 10000)
   (lsp-signature-auto-activate nil)
@@ -1273,7 +1141,7 @@ Info contains the connection type, project name and host:port endpoint."
   :hook ((after-init-hook . org-roam-mode))
   :custom
   (org-roam-directory (expand-file-name "org-roam" org-directory))
-  (org-roam-completion-system 'default)
+  (org-roam-completion-system 'ivy)
   (org-roam-buffer-position 'bottom)
   ;; :init
   ;; (defhydra hydra-org-roam (:exit t :idle 0.8)
