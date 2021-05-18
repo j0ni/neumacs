@@ -651,6 +651,7 @@ frames with exactly two windows."
   (push 'company-elisp company-backends))
 
 (use-package prescient
+  :commands (prescient-persist-mode)
   :diminish
   :init
   (prescient-persist-mode 1))
@@ -1238,6 +1239,9 @@ Info contains the connection type, project name and host:port endpoint."
       mu4e-view-show-addresses t
       mm-inline-large-images 'resize
       message-send-mail-function 'smtpmail-send-it
+      sendmail-program "/usr/bin/msmtp"
+      message-sendmail-f-is-evil t
+      message-sendmail-extra-arguments '("--read-envelope-from")
       message-kill-buffer-on-exit t
       mail-user-agent 'mu4e-user-agent
       message-citation-line-function 'message-insert-formatted-citation-line
