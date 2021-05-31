@@ -16,6 +16,7 @@
 
 (defvar j0ni/font nil "Should be a string like \"Fira Code-11\" or such.")
 (defvar j0ni/is-mac (memq window-system '(mac ns)))
+(defvar j0ni/completion-system 'ivy "Should be a symbol, currently either 'selectrum or 'ivy")
 
 (use-package emacs
   :hook ((before-save-hook . delete-trailing-whitespace)
@@ -61,7 +62,7 @@
   (when j0ni/is-mac
     ;; The left and right Option or Alt keys.
     (setq ns-alternate-modifier 'meta)
-    ;; (setq ns-right-alternate-modifier 'left)
+    (setq ns-right-alternate-modifier 'left)
 
     ;; The left and right Command keys.
     (setq ns-command-modifier 'meta)
@@ -486,14 +487,15 @@ frames with exactly two windows."
 (use-package ligature
   :commands (ligature-set-ligatures)
   :straight (ligature :type git :host github :repo "mickeynp/ligature.el")
-  :config
+  ;; :config
   ;; Cascadia Code
   ;; (ligature-set-ligatures
   ;;  'prog-mode '("=:=" "==>" "=<<" "!!." ">>=" "->>" "-->"
   ;;               "<==" "<=>" "<--" "<<-" "::" ":=" "=>" "!="
   ;;               "--" ">=" ">>" "->" "<=" "<-" "<<" ".." "/*" "//" "__"))
-  (ligature-set-ligatures 'prog-mode pragmata-pro-ligatures)
-  :hook ((prog-mode-hook . ligature-mode)))
+  ;; (ligature-set-ligatures 'prog-mode pragmata-pro-ligatures)
+  ;; :hook ((prog-mode-hook . ligature-mode))
+  )
 
 (use-package ibuffer
   :bind (("C-x C-b" . ibuffer))
@@ -537,7 +539,21 @@ frames with exactly two windows."
   :init
   (setq ffip-use-rust-fd t))
 
-(use-package circe)
+(use-package circe
+  :init
+  (setq circe-network-defaults
+  '(("Coldfront" :host "irc.coldfront.net" :port 6667 :use-tls t
+     :nickserv-mask "^NickServ!services@coldfront\\.net$"
+     :nickserv-identify-challenge "/msg\\s-NickServ\\s-IDENTIFY\\s-\C-_password\C-_"
+     :nickserv-identify-command "PRIVMSG NickServ :IDENTIFY {password}"
+     )
+    ("OFTC" :host "irc.oftc.net" :port 6697 :use-tls t
+     :nickserv-mask "^NickServ!services@services\\.oftc\\.net$"
+     :nickserv-identify-challenge "This nickname is registered and protected."
+     :nickserv-identify-command "PRIVMSG NickServ :IDENTIFY {password} {nick}"
+     :nickserv-identify-confirmation "^You are successfully identified as .*\\.$"
+     )
+    ("Libera Chat" :host "irc.libera.chat" :port 6697 :use-tls t :nick "j0ni"))))
 
 (use-package undo-fu
   :custom
@@ -575,10 +591,11 @@ frames with exactly two windows."
   (modus-themes-paren-match 'intense-bold)
   :config
   ;; (load-theme 'modus-operandi t)
-  (load-theme 'modus-vivendi t)
+  ;; (load-theme 'modus-vivendi t)
   ;; if the font is paying attention ¯\_(ツ)_/¯
-  (set-face-attribute 'default nil :weight 'light)
-  (set-face-attribute 'bold nil :weight 'semibold))
+  ;; (set-face-attribute 'default nil :weight 'light)
+  ;; (set-face-attribute 'bold nil :weight 'semibold)
+  )
 
 (use-package hl-todo
   :hook ((after-init-hook . global-hl-todo-mode)))
@@ -594,8 +611,12 @@ frames with exactly two windows."
 (use-package zerodark-theme)
 (use-package doom-themes)
 (use-package zenburn-theme)
-(use-package dracula-theme)
+(use-package dracula-theme
+  :commands (dracula-theme)
+  :init
+  (load-theme 'dracula t))
 (use-package almost-mono-themes)
+(use-package base16-theme)
 
 (use-package rainbow-mode
   :bind (("C-c r" . rainbow-mode)))
@@ -656,104 +677,153 @@ frames with exactly two windows."
   :init
   (prescient-persist-mode 1))
 
-(use-package company-prescient :diminish "")
-
-(use-package ivy
-  :diminish
-  :custom
-  (ivy-height 15)
-  (ivy-wrap t)
-  (ivy-use-virtual-buffers t)
-  (ivy-extra-directories nil)
-  (confirm-nonexistent-file-or-buffer t)
+(use-package company-prescient
+  :diminish ""
   :init
-  (ivy-mode 1)
-  (setq ivy-re-builders-alist
-        '((read-file-name-internal . ivy--regex-fuzzy)
-          (t . ivy--regex-plus)))
-  (setq completion-cycle-threshold 3)
-  (setq completion-flex-nospace nil)
-  (setq completion-pcm-complete-word-inserts-delimiters t)
-  (setq completion-pcm-word-delimiters "-_./:| ")
-  (setq completion-show-help nil)
-  (setq completion-auto-help nil)
-  (setq completions-format 'one-column)
-  (setq completions-detailed t)
-  (setq read-file-name-completion-ignore-case t)
-  (setq read-answer-short t)
-  (setq completion-category-defaults nil)
-  (setq completion-ignore-case t)
-  (setq-default case-fold-search t)     ; For general regexp
-  (setq read-buffer-completion-ignore-case t)
-  (setq enable-recursive-minibuffers t)
-  (setq resize-mini-windows t)
-  (setq minibuffer-eldef-shorten-default t)
-  (setq echo-keystrokes 0.25)           ; from the C source code
-  :bind (("C-x b" . ivy-switch-buffer)
-         ("C-c v" . ivy-push-view)
-         ("C-c V" . ivy-pop-view)
-         ("C-c C-r" . ivy-resume)))
+  (company-prescient-mode 1))
 
-(use-package ivy-prescient
-  :commands (ivy-presient-mode)
-  :init
-  (ivy-prescient-mode 1))
+(cond ((eq 'ivy j0ni/completion-system)
+       (progn
+         (use-package ivy
+           :diminish
+           :custom
+           (ivy-height 15)
+           (ivy-wrap t)
+           (ivy-use-virtual-buffers t)
+           (ivy-extra-directories nil)
+           (confirm-nonexistent-file-or-buffer t)
+           :init
+           (ivy-mode 1)
+           (setq ivy-re-builders-alist
+                 '((read-file-name-internal . ivy--regex-fuzzy)
+                   (t . ivy--regex-plus)))
+           (setq completion-cycle-threshold 3)
+           (setq completion-flex-nospace nil)
+           (setq completion-pcm-complete-word-inserts-delimiters t)
+           (setq completion-pcm-word-delimiters "-_./:| ")
+           (setq completion-show-help nil)
+           (setq completion-auto-help nil)
+           (setq completions-format 'one-column)
+           (setq completions-detailed t)
+           (setq read-file-name-completion-ignore-case t)
+           (setq read-answer-short t)
+           (setq completion-category-defaults nil)
+           (setq completion-ignore-case t)
+           (setq-default case-fold-search t) ; For general regexp
+           (setq read-buffer-completion-ignore-case t)
+           (setq enable-recursive-minibuffers t)
+           (setq resize-mini-windows t)
+           (setq minibuffer-eldef-shorten-default t)
+           (setq echo-keystrokes 0.25)  ; from the C source code
+           :bind (("C-x b" . ivy-switch-buffer)
+                  ("C-c v" . ivy-push-view)
+                  ("C-c V" . ivy-pop-view)
+                  ("C-c C-r" . ivy-resume)))
 
-(use-package ivy-rich
-  :commands (ivy-rich-mode)
-  :after (ivy counsel)
-  :init
-  (ivy-rich-mode 1))
+         (use-package ivy-prescient
+           :commands (ivy-presient-mode)
+           :init
+           (ivy-prescient-mode 1))
 
-(use-package hydra
-  :commands (hydra-add-imenu)
-  :hook (emacs-lisp-mode . hydra-add-imenu))
+         (use-package ivy-rich
+           :commands (ivy-rich-mode)
+           :after (ivy counsel)
+           :init
+           (ivy-rich-mode 1))
 
-(use-package ivy-hydra
-  :commands (hydra-ivy/body))
+         (use-package hydra
+           :commands (hydra-add-imenu)
+           :hook (emacs-lisp-mode . hydra-add-imenu))
 
-(use-package swiper
-  :bind (("C-s" . swiper-isearch)
-         ("C-c u" . swiper-all)))
+         (use-package ivy-hydra
+           :commands (hydra-ivy/body))
 
-(use-package counsel
-  :after (ivy)
-  :init
-  (counsel-mode 1)
-  :diminish
-  :bind (("M-x" . counsel-M-x)
-         ("C-x C-f" . counsel-find-file)
-         ("C-M-y" . counsel-yank-pop)
-         ("<f1> f" . counsel-describe-function)
-         ("<f1> v" . counsel-describe-variable)
-         ("<f1> l" . counsel-find-library)
-         ("<f2> i" . counsel-info-lookup-symbol)
-         ("<f2> u" . counsel-unicode-char)
-         ("<f2> j" . counsel-set-variable)
-         ("C-c C" . counsel-compile)
-         ("C-c g" . counsel-git)
-         ("C-c j" . counsel-git-grep)
-         ("C-c L" . counsel-git-log)
-         ("C-c k" . counsel-rg)
-         ;; ("C-c m" 'counsel-linux-app)
-         ("C-c n" . counsel-fzf)
-         ("C-x l" . counsel-locate)
-         ("C-c J" . counsel-file-jump)
-         ;; ("C-S-o" . counsel-rhythmbox)
-         ("C-c w" . counsel-wmctrl)
-         ("C-c b" . counsel-bookmark)
-         ("C-c d" . counsel-descbinds)
-         ("C-c o" . counsel-outline)
-         ("C-c t" . counsel-load-theme)
-         ("C-c F" . counsel-org-file)))
+         (use-package swiper
+           :bind (("C-s" . swiper-isearch)
+                  ("C-c u" . swiper-all)))
 
-(use-package counsel-jq)
-(use-package counsel-org-clock)
+         (use-package counsel
+           :after (ivy)
+           :init
+           (counsel-mode 1)
+           :diminish
+           :bind (("M-x" . counsel-M-x)
+                  ("C-x C-f" . counsel-find-file)
+                  ("C-M-y" . counsel-yank-pop)
+                  ("<f1> f" . counsel-describe-function)
+                  ("<f1> v" . counsel-describe-variable)
+                  ("<f1> l" . counsel-find-library)
+                  ("<f2> i" . counsel-info-lookup-symbol)
+                  ("<f2> u" . counsel-unicode-char)
+                  ("<f2> j" . counsel-set-variable)
+                  ("C-c C" . counsel-compile)
+                  ("C-c g" . counsel-git)
+                  ("C-c j" . counsel-git-grep)
+                  ("C-c L" . counsel-git-log)
+                  ("C-c k" . counsel-rg)
+                  ;; ("C-c m" 'counsel-linux-app)
+                  ("C-c n" . counsel-fzf)
+                  ("C-x l" . counsel-locate)
+                  ("C-c J" . counsel-file-jump)
+                  ;; ("C-S-o" . counsel-rhythmbox)
+                  ("C-c w" . counsel-wmctrl)
+                  ("C-c b" . counsel-bookmark)
+                  ("C-c d" . counsel-descbinds)
+                  ("C-c o" . counsel-outline)
+                  ("C-c t" . counsel-load-theme)
+                  ("C-c F" . counsel-org-file)))
 
-(use-package counsel-projectile
-  :diminish
-  :commands (counsel-projectile-mode)
-  :hook (after-init-hook . counsel-projectile-mode))
+         (use-package counsel-jq)
+         (use-package counsel-org-clock)
+
+         (use-package counsel-projectile
+           :diminish
+           :commands (counsel-projectile-mode)
+           :hook (after-init-hook . counsel-projectile-mode))))
+
+      ((eq 'selectrum j0ni/completion-system)
+       (progn
+         (use-package selectrum
+           :commands (selectrum-mode)
+           :bind (:map selectrum-minibuffer-map
+                       ("C-j" . selectrum-select-current-candidate)
+                       ("C-s" . selectrum-previous-candidate))
+           :custom
+           (selectrum-display-action nil)
+           (selectrum-max-window-height 20)
+           (selectrum-fix-vertical-window-height nil)
+           (selectrum-num-candidates-displayed 'auto)
+           (selectrum-extend-current-candidate-highlight t)
+           :init
+           (selectrum-mode 1))
+
+         (use-package selectrum-prescient
+           :commands (selectrum-prescient-mode)
+           :hook ((selectrum-mode-hook . selectrum-prescient-mode)))
+
+         (use-package consult
+           :bind (("C-x b" . consult-buffer)
+                  ("C-s" . consult-line)
+                  ("C-r" . consult-isearch)
+                  ("C-c i" . consult-imenu)
+                  ("C-c C-s" . consult-ripgrep)
+                  :map projectile-command-map
+                  ("s r" . consult-ripgrep))
+           :custom
+           (consult-project-root-function #'ffip-get-project-root-directory)
+           (consult-preview-key 'any)
+           (xref-show-xrefs-function #'consult-xref)
+           (xref-show-definitions-function #'consult-xref))
+
+         (use-package marginalia
+           :commands (marginalia-mode)
+           :custom
+           (marginalia-annotators
+            '(marginalia-annotators-heavy marginalia-annotators-light))
+           :init
+           (marginalia-mode 1))))
+
+      (t (message "*poof!*")))
 
 (use-package browse-kill-ring
   :init
@@ -869,7 +939,7 @@ frames with exactly two windows."
   (lsp-modeline-diagnostics-enable t)
   (lsp-modeline-workspace-status-enable nil)
   (lsp-enable-indentation t)
-  (lsp-enable-completion-at-point t)
+  (lsp-completion-enable t)
   (lsp-auto-configure t)
   (lsp-enable-xref t)
   (lsp-enable-snippet nil)
@@ -880,7 +950,10 @@ frames with exactly two windows."
   (lsp-enable-symbol-highlighting t)
   (lsp-idle-delay 0.8)
   (lsp-lens-enable nil)
-  (lsp-prefer-flymake nil)
+  (lsp-diagnostics-disabled-modes '(clojure-mode
+                                    clojurex-mode
+                                    clojurec-mode))
+  ;; (lsp-prefer-flymake nil)
   (lsp-file-watch-threshold 10000)
   (lsp-signature-auto-activate nil)
   (lsp-completion-provider :capf)
@@ -1001,11 +1074,11 @@ Info contains the connection type, project name and host:port endpoint."
      clojurescript-mode-hook
      clojurex-mode-hook)
     . (lambda ()
-        (lsp)
+        ;; (lsp)
         (cider-mode 1)
         (clj-refactor-mode 1)
         (enable-paredit-mode)
-        (flycheck-mode 1)
+        ;; (flycheck-mode 1)
         (subword-mode 1))))
   :init
   (dolist (m '(clojure-mode clojurec-mode clojurescript-mode clojurex-mode))
