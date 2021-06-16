@@ -25,6 +25,7 @@
          (after-init-hook . recentf-mode)
          (after-init-hook . savehist-mode))
   :custom
+  (warning-suppress-types '((comp)))
   (epa-pinentry-mode 'loopback)
   (flymake-fringe-indicator-position 'right-fringe)
   (inhibit-startup-screen t)
@@ -591,7 +592,7 @@ frames with exactly two windows."
   (modus-themes-paren-match 'intense-bold)
   :config
   ;; (load-theme 'modus-operandi t)
-  ;; (load-theme 'modus-vivendi t)
+  (load-theme 'modus-vivendi t)
   ;; if the font is paying attention ¯\_(ツ)_/¯
   ;; (set-face-attribute 'default nil :weight 'light)
   ;; (set-face-attribute 'bold nil :weight 'semibold)
@@ -614,7 +615,8 @@ frames with exactly two windows."
 (use-package dracula-theme
   :commands (dracula-theme)
   :init
-  (load-theme 'dracula t))
+  ;;(load-theme 'dracula t))
+  )
 (use-package almost-mono-themes)
 (use-package base16-theme)
 
@@ -891,11 +893,11 @@ frames with exactly two windows."
 (use-package racket-mode
   :hook ((racket-mode-hook . enable-paredit-mode)))
 
-(use-package smartparens
-  :diminish ""
-  ;; :config
-  ;; (require 'smartparens-config)
-  )
+;; (use-package smartparens
+;;   :diminish ""
+;;   ;; :config
+;;   ;; (require 'smartparens-config)
+;;   )
 
 (use-package which-key
   :diminish ""
@@ -935,25 +937,29 @@ frames with exactly two windows."
 (use-package lsp-mode
   :commands (lsp lsp-register-custom-settings lsp-deferred)
   :custom
+  (lsp-auto-configure nil)
+  (lsp-enable-snippet t)
+  (lsp-enable-folding nil)
+  (lsp-enable-file-watchers t)
+  (lsp-enable-links t)
+  (lsp-enable-imenu t)
+  (lsp-enable-dap-auto-configure t)
+  (lsp-enable-symbol-highlighting t)
+  (lsp-enable-xref t)
+  (lsp-enable-indentation t)
+  (lsp-enable-on-type-formatting nil)
+  (lsp-enable-text-document-color nil)
   (lsp-modeline-code-actions-enable nil)
   (lsp-modeline-diagnostics-enable t)
   (lsp-modeline-workspace-status-enable nil)
-  (lsp-enable-indentation t)
   (lsp-completion-enable t)
-  (lsp-auto-configure t)
-  (lsp-enable-xref t)
-  (lsp-enable-snippet nil)
   (lsp-auto-guess-root nil)
   (lsp-eldoc-enable-hover nil)
   (lsp-eldoc-render-all nil)
   (lsp-signature-render-all t)
-  (lsp-enable-symbol-highlighting t)
   (lsp-idle-delay 0.8)
   (lsp-lens-enable nil)
-  (lsp-diagnostics-disabled-modes '(clojure-mode
-                                    clojurex-mode
-                                    clojurec-mode))
-  ;; (lsp-prefer-flymake nil)
+  (lsp-prefer-flymake nil)
   (lsp-file-watch-threshold 10000)
   (lsp-signature-auto-activate nil)
   (lsp-completion-provider :capf)
@@ -1068,21 +1074,22 @@ Info contains the connection type, project name and host:port endpoint."
   (cljr-add-keybindings-with-prefix "C-c C-j"))
 
 (use-package clojure-mode
+  :init
+  ;; (setq lsp-clojure-custom-server-command '("bash" "-c" "/usr/bin/clojure-lsp"))
+  (defun j0ni/clojure-hook ()
+    (cider-mode 1)
+    (clj-refactor-mode 1)
+    (enable-paredit-mode)
+    ;; (flycheck-mode 1)
+    (subword-mode 1)
+    (require 'lsp-clojure)
+    (lsp))
   :hook
   (((clojure-mode-hook
      clojurec-mode-hook
      clojurescript-mode-hook
      clojurex-mode-hook)
-    . (lambda ()
-        ;; (lsp)
-        (cider-mode 1)
-        (clj-refactor-mode 1)
-        (enable-paredit-mode)
-        ;; (flycheck-mode 1)
-        (subword-mode 1))))
-  :init
-  (dolist (m '(clojure-mode clojurec-mode clojurescript-mode clojurex-mode))
-    (add-to-list 'lsp-language-id-configuration `(,m . "clojure"))))
+    . j0ni/clojure-hook)))
 
 (use-package ruby-mode
   :hook (ruby-mode-hook . flycheck-mode))
@@ -1138,6 +1145,7 @@ Info contains the connection type, project name and host:port endpoint."
   (push 'rustic-clippy flycheck-checkers))
 
 (use-package org
+  :straight (:type built-in)
   :bind (("C-c c" . org-capture)
          ("C-c a" . org-agenda))
   :custom

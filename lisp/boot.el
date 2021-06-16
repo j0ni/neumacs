@@ -8,8 +8,6 @@
 ;;;
 ;;; Code:
 
-(setq comp-async-report-warnings-errors nil)
-
 (setq straight-repository-branch "develop")
 (setq straight-vc-git-default-protocol 'ssh)
 (setq straight-use-package-by-default t)
