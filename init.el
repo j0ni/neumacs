@@ -60,6 +60,46 @@
   (mouse-wheel-progressive-speed t)              ; don't accelerate scrolling
   (shr-color-visible-luminance-min 90)
   :init
+  (set-frame-parameter (selected-frame) 'alpha '(90 . 50))
+
+  ;; set up logging
+  (defun j0ni/current-time-microseconds ()
+    "Return the current time formatted to include microseconds."
+    (let* ((nowtime (current-time))
+           (now-ms (nth 2 nowtime)))
+      (concat (format-time-string "[%Y-%m-%dT%T" nowtime) (format ".%d]" now-ms))))
+
+  (defvar j0ni/last-log-message nil
+    "Last message with timestamp appended to it.")
+
+  (defun j0ni/sanitize-log-message (format-string args)
+    (string-trim
+     (if args
+         (apply 'format `(,format-string ,@args))
+       format-string)))
+
+  (defun j0ni/ad-timestamp-message (format-string &rest args)
+    "Prepend timestamp to each message in message buffer.
+
+FORMAT-STRING and ARGS are used by `message' to print a formatted string.
+
+Enable with (add-hook 'find-file-hook 'j0ni/ad-timestamp-message)"
+    (when (and message-log-max
+               (not (string-equal format-string "%s%s")))
+      (let ((formatted-message-string (j0ni/sanitize-log-message format-string args)))
+        (unless (string= formatted-message-string j0ni/last-log-message)
+          (setq j0ni/last-log-message formatted-message-string)
+          (let ((deactivate-mark nil)
+                (inhibit-read-only t))
+            (with-current-buffer "*Messages*"
+              (goto-char (point-max))
+              (when (not (bolp))
+                (newline))
+              (insert (format-time-string "[%F %T.%3N] "))))))))
+
+  ;; (advice-add 'message :before 'j0ni/ad-timestamp-message)
+
+  ;; OS dependent modifier setup
   (when j0ni/is-mac
     ;; The left and right Option or Alt keys.
     (setq ns-alternate-modifier 'meta)
@@ -203,6 +243,13 @@ frames with exactly two windows."
             (set-window-buffer (next-window) next-win-buffer)
             (select-window first-win)
             (if this-win-2nd (other-window 1))))))
+  (defun zarkone/vertical-three-windows-layout ()
+    "Vertical, three window layout"
+    (interactive)
+    (delete-other-windows)
+    (split-window-horizontally)
+    (split-window-horizontally)
+    (balance-windows))
   (defun j0ni/read-string-from-file (file-path)
     (with-temp-buffer
       (insert-file-contents file-path)
@@ -231,12 +278,33 @@ frames with exactly two windows."
   :bind (("M-[" . beginning-of-buffer)
          ("M-]" . end-of-buffer)
          ("C-x C-r" . revert-buffer)
-         ("C-c C-k" . eval-buffer)
          ("C-x |" . j0ni/toggle-window-split)
+         ("C-c C-k" . eval-buffer)
          ("C-c ." . j0ni/delete-whitespace)
          ("C-c s" . j0ni/insert-shrug)
          ("C-=" . text-scale-increase)
-         ("C--" . text-scale-decrease)))
+         ("C--" . text-scale-decrease))
+  :chords
+  (("df" . previous-window-any-frame)
+   ("jk" . next-window-any-frame)
+   ("kl" . display-line-numbers-mode)))
+
+(use-package xref
+  ;;:init
+  ;; WIP - I want to pop back to the buffer I was in before
+  ;; (defvar j0ni/window-history-alist '() "keep track of where we are")
+  ;; (defun j0ni/xref--show-xref-buffer (fetcher alist)
+  ;;   (let ((this-buffer (window-buffer))
+  ;;         (this-window (get-buffer-window this-buffer))
+  ;;         (current-window-list (assoc-default this-window j0ni/window-history-alist nil '())))
+  ;;     (append )
+  ;;     (setq j0ni/window-history-alist (cons '(this-window) ))))
+  ;; (lambda ()
+  ;;                                    (let ((buf (window-buffer)))))
+  :custom
+  (xref-marker-ring-length 64)
+  (xref-show-xrefs-function 'xref--show-xref-buffer) ; default
+  (xref-show-definitions-function 'xref-show-definitions-completing-read))
 
 (defvar pragmata-pro-ligatures
   (mapcar #'car
@@ -497,6 +565,10 @@ frames with exactly two windows."
   ;; (ligature-set-ligatures 'prog-mode pragmata-pro-ligatures)
   ;; :hook ((prog-mode-hook . ligature-mode))
   )
+
+(use-package beacon
+  :commands (beacon-blink)
+  :bind (("C-x =" . beacon-blink)))
 
 (use-package ibuffer
   :bind (("C-x C-b" . ibuffer))
@@ -934,43 +1006,49 @@ frames with exactly two windows."
 
 (use-package restclient)
 
-(use-package lsp-mode
-  :commands (lsp lsp-register-custom-settings lsp-deferred)
-  :custom
-  (lsp-auto-configure nil)
-  (lsp-enable-snippet t)
-  (lsp-enable-folding nil)
-  (lsp-enable-file-watchers t)
-  (lsp-enable-links t)
-  (lsp-enable-imenu t)
-  (lsp-enable-dap-auto-configure t)
-  (lsp-enable-symbol-highlighting t)
-  (lsp-enable-xref t)
-  (lsp-enable-indentation t)
-  (lsp-enable-on-type-formatting nil)
-  (lsp-enable-text-document-color nil)
-  (lsp-modeline-code-actions-enable nil)
-  (lsp-modeline-diagnostics-enable t)
-  (lsp-modeline-workspace-status-enable nil)
-  (lsp-completion-enable t)
-  (lsp-auto-guess-root nil)
-  (lsp-eldoc-enable-hover nil)
-  (lsp-eldoc-render-all nil)
-  (lsp-signature-render-all t)
-  (lsp-idle-delay 0.8)
-  (lsp-lens-enable nil)
-  (lsp-prefer-flymake nil)
-  (lsp-file-watch-threshold 10000)
-  (lsp-signature-auto-activate nil)
-  (lsp-completion-provider :capf)
-  (lsp-keymap-prefix "C-c l")
-  :bind (:map lsp-mode-map
-              ("C-c C-l d" . lsp-describe-thing-at-point)
-              ("C-c C-l e" . lsp-execute-code-action)
-              ("C-c C-l r" . lsp-rename)
-              ("C-c C-l i" . lsp-find-implementation)
-              ("C-c C-l ." . lsp-find-type-definition)
-              ("C-c C-l x" . lsp-workspace-restart)))
+;; (use-package lsp-mode
+;;   :commands (lsp lsp-register-custom-settings lsp-deferred)
+;;   :hook ((lsp-mode-hook . lsp-enable-which-key-integration))
+;;   :custom
+;;   (lsp-auto-configure nil)
+;;   (lsp-enable-snippet t)
+;;   (lsp-enable-folding nil)
+;;   (lsp-enable-file-watchers t)
+;;   (lsp-enable-links t)
+;;   (lsp-enable-imenu t)
+;;   (lsp-enable-dap-auto-configure t)
+;;   (lsp-enable-symbol-highlighting t)
+;;   (lsp-enable-xref t)
+;;   (lsp-enable-indentation t)
+;;   (lsp-enable-on-type-formatting nil)
+;;   (lsp-enable-text-document-color nil)
+;;   (lsp-modeline-code-actions-enable nil)
+;;   (lsp-modeline-diagnostics-enable t)
+;;   (lsp-modeline-workspace-status-enable nil)
+;;   (lsp-completion-enable t)
+;;   (lsp-auto-guess-root nil)
+;;   (lsp-eldoc-enable-hover nil)
+;;   (lsp-eldoc-render-all nil)
+;;   (lsp-signature-render-all t)
+;;   (lsp-idle-delay 0.8)
+;;   (lsp-lens-enable nil)
+;;   (lsp-prefer-flymake nil)
+;;   (lsp-file-watch-threshold 10000)
+;;   (lsp-signature-auto-activate nil)
+;;   (lsp-completion-provider :capf)
+;;   (lsp-keymap-prefix "C-c l")
+;;   :bind (:map lsp-mode-map
+;;               ("C-c C-l d" . lsp-describe-thing-at-point)
+;;               ("C-c C-l e" . lsp-execute-code-action)
+;;               ("C-c C-l r" . lsp-rename)
+;;               ("C-c C-l i" . lsp-find-implementation)
+;;               ("C-c C-l ." . lsp-find-type-definition)
+;;               ("C-c C-l x" . lsp-workspace-restart)))
+
+;; (use-package lsp-java
+;;   :init
+;;   (require 'lsp-java)
+;;   :hook ((java-mode-hook . lsp)))
 
 ;; (use-package lsp-ui
 ;;   :config
@@ -1000,7 +1078,7 @@ frames with exactly two windows."
   :custom
   (treemacs-space-between-root-nodes nil))
 
-(use-package lsp-treemacs)
+;; (use-package lsp-treemacs)
 
 (use-package sly
   :hook ((sly-mrepl-hook . company-mode))
@@ -1082,8 +1160,9 @@ Info contains the connection type, project name and host:port endpoint."
     (enable-paredit-mode)
     ;; (flycheck-mode 1)
     (subword-mode 1)
-    (require 'lsp-clojure)
-    (lsp))
+    ;; (require 'lsp-clojure)
+    ;; (lsp)
+    )
   :hook
   (((clojure-mode-hook
      clojurec-mode-hook
@@ -1111,8 +1190,9 @@ Info contains the connection type, project name and host:port endpoint."
   :hook ((purescript-mode-hook . psc-ide-mode)))
 
 (use-package typescript-mode
-  :after (lsp-mode)
-  :hook ((typescript-mode-hook . lsp)))
+  ;; :after (lsp-mode)
+  ;; :hook ((typescript-mode-hook . lsp))
+  )
 
 (use-package eros
   :hook ((after-init-hook . eros-mode)))
@@ -1121,7 +1201,7 @@ Info contains the connection type, project name and host:port endpoint."
   :hook ((prog-mode-hook . flycheck-mode))
   :custom
   (flycheck-indication-mode 'right-fringe)
-  (flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+  (flycheck-disabled-checkers '(emacs-lisp-checkdoc clojure clojurescript))
   (flycheck-check-syntax-automatically '(save idle-change mode-enabled))
   :config
   (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
@@ -1136,13 +1216,16 @@ Info contains the connection type, project name and host:port endpoint."
   (rustic-indent-method-chain t)
   (rustic-lsp-server 'rust-analyzer)
   (rustic-lsp-format t)
-  (rustic-lsp-client 'lsp)
+  (rustic-lsp-client 'eglot)
   (rustic-indent-method-chain nil)
   :config
   (setq indent-tabs-mode nil)
   (require 'lsp-rust)
   (setq lsp-rust-server 'rust-analyzer)
   (push 'rustic-clippy flycheck-checkers))
+
+(use-package eglot
+  :commands (eglot-ensure))
 
 (use-package org
   :straight (:type built-in)
@@ -1431,4 +1514,4 @@ Info contains the connection type, project name and host:port endpoint."
 (require 'keys)
 
 ;; everything is now loaded...
-(server-start)
+(add-hook 'after-init-hook #'server-start)
