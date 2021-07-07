@@ -674,7 +674,6 @@ frames with exactly two windows."
   :hook ((after-init-hook . global-hl-todo-mode)))
 
 (use-package volatile-highlights
-  :ensure t
   :config
   (volatile-highlights-mode +1)
   (diminish 'volatile-highlights-mode))

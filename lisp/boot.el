@@ -45,5 +45,8 @@
   ;; such as `describe-symbol'.
   (setq use-package-hook-name-suffix nil))
 
+(use-package use-package-chords)
+(key-chord-mode 1)
+
 (provide 'boot)
 ;;; boot.el ends here
