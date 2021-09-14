@@ -124,9 +124,9 @@ Enable with (add-hook 'find-file-hook 'j0ni/ad-timestamp-message)"
   (set-language-environment "UTF-8")
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
-  ;;(set-default-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
-  (setq j0ni/font "Monoid-12")
+  (setq j0ni/completion-system 'vertico)
+  (setq j0ni/font "Monoisome-10")
   ;; (setq j0ni/font "PT Mono-11")
   ;; (setq j0ni/font "Monoisome-10")
   ;; (setq j0ni/font "Lucida Grande Mono-11")
@@ -698,8 +698,6 @@ frames with exactly two windows."
 (use-package rainbow-delimiters
   :hook ((paredit-mode-hook . rainbow-delimiters-mode)))
 
-(use-package fish-mode)
-
 (use-package browse-at-remote)
 
 (use-package diff-hl
@@ -896,6 +894,83 @@ frames with exactly two windows."
            :init
            (marginalia-mode 1))))
 
+      ((eq 'vertico j0ni/completion-system)
+       (progn
+         (use-package vertico
+           :init
+           ;; Add prompt indicator to `completing-read-multiple'.
+           ;; Alternatively try `consult-completing-read-multiple'.
+           (defun crm-indicator (args)
+             (cons (concat "[CRM] " (car args)) (cdr args)))
+           (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+           ;; Do not allow the cursor in the minibuffer prompt
+           (setq minibuffer-prompt-properties
+                 '(read-only t cursor-intangible t face minibuffer-prompt))
+           (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+           ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+           ;; Vertico commands are hidden in normal buffers. (setq
+           ;; read-extended-command-predicate #'command-completion-default-include-p)
+           (vertico-mode 1))
+
+         (use-package orderless
+           :init
+           (setq completion-styles '(substring orderless)
+                 completion-category-defaults nil
+                 completion-category-overrides '((file (styles partial-completion)))))
+
+         (use-package consult
+           :bind (("C-x b" . consult-buffer)
+                  ("C-s" . consult-line)
+                  ("C-r" . consult-isearch)
+                  ("C-c i" . consult-imenu)
+                  ("C-c C-s" . consult-ripgrep)
+                  :map projectile-command-map
+                  ("s r" . consult-ripgrep))
+           :custom
+           (consult-project-root-function #'ffip-get-project-root-directory)
+           (consult-preview-key 'any)
+           (xref-show-xrefs-function #'consult-xref)
+           (xref-show-definitions-function #'consult-xref))
+
+         (use-package embark
+           :ensure t
+
+           :bind
+           (("C-." . embark-act) ;; pick some comfortable binding
+            ("C-;" . embark-dwim) ;; good alternative: M-.
+            ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+
+           :init
+
+           ;; Optionally replace the key help with a completing-read interface
+           (setq prefix-help-command #'embark-prefix-help-command)
+
+           :config
+
+           ;; Hide the mode line of the Embark live/completions buffers
+           (add-to-list 'display-buffer-alist
+                        '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                          nil
+                          (window-parameters (mode-line-format . none)))))
+
+         ;; Consult users will also want the embark-consult package.
+         (use-package embark-consult
+           :ensure t
+           :after (embark consult)
+           :demand t ; only necessary if you have the hook below
+           ;; if you want to have consult previews as you move around an
+           ;; auto-updating embark collect buffer
+           :hook
+           (embark-collect-mode-hook . consult-preview-at-point-mode))
+
+         (use-package marginalia
+           :commands (marginalia-mode)
+           :custom
+           (marginalia-annotators
+            '(marginalia-annotators-heavy marginalia-annotators-light))
+           :init
+           (marginalia-mode 1))))
+
       (t (message "*poof!*")))
 
 (use-package browse-kill-ring
@@ -920,10 +995,10 @@ frames with exactly two windows."
 (use-package projectile
   :hook ((after-init-hook . projectile-mode))
   :diminish ""
-  :custom
-  (projectile-completion-system 'ivy)
+  ;; :custom
+  ;; (projectile-completion-system 'ivy)
   ;; (projectile-completion-system 'default)
-  (projectile-sort-order 'recently-active)
+  ;; (projectile-sort-order 'recently-active)
   :bind-keymap ("C-c p" . projectile-command-map))
 
 (use-package ripgrep
@@ -1301,23 +1376,19 @@ Info contains the connection type, project name and host:port endpoint."
   :hook ((org-agenda-mode-hook . org-super-agenda-mode)))
 
 (use-package org-roam
+  :init
+  (setq org-roam-v2-ack t)
+  :config
+  (org-roam-db-autosync-mode)
+  (add-to-list 'display-buffer-alist
+               '("\\*org-roam\\*"
+                 (display-buffer-in-direction)
+                 (direction . right)
+                 (window-width . 0.33)
+                 (window-height . fit-window-to-buffer)))
   :diminish ""
-  :hook ((after-init-hook . org-roam-mode))
   :custom
-  (org-roam-directory (expand-file-name "org-roam" org-directory))
-  (org-roam-completion-system 'ivy)
-  (org-roam-buffer-position 'bottom)
-  ;; :init
-  ;; (defhydra hydra-org-roam (:exit t :idle 0.8)
-  ;;   "Launcher for `org-roam'."
-  ;;   ("c" org-roam-capture "capture")
-  ;;   ("i" org-roam-insert "insert")
-  ;;   ("f" org-roam-find-file "find-file")
-  ;;   ("v" org-roam-buffer-activate "backlinks"))
-  ;; :bind
-  ;; (("<f5>" . hydra-org-roam/body)
-  ;;  ("C-c C" . org-roam-capture))
-  )
+  (org-roam-directory (expand-file-name "org-roam" org-directory)))
 
 (use-package elfeed
   :custom
