@@ -934,19 +934,19 @@ frames with exactly two windows."
 
          (use-package embark
            :ensure t
-
            :bind
-           (("C-." . embark-act) ;; pick some comfortable binding
-            ("C-;" . embark-dwim) ;; good alternative: M-.
+           (("C-." . embark-act)         ;; pick some comfortable binding
+            ("C-;" . embark-dwim)        ;; good alternative: M-.
             ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
-
            :init
-
            ;; Optionally replace the key help with a completing-read interface
            (setq prefix-help-command #'embark-prefix-help-command)
-
            :config
-
+           (setq embark-action-indicator
+                 (lambda (map _target)
+                   (which-key--show-keymap "Embark" map nil nil 'no-paging)
+                   #'which-key--hide-popup-ignore-command)
+                 embark-become-indicator embark-action-indicator)
            ;; Hide the mode line of the Embark live/completions buffers
            (add-to-list 'display-buffer-alist
                         '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
@@ -957,7 +957,7 @@ frames with exactly two windows."
          (use-package embark-consult
            :ensure t
            :after (embark consult)
-           :demand t ; only necessary if you have the hook below
+           :demand t                 ; only necessary if you have the hook below
            ;; if you want to have consult previews as you move around an
            ;; auto-updating embark collect buffer
            :hook
