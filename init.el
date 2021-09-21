@@ -1,4 +1,4 @@
-;;; init.el --- monolithic emacs config -*- no-byte-compile: t -*-
+;;; init.el --- emacs config -*- no-byte-compile: t -*-
 ;;;
 ;;; Commentary:
 ;;;
@@ -14,21 +14,25 @@
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
 (require 'boot)
 
-(defvar j0ni/font nil "Should be a string like \"Fira Code-11\" or such.")
+(defvar j0ni/fixed-font nil "Should be a string like \"Fira Code Mono-11\" or such.")
+(defvar j0ni/variable-font nil "Should be a string like \"Fira Code-11\" or such.")
 (defvar j0ni/is-mac (memq window-system '(mac ns)))
-(defvar j0ni/completion-system 'ivy "Should be a symbol, currently either 'selectrum or 'ivy")
+(defvar j0ni/completion-system 'ivy "Should be a symbol, currently 'selectrum, 'ivy or 'vertico")
+
+(use-package whitespace-mode
+  :custom
+  (whitespace-line-column 100)
+  (whitespace-style '(face trailing lines-tail tabs))
+  :hook ((prog-mode-hook . whitespace-mode)
+         (whitespace-mode-hook . (lambda () (diminish 'whitespace-mode)))))
 
 (use-package emacs
-  :hook ((before-save-hook . delete-trailing-whitespace)
-         (prog-mode-hook . whitespace-mode)
-         (whitespace-mode-hook . (lambda () (diminish 'whitespace-mode)))
-         (after-init-hook . recentf-mode)
-         (after-init-hook . savehist-mode))
   :custom
   (warning-suppress-types '((comp)))
   (epa-pinentry-mode 'loopback)
   (flymake-fringe-indicator-position 'right-fringe)
   (inhibit-startup-screen t)
+  (auto-revert-verbose t)
   (vc-follow-symlinks t)
   (find-file-suppress-same-file-warnings t)
   (read-file-name-completion-ignore-case t)
@@ -51,71 +55,33 @@
   (enable-local-variables :all)
   (confirm-kill-emacs nil)
   (sentence-end-double-space nil)
-  (whitespace-line-column 100)
-  (whitespace-style '(face trailing lines-tail tabs))
   (delete-old-versions t)
   (version-control t)
   (custom-safe-themes t)
   (mouse-wheel-scroll-amount '(1 ((shift) . 1))) ; one line at a time
-  (mouse-wheel-progressive-speed t)              ; don't accelerate scrolling
+  (mouse-wheel-progressive-speed t)              ; accelerate scrolling
   (shr-color-visible-luminance-min 90)
   :init
+  (when window-system
+    (fringe-mode 8)
+    (menu-bar-mode -1)
+    (scroll-bar-mode -1)
+    (tool-bar-mode -1)
+    (tooltip-mode -1))
   (set-frame-parameter (selected-frame) 'alpha '(90 . 50))
-
-  ;; set up logging
-  (defun j0ni/current-time-microseconds ()
-    "Return the current time formatted to include microseconds."
-    (let* ((nowtime (current-time))
-           (now-ms (nth 2 nowtime)))
-      (concat (format-time-string "[%Y-%m-%dT%T" nowtime) (format ".%d]" now-ms))))
-
-  (defvar j0ni/last-log-message nil
-    "Last message with timestamp appended to it.")
-
-  (defun j0ni/sanitize-log-message (format-string args)
-    (string-trim
-     (if args
-         (apply 'format `(,format-string ,@args))
-       format-string)))
-
-  (defun j0ni/ad-timestamp-message (format-string &rest args)
-    "Prepend timestamp to each message in message buffer.
-
-FORMAT-STRING and ARGS are used by `message' to print a formatted string.
-
-Enable with (add-hook 'find-file-hook 'j0ni/ad-timestamp-message)"
-    (when (and message-log-max
-               (not (string-equal format-string "%s%s")))
-      (let ((formatted-message-string (j0ni/sanitize-log-message format-string args)))
-        (unless (string= formatted-message-string j0ni/last-log-message)
-          (setq j0ni/last-log-message formatted-message-string)
-          (let ((deactivate-mark nil)
-                (inhibit-read-only t))
-            (with-current-buffer "*Messages*"
-              (goto-char (point-max))
-              (when (not (bolp))
-                (newline))
-              (insert (format-time-string "[%F %T.%3N] "))))))))
-
-  ;; (advice-add 'message :before 'j0ni/ad-timestamp-message)
-
   ;; OS dependent modifier setup
   (when j0ni/is-mac
     ;; The left and right Option or Alt keys.
     (setq ns-alternate-modifier 'meta)
     (setq ns-right-alternate-modifier 'left)
-
     ;; The left and right Command keys.
     (setq ns-command-modifier 'meta)
     (setq ns-right-command-modifier 'super)
-
     ;; The left and right Control keys.
     ;; (setq ns-control-modifier 'control)
     ;; (setq ns-right-control-modifier 'control)
-
     ;; The Function (fn) key.
     (setq ns-function-modifier 'none))
-
   (setq-default browse-url-browser-function
                 (cl-case system-type
                   ((darwin macos) 'browse-url-default-macosx-browser)
@@ -126,7 +92,9 @@ Enable with (add-hook 'find-file-hook 'j0ni/ad-timestamp-message)"
   (set-keyboard-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
   (setq j0ni/completion-system 'vertico)
-  (setq j0ni/font "Monoisome-10")
+  ;; (setq j0ni/font "Monoisome-10")
+  (setq j0ni/fixed-font "OpenDyslexicMono Nerd Font-10")
+  (setq j0ni/variable-font "OpenDyslexic Nerd Font-11")
   ;; (setq j0ni/font "PT Mono-11")
   ;; (setq j0ni/font "Monoisome-10")
   ;; (setq j0ni/font "Lucida Grande Mono-11")
@@ -134,11 +102,10 @@ Enable with (add-hook 'find-file-hook 'j0ni/ad-timestamp-message)"
   ;; (setq j0ni/font "Iosevka Snuggle Light-11")
   ;; (setq j0ni/font "PragmataPro Liga-14")
   ;; (setq j0ni/font "Fira Code-13")
-  (set-face-font 'variable-pitch "Lucida Grande-10" nil)
-  (set-frame-font j0ni/font t t)
-  (set-face-font 'fixed-pitch j0ni/font nil)
-  (set-face-font 'fixed-pitch-serif j0ni/font nil)
-  (setq line-spacing 0)
+  (set-face-font 'variable-pitch j0ni/variable-font nil)
+  (set-frame-font j0ni/fixed-font t t)
+  (set-face-font 'fixed-pitch j0ni/fixed-font nil)
+  (set-face-font 'fixed-pitch-serif j0ni/fixed-font nil)
   (set-fontset-font t 'unicode "Symbola" nil 'prepend)
   (when (string= system-type "gnu/linux")
     (setq x-super-keysym 'meta))
@@ -150,7 +117,6 @@ Enable with (add-hook 'find-file-hook 'j0ni/ad-timestamp-message)"
   (setq scroll-conservatively 100000)
   (setq scroll-preserve-screen-position t)
   (setq gc-cons-threshold (* 50 1024 1024))
-  (setq auto-revert-verbose nil)
   (setq create-lockfiles nil)
   (setq redisplay-dont-pause t)
   (setq disabled-command-function nil)
@@ -162,18 +128,6 @@ Enable with (add-hook 'find-file-hook 'j0ni/ad-timestamp-message)"
   (setq load-prefer-newer t)
   (setq highlight-nonselected-windows nil)
   (setq kill-buffer-query-functions nil)
-  (setq display-time-format nil)
-  (setq display-time-24hr-format t)
-  (setq display-time-day-and-date nil)
-  (setq display-time-interval 15)
-  (setq display-time-default-load-average nil)
-  (setq zoneinfo-style-world-list
-        '(("America/Los_Angeles" "San Francisco")
-          ("America/New_York" "Toronto")
-          ("Europe/London" "London")
-          ("Europe/Berlin" "Berlin")
-          ("Asia/Hong_Kong" "Hong Kong")
-          ("Asia/Tokyo" "Tokyo")))
   (setq-default cache-long-scans t)
   (setq-default word-wrap nil)
   (setq-default indicate-buffer-boundaries 'left)
@@ -254,26 +208,23 @@ frames with exactly two windows."
     (with-temp-buffer
       (insert-file-contents file-path)
       (buffer-string)))
+  :hook ((before-save-hook . delete-trailing-whitespace)
+         (window-setup-hook . (recentf-mode
+                               savehist-mode
+                               electric-indent-mode
+                               show-paren-mode
+                               save-place-mode
+                               global-hl-line-mode
+                               column-number-mode
+                               winner-mode
+                               global-auto-revert-mode
+                               file-name-shadow-mode
+                               minibuffer-depth-indicate-mode
+                               minibuffer-electric-default-mode)))
   :config
-  (when window-system
-    (fringe-mode 8)
-    (menu-bar-mode -1)
-    (scroll-bar-mode -1)
-    (tool-bar-mode -1)
-    (tooltip-mode -1))
-  (electric-indent-mode 1)
-  (show-paren-mode 1)
-  (save-place-mode 1)
-  (global-hl-line-mode 1)
-  (column-number-mode 1)
-  (winner-mode 1)
-  (global-auto-revert-mode 1)
   (blink-cursor-mode -1)
-  (file-name-shadow-mode 1)
-  (minibuffer-depth-indicate-mode 1)
-  (minibuffer-electric-default-mode 1)
   (remove-hook 'minibuffer-setup-hook 'winner-save-unconditionally)
-  (diminish 'eldoc-mode)
+  ;; (diminish 'eldoc-mode)
   (advice-add #'shr-colorize-region :around (defun shr-no-colorise-region (&rest ignore)))
   :bind (("M-[" . beginning-of-buffer)
          ("M-]" . end-of-buffer)
@@ -288,6 +239,22 @@ frames with exactly two windows."
   (("df" . previous-window-any-frame)
    ("jk" . next-window-any-frame)
    ("kl" . display-line-numbers-mode)))
+
+(use-package time
+  :hook ((after-init-hook . display-time-mode))
+  :custom
+  (display-time-format nil)
+  (display-time-24hr-format t)
+  (display-time-day-and-date nil)
+  (display-time-interval 15)
+  (display-time-default-load-average nil)
+  (zoneinfo-style-world-list
+   '(("America/Los_Angeles" "San Francisco")
+     ("America/New_York" "Toronto")
+     ("Europe/London" "London")
+     ("Europe/Berlin" "Berlin")
+     ("Asia/Hong_Kong" "Hong Kong")
+     ("Asia/Tokyo" "Tokyo"))))
 
 (use-package xref
   ;;:init
@@ -753,225 +720,11 @@ frames with exactly two windows."
   :init
   (company-prescient-mode 1))
 
-(cond ((eq 'ivy j0ni/completion-system)
-       (progn
-         (use-package ivy
-           :diminish
-           :custom
-           (ivy-height 15)
-           (ivy-wrap t)
-           (ivy-use-virtual-buffers t)
-           (ivy-extra-directories nil)
-           (confirm-nonexistent-file-or-buffer t)
-           :init
-           (ivy-mode 1)
-           (setq ivy-re-builders-alist
-                 '((read-file-name-internal . ivy--regex-fuzzy)
-                   (t . ivy--regex-plus)))
-           (setq completion-cycle-threshold 3)
-           (setq completion-flex-nospace nil)
-           (setq completion-pcm-complete-word-inserts-delimiters t)
-           (setq completion-pcm-word-delimiters "-_./:| ")
-           (setq completion-show-help nil)
-           (setq completion-auto-help nil)
-           (setq completions-format 'one-column)
-           (setq completions-detailed t)
-           (setq read-file-name-completion-ignore-case t)
-           (setq read-answer-short t)
-           (setq completion-category-defaults nil)
-           (setq completion-ignore-case t)
-           (setq-default case-fold-search t) ; For general regexp
-           (setq read-buffer-completion-ignore-case t)
-           (setq enable-recursive-minibuffers t)
-           (setq resize-mini-windows t)
-           (setq minibuffer-eldef-shorten-default t)
-           (setq echo-keystrokes 0.25)  ; from the C source code
-           :bind (("C-x b" . ivy-switch-buffer)
-                  ("C-c v" . ivy-push-view)
-                  ("C-c V" . ivy-pop-view)
-                  ("C-c C-r" . ivy-resume)))
-
-         (use-package ivy-prescient
-           :commands (ivy-presient-mode)
-           :init
-           (ivy-prescient-mode 1))
-
-         (use-package ivy-rich
-           :commands (ivy-rich-mode)
-           :after (ivy counsel)
-           :init
-           (ivy-rich-mode 1))
-
-         (use-package hydra
-           :commands (hydra-add-imenu)
-           :hook (emacs-lisp-mode . hydra-add-imenu))
-
-         (use-package ivy-hydra
-           :commands (hydra-ivy/body))
-
-         (use-package swiper
-           :bind (("C-s" . swiper-isearch)
-                  ("C-c u" . swiper-all)))
-
-         (use-package counsel
-           :after (ivy)
-           :init
-           (counsel-mode 1)
-           :diminish
-           :bind (("M-x" . counsel-M-x)
-                  ("C-x C-f" . counsel-find-file)
-                  ("C-M-y" . counsel-yank-pop)
-                  ("<f1> f" . counsel-describe-function)
-                  ("<f1> v" . counsel-describe-variable)
-                  ("<f1> l" . counsel-find-library)
-                  ("<f2> i" . counsel-info-lookup-symbol)
-                  ("<f2> u" . counsel-unicode-char)
-                  ("<f2> j" . counsel-set-variable)
-                  ("C-c C" . counsel-compile)
-                  ("C-c g" . counsel-git)
-                  ("C-c j" . counsel-git-grep)
-                  ("C-c L" . counsel-git-log)
-                  ("C-c k" . counsel-rg)
-                  ;; ("C-c m" 'counsel-linux-app)
-                  ("C-c n" . counsel-fzf)
-                  ("C-x l" . counsel-locate)
-                  ("C-c J" . counsel-file-jump)
-                  ;; ("C-S-o" . counsel-rhythmbox)
-                  ("C-c w" . counsel-wmctrl)
-                  ("C-c b" . counsel-bookmark)
-                  ("C-c d" . counsel-descbinds)
-                  ("C-c o" . counsel-outline)
-                  ("C-c t" . counsel-load-theme)
-                  ("C-c F" . counsel-org-file)))
-
-         (use-package counsel-jq)
-         (use-package counsel-org-clock)
-
-         (use-package counsel-projectile
-           :diminish
-           :commands (counsel-projectile-mode)
-           :hook (after-init-hook . counsel-projectile-mode))))
-
-      ((eq 'selectrum j0ni/completion-system)
-       (progn
-         (use-package selectrum
-           :commands (selectrum-mode)
-           :bind (:map selectrum-minibuffer-map
-                       ("C-j" . selectrum-select-current-candidate)
-                       ("C-s" . selectrum-previous-candidate))
-           :custom
-           (selectrum-display-action nil)
-           (selectrum-max-window-height 20)
-           (selectrum-fix-vertical-window-height nil)
-           (selectrum-num-candidates-displayed 'auto)
-           (selectrum-extend-current-candidate-highlight t)
-           :init
-           (selectrum-mode 1))
-
-         (use-package selectrum-prescient
-           :commands (selectrum-prescient-mode)
-           :hook ((selectrum-mode-hook . selectrum-prescient-mode)))
-
-         (use-package consult
-           :bind (("C-x b" . consult-buffer)
-                  ("C-s" . consult-line)
-                  ("C-r" . consult-isearch)
-                  ("C-c i" . consult-imenu)
-                  ("C-c C-s" . consult-ripgrep)
-                  :map projectile-command-map
-                  ("s r" . consult-ripgrep))
-           :custom
-           (consult-project-root-function #'ffip-get-project-root-directory)
-           (consult-preview-key 'any)
-           (xref-show-xrefs-function #'consult-xref)
-           (xref-show-definitions-function #'consult-xref))
-
-         (use-package marginalia
-           :commands (marginalia-mode)
-           :custom
-           (marginalia-annotators
-            '(marginalia-annotators-heavy marginalia-annotators-light))
-           :init
-           (marginalia-mode 1))))
-
-      ((eq 'vertico j0ni/completion-system)
-       (progn
-         (use-package vertico
-           :init
-           ;; Add prompt indicator to `completing-read-multiple'.
-           ;; Alternatively try `consult-completing-read-multiple'.
-           (defun crm-indicator (args)
-             (cons (concat "[CRM] " (car args)) (cdr args)))
-           (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-           ;; Do not allow the cursor in the minibuffer prompt
-           (setq minibuffer-prompt-properties
-                 '(read-only t cursor-intangible t face minibuffer-prompt))
-           (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-           ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-           ;; Vertico commands are hidden in normal buffers. (setq
-           ;; read-extended-command-predicate #'command-completion-default-include-p)
-           (vertico-mode 1))
-
-         (use-package orderless
-           :init
-           (setq completion-styles '(substring orderless)
-                 completion-category-defaults nil
-                 completion-category-overrides '((file (styles partial-completion)))))
-
-         (use-package consult
-           :bind (("C-x b" . consult-buffer)
-                  ("C-s" . consult-line)
-                  ("C-r" . consult-isearch)
-                  ("C-c i" . consult-imenu)
-                  ("C-c C-s" . consult-ripgrep)
-                  :map projectile-command-map
-                  ("s r" . consult-ripgrep))
-           :custom
-           (consult-project-root-function #'ffip-get-project-root-directory)
-           (consult-preview-key 'any)
-           (xref-show-xrefs-function #'consult-xref)
-           (xref-show-definitions-function #'consult-xref))
-
-         (use-package embark
-           :ensure t
-           :bind
-           (("C-." . embark-act)         ;; pick some comfortable binding
-            ("C-;" . embark-dwim)        ;; good alternative: M-.
-            ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
-           :init
-           ;; Optionally replace the key help with a completing-read interface
-           (setq prefix-help-command #'embark-prefix-help-command)
-           :config
-           (setq embark-action-indicator
-                 (lambda (map _target)
-                   (which-key--show-keymap "Embark" map nil nil 'no-paging)
-                   #'which-key--hide-popup-ignore-command)
-                 embark-become-indicator embark-action-indicator)
-           ;; Hide the mode line of the Embark live/completions buffers
-           (add-to-list 'display-buffer-alist
-                        '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                          nil
-                          (window-parameters (mode-line-format . none)))))
-
-         ;; Consult users will also want the embark-consult package.
-         (use-package embark-consult
-           :ensure t
-           :after (embark consult)
-           :demand t                 ; only necessary if you have the hook below
-           ;; if you want to have consult previews as you move around an
-           ;; auto-updating embark collect buffer
-           :hook
-           (embark-collect-mode-hook . consult-preview-at-point-mode))
-
-         (use-package marginalia
-           :commands (marginalia-mode)
-           :custom
-           (marginalia-annotators
-            '(marginalia-annotators-heavy marginalia-annotators-light))
-           :init
-           (marginalia-mode 1))))
-
-      (t (message "*poof!*")))
+(pcase j0ni/completion-system
+ ('ivy (require 'ivy-support))
+ ('selectrum (require 'selectrum-support))
+ ('vertico (require 'vertico-support))
+ (_ (message "Completion system [j0ni/completion-system] not set, using builtin")))
 
 (use-package browse-kill-ring
   :init
@@ -1049,11 +802,16 @@ frames with exactly two windows."
   :diminish ""
   :hook (after-init-hook . which-key-mode))
 
-(use-package ace-window
+(use-package switch-window
   :custom
-  (aw-keys '(?a ?s ?d ?f ?j ?k ?l ?n ?m))
-  :commands (ace-window)
-  :bind ("C-x o" . ace-window))
+  (switch-window-shortcut-style 'qwerty)
+  (switch-window-shortcut-appearance 'text)
+  (switch-window-auto-resize-window t)
+  (switch-window-background t)
+  (switch-window-default-window-size 0.8)
+  :hook ((after-init-hook . switch-window-mouse-mode))
+  :commands (switch-window switch-window-mouse-mode)
+  :bind ("C-x o" . switch-window))
 
 (use-package yaml-mode)
 
@@ -1080,73 +838,73 @@ frames with exactly two windows."
 
 (use-package restclient)
 
-;; (use-package lsp-mode
-;;   :commands (lsp lsp-register-custom-settings lsp-deferred)
-;;   :hook ((lsp-mode-hook . lsp-enable-which-key-integration))
-;;   :custom
-;;   (lsp-auto-configure nil)
-;;   (lsp-enable-snippet t)
-;;   (lsp-enable-folding nil)
-;;   (lsp-enable-file-watchers t)
-;;   (lsp-enable-links t)
-;;   (lsp-enable-imenu t)
-;;   (lsp-enable-dap-auto-configure t)
-;;   (lsp-enable-symbol-highlighting t)
-;;   (lsp-enable-xref t)
-;;   (lsp-enable-indentation t)
-;;   (lsp-enable-on-type-formatting nil)
-;;   (lsp-enable-text-document-color nil)
-;;   (lsp-modeline-code-actions-enable nil)
-;;   (lsp-modeline-diagnostics-enable t)
-;;   (lsp-modeline-workspace-status-enable nil)
-;;   (lsp-completion-enable t)
-;;   (lsp-auto-guess-root nil)
-;;   (lsp-eldoc-enable-hover nil)
-;;   (lsp-eldoc-render-all nil)
-;;   (lsp-signature-render-all t)
-;;   (lsp-idle-delay 0.8)
-;;   (lsp-lens-enable nil)
-;;   (lsp-prefer-flymake nil)
-;;   (lsp-file-watch-threshold 10000)
-;;   (lsp-signature-auto-activate nil)
-;;   (lsp-completion-provider :capf)
-;;   (lsp-keymap-prefix "C-c l")
-;;   :bind (:map lsp-mode-map
-;;               ("C-c C-l d" . lsp-describe-thing-at-point)
-;;               ("C-c C-l e" . lsp-execute-code-action)
-;;               ("C-c C-l r" . lsp-rename)
-;;               ("C-c C-l i" . lsp-find-implementation)
-;;               ("C-c C-l ." . lsp-find-type-definition)
-;;               ("C-c C-l x" . lsp-workspace-restart)))
+(use-package lsp-mode
+  :commands (lsp lsp-register-custom-settings lsp-deferred)
+  :hook ((lsp-mode-hook . lsp-enable-which-key-integration))
+  :custom
+  (lsp-auto-configure nil)
+  (lsp-enable-snippet t)
+  (lsp-enable-folding nil)
+  (lsp-enable-file-watchers t)
+  (lsp-enable-links t)
+  (lsp-enable-imenu t)
+  (lsp-enable-dap-auto-configure t)
+  (lsp-enable-symbol-highlighting t)
+  (lsp-enable-xref t)
+  (lsp-enable-indentation t)
+  (lsp-enable-on-type-formatting nil)
+  (lsp-enable-text-document-color nil)
+  (lsp-modeline-code-actions-enable nil)
+  (lsp-modeline-diagnostics-enable t)
+  (lsp-modeline-workspace-status-enable nil)
+  (lsp-completion-enable t)
+  (lsp-auto-guess-root nil)
+  (lsp-eldoc-enable-hover nil)
+  (lsp-eldoc-render-all nil)
+  (lsp-signature-render-all t)
+  (lsp-idle-delay 0.8)
+  (lsp-lens-enable nil)
+  (lsp-prefer-flymake nil)
+  (lsp-file-watch-threshold 10000)
+  (lsp-signature-auto-activate nil)
+  (lsp-completion-provider :capf)
+  (lsp-keymap-prefix "C-c l")
+  :bind (:map lsp-mode-map
+              ("C-c C-l d" . lsp-describe-thing-at-point)
+              ("C-c C-l e" . lsp-execute-code-action)
+              ("C-c C-l r" . lsp-rename)
+              ("C-c C-l i" . lsp-find-implementation)
+              ("C-c C-l ." . lsp-find-type-definition)
+              ("C-c C-l x" . lsp-workspace-restart)))
 
-;; (use-package lsp-java
-;;   :init
-;;   (require 'lsp-java)
-;;   :hook ((java-mode-hook . lsp)))
+(use-package lsp-java
+  :init
+  (require 'lsp-java)
+  :hook ((java-mode-hook . lsp)))
 
-;; (use-package lsp-ui
-;;   :config
-;;   (require 'lsp-ui-imenu)
-;;   :custom
-;;   (lsp-ui-autoconfigure t)
-;;   (lsp-ui-sideline-enable nil)
-;;   (lsp-ui-doc-enable nil)
-;;   (lsp-ui-peek-enable t)
-;;   (lsp-ui-peek-always-show nil)
-;;   (lsp-ui-imenu-autorefresh t)
-;;   (lsp-ui-doc-show-with-cursor t)
-;;   (lsp-ui-doc-show-with-mouse nil)
-;;   :bind
-;;   (:map lsp-ui-mode-map
-;;         ("C-c l I" . lsp-ui-imenu)
-;;         ("C-c l ." . lsp-ui-peek-find-definitions)
-;;         ("C-c l ?" . lsp-ui-peek-find-references)
-;;         ("C-c l r" . lsp-rename)
-;;         ("C-c l x" . lsp-workspace-restart)
-;;         ("C-c l w" . lsp-ui-peek-find-workspace-symbol)
-;;         ("C-c l i" . lsp-ui-peek-find-implementation)
-;;         ("C-c l d" . lsp-describe-thing-at-point)
-;;         ("C-c l e" . lsp-execute-code-action)))
+(use-package lsp-ui
+  :config
+  (require 'lsp-ui-imenu)
+  :custom
+  (lsp-ui-autoconfigure t)
+  (lsp-ui-sideline-enable nil)
+  (lsp-ui-doc-enable nil)
+  (lsp-ui-peek-enable t)
+  (lsp-ui-peek-always-show nil)
+  (lsp-ui-imenu-autorefresh t)
+  (lsp-ui-doc-show-with-cursor t)
+  (lsp-ui-doc-show-with-mouse nil)
+  :bind
+  (:map lsp-ui-mode-map
+        ("C-c l I" . lsp-ui-imenu)
+        ("C-c l ." . lsp-ui-peek-find-definitions)
+        ("C-c l ?" . lsp-ui-peek-find-references)
+        ("C-c l r" . lsp-rename)
+        ("C-c l x" . lsp-workspace-restart)
+        ("C-c l w" . lsp-ui-peek-find-workspace-symbol)
+        ("C-c l i" . lsp-ui-peek-find-implementation)
+        ("C-c l d" . lsp-describe-thing-at-point)
+        ("C-c l e" . lsp-execute-code-action)))
 
 (use-package treemacs
   :custom
@@ -1290,7 +1048,7 @@ Info contains the connection type, project name and host:port endpoint."
   (rustic-indent-method-chain t)
   (rustic-lsp-server 'rust-analyzer)
   (rustic-lsp-format t)
-  (rustic-lsp-client 'eglot)
+  ;; (rustic-lsp-client 'eglot)
   (rustic-indent-method-chain nil)
   :config
   (setq indent-tabs-mode nil)
