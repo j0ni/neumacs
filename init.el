@@ -720,11 +720,14 @@ frames with exactly two windows."
   :init
   (company-prescient-mode 1))
 
-(pcase j0ni/completion-system
- ('ivy (require 'ivy-support))
- ('selectrum (require 'selectrum-support))
- ('vertico (require 'vertico-support))
- (_ (message "Completion system [j0ni/completion-system] not set, using builtin")))
+(cl-case j0ni/completion-system
+  ('ivy (require 'ivy-support))
+  ('selectrum (require 'selectrum-support))
+  ('vertico (require 'vertico-support))
+  ('icomplete (require 'icomplete-support))
+  ('embark (require 'embark-support))
+  ('builtin (require 'builtin-support))
+  (t (message "Completion system [j0ni/completion-system] not set, nothing configured")))
 
 (use-package browse-kill-ring
   :init
