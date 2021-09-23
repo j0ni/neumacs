@@ -17,7 +17,8 @@
 (defvar j0ni/fixed-font nil "Should be a string like \"Fira Code Mono-11\" or such.")
 (defvar j0ni/variable-font nil "Should be a string like \"Fira Code-11\" or such.")
 (defvar j0ni/is-mac (memq window-system '(mac ns)))
-(defvar j0ni/completion-system 'ivy "Should be a symbol, currently 'selectrum, 'ivy or 'vertico")
+(defvar j0ni/completion-system 'builtin
+  "Should be a symbol, currently 'selectrum, 'ivy, 'icomplete, 'embark, 'vertico or 'builtin")
 
 (use-package whitespace-mode
   :custom
@@ -68,7 +69,7 @@
     (scroll-bar-mode -1)
     (tool-bar-mode -1)
     (tooltip-mode -1))
-  (set-frame-parameter (selected-frame) 'alpha '(90 . 50))
+  (set-frame-parameter (selected-frame) 'alpha '(95 . 80))
   ;; OS dependent modifier setup
   (when j0ni/is-mac
     ;; The left and right Option or Alt keys.
@@ -91,16 +92,19 @@
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
-  (setq j0ni/completion-system 'vertico)
+  (setq j0ni/completion-system 'icomplete)
   ;; (setq j0ni/font "Monoisome-10")
-  (setq j0ni/fixed-font "OpenDyslexicMono Nerd Font-10")
-  (setq j0ni/variable-font "OpenDyslexic Nerd Font-11")
+  ;; (setq j0ni/fixed-font "OpenDyslexicMono Nerd Font-10")
+  ;; (setq j0ni/variable-font "OpenDyslexic Nerd Font-11")
   ;; (setq j0ni/font "PT Mono-11")
   ;; (setq j0ni/font "Monoisome-10")
   ;; (setq j0ni/font "Lucida Grande Mono-11")
   ;; (setq j0ni/font "Lucida Console Patched-11")
-  ;; (setq j0ni/font "Iosevka Snuggle Light-11")
-  ;; (setq j0ni/font "PragmataPro Liga-14")
+  (setq j0ni/fixed-font "Iosevka Snuggle-12")
+  ;; (setq j0ni/fixed-font "PragmataPro Mono-12")
+  ;; (setq j0ni/fixed-font "Monoid Nerd Font-10")
+  ;; (setq j0ni/fixed-font "Monoid-10")
+  (setq j0ni/variable-font "Cantarell-11")
   ;; (setq j0ni/font "Fira Code-13")
   (set-face-font 'variable-pitch j0ni/variable-font nil)
   (set-frame-font j0ni/fixed-font t t)
@@ -208,20 +212,21 @@ frames with exactly two windows."
     (with-temp-buffer
       (insert-file-contents file-path)
       (buffer-string)))
-  :hook ((before-save-hook . delete-trailing-whitespace)
-         (window-setup-hook . (recentf-mode
-                               savehist-mode
-                               electric-indent-mode
-                               show-paren-mode
-                               save-place-mode
-                               global-hl-line-mode
-                               column-number-mode
-                               winner-mode
-                               global-auto-revert-mode
-                               file-name-shadow-mode
-                               minibuffer-depth-indicate-mode
-                               minibuffer-electric-default-mode)))
+  :hook ((before-save-hook . delete-trailing-whitespace))
   :config
+  (dolist (mode '(recentf-mode
+                  savehist-mode
+                  electric-indent-mode
+                  show-paren-mode
+                  save-place-mode
+                  global-hl-line-mode
+                  column-number-mode
+                  winner-mode
+                  global-auto-revert-mode
+                  file-name-shadow-mode
+                  minibuffer-depth-indicate-mode
+                  minibuffer-electric-default-mode))
+    (funcall mode 1))
   (blink-cursor-mode -1)
   (remove-hook 'minibuffer-setup-hook 'winner-save-unconditionally)
   ;; (diminish 'eldoc-mode)
@@ -633,9 +638,8 @@ frames with exactly two windows."
   ;; (load-theme 'modus-operandi t)
   (load-theme 'modus-vivendi t)
   ;; if the font is paying attention ¯\_(ツ)_/¯
-  ;; (set-face-attribute 'default nil :weight 'light)
-  ;; (set-face-attribute 'bold nil :weight 'semibold)
-  )
+  (set-face-attribute 'default nil :weight 'light)
+  (set-face-attribute 'bold nil :weight 'semibold))
 
 (use-package hl-todo
   :hook ((after-init-hook . global-hl-todo-mode)))
@@ -645,23 +649,17 @@ frames with exactly two windows."
   (volatile-highlights-mode +1)
   (diminish 'volatile-highlights-mode))
 
-(use-package gruvbox-theme)
-(use-package cyberpunk-theme)
-(use-package zerodark-theme)
 (use-package doom-themes)
-(use-package zenburn-theme)
 (use-package dracula-theme
   :commands (dracula-theme)
   :init
   ;;(load-theme 'dracula t))
   )
 (use-package almost-mono-themes)
-(use-package base16-theme)
 
 (use-package rainbow-mode
   :bind (("C-c r" . rainbow-mode)))
 
-;; (remove-hook 'paredit-mode-hook 'rainbow-delimiters-mode)
 (use-package rainbow-delimiters
   :hook ((paredit-mode-hook . rainbow-delimiters-mode)))
 
@@ -682,7 +680,8 @@ frames with exactly two windows."
 (use-package dockerfile-mode)
 
 (use-package anzu
-  :hook ((after-init-mode . anzu-mode)))
+  :commands (global-anzu-mode)
+  :hook ((after-init-mode . global-anzu-mode)))
 
 ;;; Completion
 
@@ -735,8 +734,7 @@ frames with exactly two windows."
 
 (use-package magit
   :custom
-  (magit-completing-read-function #'ivy-completing-read)
-  ;; (magit-completing-read-function #'selectrum-completing-read)
+  (magit-completing-read-function #'completing-read)
   (magit-diff-refine-hunk t)
   (magit-bury-buffer-function #'magit-mode-quit-window)
   :bind (("C-x g" . magit-status)
@@ -751,10 +749,6 @@ frames with exactly two windows."
 (use-package projectile
   :hook ((after-init-hook . projectile-mode))
   :diminish ""
-  ;; :custom
-  ;; (projectile-completion-system 'ivy)
-  ;; (projectile-completion-system 'default)
-  ;; (projectile-sort-order 'recently-active)
   :bind-keymap ("C-c p" . projectile-command-map))
 
 (use-package ripgrep
@@ -789,17 +783,11 @@ frames with exactly two windows."
 (use-package geiser
   :commands (turn-on-geiser-mode)
   :hook ((scheme-mode-hook . turn-on-geiser-mode)
-         (racket-mode-hook . turn-on-geiser-mode)
          (geiser-repl-mode-hook . enable-paredit-mode)))
 
 (use-package racket-mode
-  :hook ((racket-mode-hook . enable-paredit-mode)))
-
-;; (use-package smartparens
-;;   :diminish ""
-;;   ;; :config
-;;   ;; (require 'smartparens-config)
-;;   )
+  :hook ((racket-mode-hook . enable-paredit-mode)
+         (racket-mode-hook . turn-on-geiser-mode)))
 
 (use-package which-key
   :diminish ""
@@ -913,7 +901,7 @@ frames with exactly two windows."
   :custom
   (treemacs-space-between-root-nodes nil))
 
-;; (use-package lsp-treemacs)
+(use-package lsp-treemacs)
 
 (use-package sly
   :hook ((sly-mrepl-hook . company-mode))
@@ -928,8 +916,7 @@ frames with exactly two windows."
 ;;   ;; :config
 ;;   ;; (inf-clojure-update-feature 'clojure 'completion
 ;;   ;;                             "(compliment.core/completions \"%s\")")
-;;   :hook ((clojure-mode-hook . inf-clojure-minor-mode)
-;;          (inf-clojure-mode-hook . turn-on-eldoc-mode)
+;;   :hook ((inf-clojure-mode-hook . turn-on-eldoc-mode)
 ;;          (inf-clojure-mode-hook . enable-paredit-mode)))
 
 (use-package cider
@@ -968,8 +955,6 @@ Info contains the connection type, project name and host:port endpoint."
         ("C-RET" . cider-repl-return)))
 
 (use-package cider-eval-sexp-fu)
-
-;; (use-package flycheck-clj-kondo)
 
 (use-package clj-refactor
   :diminish ""
@@ -1025,9 +1010,8 @@ Info contains the connection type, project name and host:port endpoint."
   :hook ((purescript-mode-hook . psc-ide-mode)))
 
 (use-package typescript-mode
-  ;; :after (lsp-mode)
-  ;; :hook ((typescript-mode-hook . lsp))
-  )
+  :after (lsp-mode)
+  :hook ((typescript-mode-hook . lsp)))
 
 (use-package eros
   :hook ((after-init-hook . eros-mode)))
@@ -1176,16 +1160,15 @@ Info contains the connection type, project name and host:port endpoint."
   (setq image-scaling-factor 1.4)
   :custom
   (doom-modeline-icon nil)
+  (doom-modeline-window-width-limit nil)
+  (doom-modeline-bar-width 4)
   :hook ((after-init-hook . doom-modeline-mode)))
 
 (use-package markdown-mode
   :hook ((markdown-mode-hook . visual-line-mode)))
 
-(use-package all-the-icons)
-
-;; (use-package lpy
-;;   :commands (lpy-mode)
-;;   :hook ((python-mode-hook . lpy-mode)))
+(use-package all-the-icons
+  :commands (all-the-icons-install-fonts))
 
 (use-package haskell-mode
   :hook ((haskell-mode-hook . electric-pair-mode)))
@@ -1244,7 +1227,6 @@ Info contains the connection type, project name and host:port endpoint."
       mu4e-personal-addresses '("j@lollyshouse.ca"
                                 "hi@mhcat.ca"
                                 "jonathan.irving@gmail.com"
-                                "jonathan.irving@vara.ai"
                                 "j0ni@fastmail.com"
                                 "joni@well.com"
                                 "j0ni@protonmail.com"

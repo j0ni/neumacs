@@ -1,6 +1,10 @@
 ;;; vertico-support.el --- Install the vertico completion ecosystem
 
+(require 'use-package)
+
 (use-package vertico
+  :custom
+  (vertico-count 10)
   :init
   ;; Add prompt indicator to `completing-read-multiple'.
   ;; Alternatively try `consult-completing-read-multiple'.
@@ -12,8 +16,9 @@
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
   ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-  ;; Vertico commands are hidden in normal buffers. (setq
-  ;; read-extended-command-predicate #'command-completion-default-include-p)
+  ;; Vertico commands are hidden in normal buffers.
+  (setq read-extended-command-predicate #'command-completion-default-include-p)
+  ;; switch it on
   (vertico-mode 1))
 
 (use-package orderless
@@ -39,9 +44,11 @@
 (use-package embark
   :ensure t
   :bind
-  (("C-." . embark-act)         ;; pick some comfortable binding
-   ("C-;" . embark-dwim)        ;; good alternative: M-.
-   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+  (("C-." . embark-act)        ;; pick some comfortable binding
+   ("C-;" . embark-dwim)       ;; good alternative: M-.
+   ("C-h B" . embark-bindings) ;; alternative for `describe-bindings'
+   :map minibuffer-mode-map
+   ("M-." . embark-collect-live))
   :init
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
@@ -53,17 +60,14 @@
         embark-become-indicator embark-action-indicator)
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
-               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                 nil
-                 (window-parameters (mode-line-format . none)))))
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*" .
+                 (display-buffer-at-bottom . (window-parameters (mode-line-format . none)
+                                                                (window-height . 10))))))
 
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
   :ensure t
   :after (embark consult)
-  :demand t                 ; only necessary if you have the hook below
-  ;; if you want to have consult previews as you move around an
-  ;; auto-updating embark collect buffer
   :hook
   (embark-collect-mode-hook . consult-preview-at-point-mode))
 
