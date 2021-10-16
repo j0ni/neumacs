@@ -804,7 +804,7 @@ frames with exactly two windows."
   :custom
   (switch-window-shortcut-style 'qwerty)
   (switch-window-shortcut-appearance 'text)
-  (switch-window-auto-resize-window t)
+  (switch-window-auto-resize-window nil)
   (switch-window-background t)
   (switch-window-default-window-size 0.8)
   :hook ((after-init-hook . switch-window-mouse-mode))
