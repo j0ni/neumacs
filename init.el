@@ -97,7 +97,7 @@
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
-  (setq j0ni/completion-system 'icomplete)
+  (setq j0ni/completion-system 'vertico)
   ;; (setq j0ni/font "Monoisome-10")
   ;; (setq j0ni/fixed-font "OpenDyslexicMono Nerd Font-10")
   ;; (setq j0ni/variable-font "OpenDyslexic Nerd Font-11")
