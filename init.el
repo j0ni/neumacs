@@ -1107,8 +1107,12 @@ Info contains the connection type, project name and host:port endpoint."
       "* TODO %?\n  %a\n%i")
      ("b" "BP Journal" entry (file+olp+datetree ,(concat org-directory "/bp.org") "Blood Pressure")
       "* %T\n** Systolic: %^{systolic}\n** Diastolic: %^{diastolic}\n** Pulse: %^{pulse}\n** Notes\n%?\n")))
+  ;; (org-publish-project-alist
+  ;;  '(("")))
   :init
   (defun j0ni/org-mode-hook ()
+    ;; org exporting stuff
+    (require 'ox-publish)
     ;; org-capture - for inserting into date based trees
     (require 'org-datetree)
     ;; needed for structure templates (<s-TAB etc)
@@ -1118,6 +1122,8 @@ Info contains the connection type, project name and host:port endpoint."
     (add-hook 'before-save-hook 'org-update-all-dblocks nil 'local-only))
   :hook ((org-mode-hook . j0ni/org-mode-hook)
          (org-capture-mode-hook . j0ni/org-mode-hook)))
+
+(use-package simple-httpd)
 
 (use-package org-super-agenda
   :after (org-with-contrib)
