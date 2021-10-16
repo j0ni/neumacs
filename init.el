@@ -709,9 +709,7 @@ frames with exactly two windows."
          ("C-\\" . company-complete-common-or-cycle)
          ("C-j" . company-complete-selection)
          ("C-n" . company-select-next)
-         ("C-p" . company-select-previous))
-  :config
-  (push 'company-elisp company-backends))
+         ("C-p" . company-select-previous)))
 
 (use-package prescient
   :commands (prescient-persist-mode)
