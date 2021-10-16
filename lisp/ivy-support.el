@@ -27,7 +27,6 @@
   (setq completion-ignore-case t)
   (setq-default case-fold-search t)   ; For general regexp
   (setq read-buffer-completion-ignore-case t)
-  (setq enable-recursive-minibuffers t)
   (setq resize-mini-windows t)
   (setq minibuffer-eldef-shorten-default t)
   (setq echo-keystrokes 0.25)         ; from the C source code

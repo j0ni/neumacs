@@ -143,6 +143,7 @@
   (setq-default fill-column 80)
   (setq-default line-spacing 0)
   (setq-default truncate-lines t)
+  (setq enable-recursive-minibuffers t)
   (defun j0ni/disable-truncate-lines ()
     (interactive)
     (setq-local truncate-lines nil))
