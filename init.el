@@ -776,12 +776,16 @@ frames with exactly two windows."
 
 ;; C-M-SPC mark-sexp Put the mark at the end of the sexp.
 
+
 (use-package paredit
   :diminish ""
   :hook ((emacs-lisp-mode-hook . enable-paredit-mode)
          (lisp-mode-hook . enable-paredit-mode)
          (scheme-mode-hook . enable-paredit-mode))
-  :commands (enable-paredit-mode))
+  :commands (enable-paredit-mode)
+  :config
+  (define-key paredit-mode-map (kbd "C-M-s") #'paredit-splice-sexp)
+  (define-key paredit-mode-map (kbd "M-s") nil))
 
 (use-package geiser
   :commands (turn-on-geiser-mode)
