@@ -63,12 +63,17 @@
   (mouse-wheel-progressive-speed t)              ; accelerate scrolling
   (shr-color-visible-luminance-min 90)
   :init
-  (when window-system
-    (fringe-mode 8)
-    (menu-bar-mode -1)
-    (scroll-bar-mode -1)
-    (tool-bar-mode -1)
-    (tooltip-mode -1))
+  (defun j0ni/init-frame ()
+    (when window-system
+      (fringe-mode 8)
+      (menu-bar-mode -1)
+      (scroll-bar-mode -1)
+      (tool-bar-mode -1)
+      (tooltip-mode -1)))
+  (j0ni/init-frame)
+  ;; This is an attempt to prevent the emacsclient frame from ignoring all this
+  ;; stuff. Unfortunately it does not appear to work.
+  ;; (add-to-list 'after-make-frame-functions #'j0ni/init-frame)
   (set-frame-parameter (selected-frame) 'alpha '(95 . 80))
   ;; OS dependent modifier setup
   (when j0ni/is-mac
