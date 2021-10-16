@@ -657,10 +657,9 @@ frames with exactly two windows."
 
 (use-package doom-themes)
 (use-package dracula-theme
-  :commands (dracula-theme)
-  :init
-  ;;(load-theme 'dracula t))
-  )
+  ;; :init (load-theme 'dracula t))
+  :commands (dracula-theme))
+
 (use-package almost-mono-themes)
 
 (use-package rainbow-mode
