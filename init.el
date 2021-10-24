@@ -1302,33 +1302,6 @@ Info contains the connection type, project name and host:port endpoint."
                      (smtpmail-smtp-service . 587)
                      (smtpmail-stream-type . starttls)))
             (make-mu4e-context
-             :name "Xapix"
-             :enter-func (lambda ()
-                           (when (mu4e-running-p)
-                             (mu4e-update-mail-and-index nil))
-                           (mu4e-message "Switching to Xapix context"))
-             :match-func (lambda (msg)
-                           (when msg
-                             (string-match-p "^/Xapix" (mu4e-message-field msg :maildir))))
-             :vars `((user-mail-address . "jon@xapix.io")
-                     (user-full-name . "Jon Irving")
-                     (mu4e-sent-messages-behavior . sent)
-                     (mu4e-sent-folder . "/Xapix/sent-mail")
-                     (mu4e-trash-folder . "/Xapix/trash")
-                     (mu4e-drafts-folder . "/Xapix/drafts")
-                     (mu4e-refile-folder . "/Xapix/all-mail")
-                     (mu4e-maildir-shortcuts . (("/Xapix/INBOX" . ?i)
-                                                ("/Xapix/sent-mail" . ?s)
-                                                ("/Xapix/drafts" . ?d)
-                                                ("/Xapix/trash" . ?t)))
-                     (mu4e-compose-signature . "https://j0ni.ca ~ https://keybase.io/j0ni ~ https://xapix.io")
-                     (mu4e-bookmarks . ,(list (j0ni/mu4e-bookmark "Xapix" "7" ?w)
-                                              (j0ni/mu4e-bookmark "Xapix" "30" ?m)))
-                     (smtpmail-smtp-user . "jon@xapix.io")
-                     (smtpmail-smtp-server . "smtp.gmail.com")
-                     (smtpmail-smtp-service . 587)
-                     (smtpmail-stream-type . starttls)))
-            (make-mu4e-context
              :name "Well"
              :enter-func (lambda ()
                            (when (mu4e-running-p)
