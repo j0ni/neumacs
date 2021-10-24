@@ -62,6 +62,10 @@
   (mouse-wheel-scroll-amount '(1 ((shift) . 1))) ; one line at a time
   (mouse-wheel-progressive-speed t)              ; accelerate scrolling
   (shr-color-visible-luminance-min 90)
+  ;; 43.67066, -79.30211 - location
+  (calendar-longitude 43.67066)
+  (calendar-latitude -79.30211)
+  (calendar-location-name "Toronto")
   :init
   (defun j0ni/init-frame ()
     (when window-system
@@ -105,11 +109,11 @@
   ;; (setq j0ni/font "Monoisome-10")
   ;; (setq j0ni/font "Lucida Grande Mono-11")
   ;; (setq j0ni/font "Lucida Console Patched-11")
-  (setq j0ni/fixed-font "Iosevka Snuggle-12")
+  (setq j0ni/fixed-font "Iosevka Snuggle-13")
   ;; (setq j0ni/fixed-font "PragmataPro Mono-12")
   ;; (setq j0ni/fixed-font "Monoid Nerd Font-10")
   ;; (setq j0ni/fixed-font "Monoid-10")
-  (setq j0ni/variable-font "Cantarell-11")
+  (setq j0ni/variable-font "Sans-11")
   ;; (setq j0ni/font "Fira Code-13")
   (set-face-font 'variable-pitch j0ni/variable-font nil)
   (set-frame-font j0ni/fixed-font t t)
