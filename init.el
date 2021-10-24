@@ -638,7 +638,7 @@ frames with exactly two windows."
   :custom
   (modus-themes-bold-constructs t)
   (modus-themes-slanted-constructs t)
-  (modus-themes-syntax nil) ;; 'faint
+  (modus-themes-syntax '(yellow-comments)l) ;; 'faint
   (modus-themes-fringes nil)
   (modus-themes-hl-line 'underline-neutral)
   (modus-themes-completions 'opinionated)
@@ -1194,14 +1194,18 @@ Info contains the connection type, project name and host:port endpoint."
     '(defadvice modus-themes-toggle (after clear-telega-icon-cache activate)
        (setq telega-mode-line--logo-image-cache nil))))
 
-(use-package doom-modeline
-  :init
-  (setq image-scaling-factor 1.4)
-  :custom
-  (doom-modeline-icon nil)
-  (doom-modeline-window-width-limit nil)
-  (doom-modeline-bar-width 4)
-  :hook ((after-init-hook . doom-modeline-mode)))
+;; (use-package doom-modeline
+;;   ;; :init
+;;   ;; (setq image-scaling-factor 1.4)
+;;   :custom
+;;   (doom-modeline-hud t)
+;;   (doom-modeline-icon nil)
+;;   (doom-modeline-window-width-limit nil)
+;;   (doom-modeline-bar-width 4)
+;;   :hook ((after-init-hook . doom-modeline-mode)))
+
+(use-package minions
+  :hook ((after-init-hook . minions-mode)))
 
 (use-package markdown-mode
   :hook ((markdown-mode-hook . visual-line-mode)))
