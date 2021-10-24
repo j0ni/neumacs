@@ -256,7 +256,7 @@ frames with exactly two windows."
    ("kl" . display-line-numbers-mode)))
 
 (use-package time
-  :hook ((after-init-hook . display-time-mode))
+  ;; :hook ((after-init-hook . display-time-mode))
   :custom
   (display-time-format nil)
   (display-time-24hr-format t)
@@ -1079,7 +1079,6 @@ Info contains the connection type, project name and host:port endpoint."
    '((sequence "TODO(t)" "WAITING(w!)" "PAUSED(p!)" "|" "DONE(d!)" "ABANDONED(a!)")))
   (org-tag-persistent-alist
    '((home . ?h)
-     (xapix . ?x)
      (sanity . ?s)
      (rachel . ?r)
      (lauren . ?l)
