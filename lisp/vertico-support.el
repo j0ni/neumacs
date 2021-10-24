@@ -23,7 +23,7 @@
 
 (use-package orderless
   :custom
-  (orderless-matching-styles '(orderless-literal orderless-regexp orderless-flex))
+  (orderless-matching-styles '(orderless-literal orderless-regexp))
   :init
   (setq completion-styles '(orderless)
         completion-category-defaults nil
