@@ -880,6 +880,28 @@ frames with exactly two windows."
               ("C-c C-l ." . lsp-find-type-definition)
               ("C-c C-l x" . lsp-workspace-restart)))
 
+;;; Scala
+
+(use-package lsp-metals)
+
+(use-package scala-mode
+  :hook ((scala-mode-hook . lsp))
+  :interpreter
+  ("scala" . scala-mode))
+
+;; Enable sbt mode for executing sbt commands
+(use-package sbt-mode
+  :commands (sbt-start sbt-command)
+  :config
+  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+  ;; allows using SPACE when in the minibuffer
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map)
+  ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+  (setq sbt:program-options '("-Dsbt.supershell=false")))
+
 (use-package lsp-java
   :init
   (require 'lsp-java)
