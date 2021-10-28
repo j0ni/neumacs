@@ -28,53 +28,55 @@
 'embark, 'vertico, 'mct or 'builtin")
 
 (use-package whitespace-mode
-  :custom
-  (whitespace-line-column 100)
-  (whitespace-style '(face trailing lines-tail tabs))
-  :hook ((prog-mode-hook . whitespace-mode)
-         (whitespace-mode-hook . (lambda () (diminish 'whitespace-mode)))))
+  :init
+  (setq whitespace-line-column 100)
+  (setq whitespace-style '(face trailing lines-tail tabs))
+
+  :hook
+  ((prog-mode-hook . whitespace-mode)
+   (whitespace-mode-hook . (lambda () (diminish 'whitespace-mode)))))
 
 (use-package emacs
-  :custom
-  (warning-suppress-types '((comp)))
-  (epa-pinentry-mode 'loopback)
-  (flymake-fringe-indicator-position 'right-fringe)
-  (inhibit-startup-screen t)
-  (auto-revert-verbose t)
-  (vc-follow-symlinks t)
-  (find-file-suppress-same-file-warnings t)
-  (read-file-name-completion-ignore-case t)
-  (comint-prompt-read-only t)
+  :init
+  (setq warning-suppress-types '((comp)))
+  (setq epa-pinentry-mode 'loopback)
+  (setq flymake-fringe-indicator-position 'right-fringe)
+  (setq inhibit-startup-screen t)
+  (setq auto-revert-verbose t)
+  (setq vc-follow-symlinks t)
+  (setq find-file-suppress-same-file-warnings t)
+  (setq read-file-name-completion-ignore-case t)
+  (setq comint-prompt-read-only t)
   ;; This defaults to a warning - abo-abo uses advice quite a bit, which is
   ;; where this comes from; I don't see much in the way of warnings yet so let's
   ;; leave this out for now.
   ;; (ad-redefinition-action 'accept)
   ;; hmm
-  (select-enable-clipboard t)
-  (select-enable-primary t)
-  (uniquify-buffer-name-style 'forward)
-  (save-interprogram-paste-before-kill t)
-  (compilation-always-kill t)
-  (compilation-ask-about-save nil)
-  (apropos-do-all t)
-  (mouse-yank-at-point t)
-  (save-place-file (concat user-emacs-directory ".places"))
-  (backup-directory-alist `(("." . ,(concat user-emacs-directory ".backups"))))
-  (enable-local-variables :all)
-  (confirm-kill-emacs nil)
-  (sentence-end-double-space nil)
-  (delete-old-versions t)
-  (version-control t)
-  (custom-safe-themes t)
-  (mouse-wheel-scroll-amount '(1 ((shift) . 1))) ; one line at a time
-  (mouse-wheel-progressive-speed t)              ; accelerate scrolling
-  (shr-color-visible-luminance-min 90)
+  (setq select-enable-clipboard t)
+  (setq select-enable-primary t)
+  (setq uniquify-buffer-name-style 'forward)
+  (setq save-interprogram-paste-before-kill t)
+  (setq compilation-always-kill t)
+  (setq compilation-ask-about-save nil)
+  (setq apropos-do-all t)
+  (setq mouse-yank-at-point t)
+  (setq save-place-file (concat user-emacs-directory ".places"))
+  (setq backup-directory-alist `(("." . ,(concat user-emacs-directory ".backups"))))
+  (setq enable-local-variables :all)
+  (setq confirm-kill-emacs nil)
+  (setq sentence-end-double-space nil)
+  (setq delete-old-versions t)
+  (setq version-control t)
+  (setq custom-safe-themes t)
+  (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ; one line at a time
+  (setq mouse-wheel-progressive-speed t)              ; accelerate scrolling
+  (setq shr-color-visible-luminance-min 90)
   ;; 43.67066, -79.30211 - location
-  (calendar-longitude 43.67066)
-  (calendar-latitude -79.30211)
-  (calendar-location-name "Toronto")
-  (minibuffer-eldef-shorten-default t)
-  :init
+  (setq calendar-longitude 43.67066)
+  (setq calendar-latitude -79.30211)
+  (setq calendar-location-name "Toronto")
+  (setq minibuffer-eldef-shorten-default t)
+  ;; some fns
   (defun j0ni/init-frame ()
     (when window-system
       (fringe-mode 8)
@@ -146,6 +148,7 @@
   (setq read-buffer-completion-ignore-case t)
   (setq-default indent-tabs-mode nil)
   (setq indent-tabs-mode nil)
+  (setq tab-always-indent 'complete)
   (setq load-prefer-newer t)
   (setq highlight-nonselected-windows nil)
   (setq kill-buffer-query-functions nil)
@@ -162,6 +165,7 @@
   (setq completion-cycle-threshold 3)
   (setq completion-ignore-case t)
   (setq completions-detailed t)
+  (setq completion-show-help nil)
   ;; handy fns
   (defun j0ni/disable-truncate-lines ()
     (interactive)
@@ -237,7 +241,10 @@ frames with exactly two windows."
     (with-temp-buffer
       (insert-file-contents file-path)
       (buffer-string)))
-  :hook ((before-save-hook . delete-trailing-whitespace))
+
+  :hook
+  ((before-save-hook . delete-trailing-whitespace))
+
   :config
   (dolist (mode '(recentf-mode
                   electric-indent-mode
@@ -253,45 +260,48 @@ frames with exactly two windows."
     (funcall mode 1))
   (blink-cursor-mode -1)
   (remove-hook 'minibuffer-setup-hook 'winner-save-unconditionally)
-  ;; (diminish 'eldoc-mode)
   (advice-add #'shr-colorize-region :around (defun shr-no-colorise-region (&rest ignore)))
-  :bind (("M-[" . beginning-of-buffer)
-         ("M-]" . end-of-buffer)
-         ("C-x C-r" . revert-buffer)
-         ("C-x |" . j0ni/toggle-window-split)
-         ("C-c C-k" . eval-buffer)
-         ("C-c ." . j0ni/delete-whitespace)
-         ("C-c s" . j0ni/insert-shrug)
-         ("C-=" . text-scale-increase)
-         ("C--" . text-scale-decrease))
+
+  :bind
+  (("M-[" . beginning-of-buffer)
+   ("M-]" . end-of-buffer)
+   ("C-x C-r" . revert-buffer)
+   ("C-x |" . j0ni/toggle-window-split)
+   ("C-c C-k" . eval-buffer)
+   ("C-c ." . j0ni/delete-whitespace)
+   ("C-c s" . j0ni/insert-shrug)
+   ("C-=" . text-scale-increase)
+   ("C--" . text-scale-decrease))
+
   :chords
   (("df" . previous-window-any-frame)
    ("jk" . next-window-any-frame)
    ("kl" . display-line-numbers-mode)))
 
 (use-package savehist
-  :custom
-  (savehist-save-minibuffer-history t)
   :init
+  (setq savehist-save-minibuffer-history t)
   (setq history-length 10000)
   (setq history-delete-duplicates t)
-  :hook ((after-init-hook . savehist-mode)))
+
+  :hook
+  ((after-init-hook . savehist-mode)))
 
 (use-package time
   ;; :hook ((after-init-hook . display-time-mode))
-  :custom
-  (display-time-format nil)
-  (display-time-24hr-format t)
-  (display-time-day-and-date nil)
-  (display-time-interval 15)
-  (display-time-default-load-average nil)
-  (zoneinfo-style-world-list
-   '(("America/Los_Angeles" "San Francisco")
-     ("America/New_York" "Toronto")
-     ("Europe/London" "London")
-     ("Europe/Berlin" "Berlin")
-     ("Asia/Hong_Kong" "Hong Kong")
-     ("Asia/Tokyo" "Tokyo"))))
+  :init
+  (setq display-time-format nil)
+  (setq display-time-24hr-format t)
+  (setq display-time-day-and-date nil)
+  (setq display-time-interval 15)
+  (setq display-time-default-load-average nil)
+  (setq zoneinfo-style-world-list
+        '(("America/Los_Angeles" "San Francisco")
+          ("America/New_York" "Toronto")
+          ("Europe/London" "London")
+          ("Europe/Berlin" "Berlin")
+          ("Asia/Hong_Kong" "Hong Kong")
+          ("Asia/Tokyo" "Tokyo"))))
 
 (use-package xref
   ;;:init
@@ -305,10 +315,10 @@ frames with exactly two windows."
   ;;     (setq j0ni/window-history-alist (cons '(this-window) ))))
   ;; (lambda ()
   ;;                                    (let ((buf (window-buffer)))))
-  :custom
-  (xref-marker-ring-length 64)
-  (xref-show-xrefs-function 'xref--show-xref-buffer) ; default
-  (xref-show-definitions-function 'xref-show-definitions-completing-read))
+  :init
+  (setq xref-marker-ring-length 64)
+  (setq xref-show-xrefs-function 'xref--show-xref-buffer) ; default
+  (setq xref-show-definitions-function 'xref-show-definitions-completing-read))
 
 (defvar pragmata-pro-ligatures
   (mapcar #'car
@@ -558,8 +568,12 @@ frames with exactly two windows."
             ("_|_"        #XEA97))))
 
 (use-package ligature
-  :commands (ligature-set-ligatures)
-  :straight (ligature :type git :host github :repo "mickeynp/ligature.el")
+  :commands
+  (ligature-set-ligatures)
+
+  :straight
+  (ligature :type git :host github :repo "mickeynp/ligature.el")
+
   ;; :config
   ;; Cascadia Code
   ;; (ligature-set-ligatures
@@ -571,38 +585,44 @@ frames with exactly two windows."
   )
 
 (use-package beacon
-  :commands (beacon-blink)
-  :bind (("C-x =" . beacon-blink)))
+  :commands
+  (beacon-blink)
+
+  :bind
+  (("C-x =" . beacon-blink)))
 
 (use-package ibuffer
-  :bind (("C-x C-b" . ibuffer))
-  :custom
-  (ibuffer-expert t)
-  (ibuffer-display-summary nil)
-  (ibuffer-use-other-window nil)
-  (ibuffer-show-empty-filter-groups nil)
-  (ibuffer-movement-cycle nil)
-  (ibuffer-default-sorting-mode 'filename/process)
-  (ibuffer-use-header-line t)
-  (ibuffer-default-shrink-to-minimum-size nil)
-  (ibuffer-saved-filter-groups nil)
-  (ibuffer-old-time 48))
+  :bind
+  (("C-x C-b" . ibuffer))
+
+  :init
+  (setq ibuffer-expert t)
+  (setq ibuffer-display-summary nil)
+  (setq ibuffer-use-other-window nil)
+  (setq ibuffer-show-empty-filter-groups nil)
+  (setq ibuffer-movement-cycle nil)
+  (setq ibuffer-default-sorting-mode 'filename/process)
+  (setq ibuffer-use-header-line t)
+  (setq ibuffer-default-shrink-to-minimum-size nil)
+  (setq ibuffer-saved-filter-groups nil)
+  (setq ibuffer-old-time 48))
 
 (use-package ibuffer-vc
-  :hook ((ibuffer-hook . j0ni/ibuffer-vc-hook))
-  :custom
-  (ibuffer-formats
-   '((mark modified read-only vc-status-mini " "
-           (name 18 18 :left :elide)
-           " "
-           (size 9 -1 :right)
-           " "
-           (mode 16 16 :left :elide)
-           " "
-           (vc-status 16 16 :left)
-           " "
-           vc-relative-file)))
+  :hook
+  ((ibuffer-hook . j0ni/ibuffer-vc-hook))
+
   :init
+  (setq ibuffer-formats
+        '((mark modified read-only vc-status-mini " "
+                (name 18 18 :left :elide)
+                " "
+                (size 9 -1 :right)
+                " "
+                (mode 16 16 :left :elide)
+                " "
+                (vc-status 16 16 :left)
+                " "
+                vc-relative-file)))
   (defun j0ni/ibuffer-vc-hook ()
     (ibuffer-auto-mode 1)
     (ibuffer-vc-set-filter-groups-by-vc-root)
@@ -610,16 +630,19 @@ frames with exactly two windows."
       (ibuffer-do-sort-by-alphabetic))))
 
 (use-package find-file-in-project
-  :commands (find-file-in-project-by-selected
-             ffip-get-project-root-directory)
-  :bind (("C-c f" . find-file-in-project-by-selected))
+  :commands
+  (find-file-in-project-by-selected
+   ffip-get-project-root-directory)
+
+  :bind
+  (("C-c f" . find-file-in-project-by-selected))
+
   :init
   (setq ffip-use-rust-fd t))
 
 (use-package erc
-  :custom
-  (erc-email-userid "j0ni")
   :init
+  (setq erc-email-userid "j0ni")
   (defun j0ni/connect-srht-bouncer ()
     (interactive)
     (erc-tls
@@ -638,18 +661,21 @@ frames with exactly two windows."
            :sasl-password "b62b1c04a20613e49aa02f201eb4c8ea"))))
 
 (use-package undo-fu
-  :custom
-  (undo-fu-allow-undo-in-region t)
-  :bind (("C-_" . undo-fu-only-undo)
-         ("C-/" . undo-fu-only-undo)
-         ("C-z" . undo-fu-only-undo)
-         ("<undo>" . undo-fu-only-undo)
-         ("C-x u" . undo-fu-only-undo)
-         ("M-_" . undo-fu-only-redo)
-         ("C-M-z" . undo-fu-only-redo)))
+  :init
+  (setq undo-fu-allow-undo-in-region t)
+
+  :bind
+  (("C-_" . undo-fu-only-undo)
+   ("C-/" . undo-fu-only-undo)
+   ("C-z" . undo-fu-only-undo)
+   ("<undo>" . undo-fu-only-undo)
+   ("C-x u" . undo-fu-only-undo)
+   ("M-_" . undo-fu-only-redo)
+   ("C-M-z" . undo-fu-only-redo)))
 
 (use-package undo-fu-session
-  :hook ((after-init-hook . global-undo-fu-session-mode)))
+  :hook
+  ((after-init-hook . global-undo-fu-session-mode)))
 
 (use-package exec-path-from-shell
   :init
@@ -660,17 +686,20 @@ frames with exactly two windows."
     (setq j0ni/exec-path-from-shell-completed t)))
 
 (use-package modus-themes
-  :hook ((after-init-hook . modus-themes-load-themes))
-  :custom
-  (modus-themes-bold-constructs t)
-  (modus-themes-slanted-constructs t)
-  (modus-themes-syntax '(yellow-comments)l) ;; 'faint
-  (modus-themes-fringes nil)
-  (modus-themes-hl-line 'underline-neutral)
-  (modus-themes-completions 'opinionated)
-  (modus-themes-scale-headings t)
-  (modus-themes-mode-line nil)
-  (modus-themes-paren-match 'intense-bold)
+  :hook
+  ((after-init-hook . modus-themes-load-themes))
+
+  :init
+  (setq modus-themes-bold-constructs t)
+  (setq modus-themes-slanted-constructs t)
+  (setq modus-themes-syntax '(yellow-comments)) ;; 'faint
+  (setq modus-themes-fringes nil)
+  (setq modus-themes-hl-line 'underline-neutral)
+  (setq modus-themes-completions 'opinionated)
+  (setq modus-themes-scale-headings t)
+  (setq modus-themes-mode-line nil)
+  (setq modus-themes-paren-match 'intense-bold)
+
   :config
   ;; (load-theme 'modus-operandi t)
   (load-theme 'modus-vivendi t)
@@ -679,7 +708,8 @@ frames with exactly two windows."
   (set-face-attribute 'bold nil :weight 'semibold))
 
 (use-package hl-todo
-  :hook ((after-init-hook . global-hl-todo-mode)))
+  :hook
+  ((after-init-hook . global-hl-todo-mode)))
 
 (use-package volatile-highlights
   :config
@@ -687,23 +717,28 @@ frames with exactly two windows."
   (diminish 'volatile-highlights-mode))
 
 (use-package doom-themes)
+
 (use-package dracula-theme
   ;; :init (load-theme 'dracula t))
-  :commands (dracula-theme))
+  :commands
+  (dracula-theme))
 
 (use-package almost-mono-themes)
 
 (use-package rainbow-mode
-  :bind (("C-c r" . rainbow-mode)))
+  :bind
+  (("C-c r" . rainbow-mode)))
 
 (use-package rainbow-delimiters
-  :hook ((paredit-mode-hook . rainbow-delimiters-mode)))
+  :hook
+  ((paredit-mode-hook . rainbow-delimiters-mode)))
 
 (use-package browse-at-remote)
 
 (use-package diff-hl
-  :diminish ""
-  :hook ((after-init-hook . global-diff-hl-mode))
+  :hook
+  ((after-init-hook . global-diff-hl-mode))
+
   :config
   (eval-after-load 'magit
     '(progn
@@ -711,56 +746,238 @@ frames with exactly two windows."
        (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))))
 
 (use-package expand-region
-  :bind (("C-x C-x" . er/expand-region)))
+  :bind
+  (("C-x C-x" . er/expand-region)))
 
 (use-package dockerfile-mode)
 
 (use-package anzu
-  :commands (global-anzu-mode)
-  :hook ((after-init-mode . global-anzu-mode)))
+  :commands
+  (global-anzu-mode)
+
+  :hook
+  ((after-init-mode . global-anzu-mode)))
 
 ;;; Completion
 
 (use-package company
-  :hook ((after-init-hook . global-company-mode))
-  :diminish ""
-  :custom
-  (company-global-modes '(not org-mode))
-  (company-tooltip-align-annotations t)
-  (company-minimum-prefix-length 1)
-  (company-idle-delay 1.0)
-  (company-tooltip-idle-delay 1.0)
-  (company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
-                       company-preview-if-just-one-frontend
-                       company-echo-metadata-frontend))
-  :bind (("M-\\" . company-complete)
-         ("C-\\" . company-complete)
-         :map company-active-map
-         ("M-\\" . company-complete-common-or-cycle)
-         ("C-\\" . company-complete-common-or-cycle)
-         ("C-j" . company-complete-selection)
-         ("C-n" . company-select-next)
-         ("C-p" . company-select-previous)))
+  :hook
+  ((after-init-hook . global-company-mode))
+
+  :init
+  (setq company-global-modes '(not org-mode))
+  (setq company-tooltip-align-annotations t)
+  (setq company-minimum-prefix-length 1)
+  (setq company-idle-delay 1.0)
+  (setq company-tooltip-idle-delay 1.0)
+  (setq company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
+                            company-preview-if-just-one-frontend
+                            company-echo-metadata-frontend))
+
+  :bind
+  (("M-\\" . company-complete)
+   ("C-\\" . company-complete)
+   :map company-active-map
+   ("M-\\" . company-complete-common-or-cycle)
+   ("C-\\" . company-complete-common-or-cycle)
+   ("C-j" . company-complete-selection)
+   ("C-n" . company-select-next)
+   ("C-p" . company-select-previous)))
 
 (use-package prescient
-  :commands (prescient-persist-mode)
-  :diminish
+  :commands
+  (prescient-persist-mode)
+
   :init
   (prescient-persist-mode 1))
 
 (use-package company-prescient
-  :diminish ""
-  :init
-  (company-prescient-mode 1))
+  :hook
+  ((after-init-hook . company-prescient-mode)))
 
+(use-package orderless
+  :init
+  (setq orderless-matching-styles '(orderless-literal orderless-regexp))
+  (setq completion-styles '(orderless))
+  (setq completion-category-defaults nil)
+  (setq completion-category-overrides '((file (styles partial-completion)))))
+
+(use-package consult
+  :bind
+  (;; Everywhere
+   ("C-s" . consult-line)
+   ;; C-c bindings (mode-specific-map)
+   ("C-c h" . consult-history)
+   ("C-c m" . consult-mode-command)
+   ("C-c b" . consult-bookmark)
+   ("C-c k" . consult-kmacro)
+   ;; C-x bindings (ctl-x-map)
+   ("C-x M-:" . consult-complex-command) ;; orig. repeat-complex-command
+   ("C-x b" . consult-buffer)            ;; orig. switch-to-buffer
+   ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+   ("C-x 5 b" . consult-buffer-other-frame) ;; orig. switch-to-buffer-other-frame
+   ;; Custom M-# bindings for fast register access
+   ("M-#" . consult-register-load)
+   ("M-'" . consult-register-store) ;; orig. abbrev-prefix-mark (unrelated)
+   ("C-M-#" . consult-register)
+   ;; Other custom bindings
+   ;;("M-y" . consult-yank-pop)                ;; orig. yank-pop
+   ("<help> a" . consult-apropos) ;; orig. apropos-command
+   ;; M-g bindings (goto-map)
+   ("M-g e" . consult-compile-error)
+   ("M-g f" . consult-flymake)           ;; Alternative: consult-flycheck
+   ("M-g g" . consult-goto-line)         ;; orig. goto-line
+   ("M-g M-g" . consult-goto-line)       ;; orig. goto-line
+   ("M-g o" . consult-outline)           ;; Alternative: consult-org-heading
+   ("M-g m" . consult-mark)
+   ("M-g k" . consult-global-mark)
+   ("M-g i" . consult-imenu)
+   ("M-g I" . consult-imenu-multi)
+   ;; M-s bindings (search-map)
+   ("M-s f" . consult-find)
+   ("M-s F" . consult-locate)
+   ("M-s g" . consult-grep)
+   ("M-s G" . consult-git-grep)
+   ("M-s r" . consult-ripgrep)
+   ("M-s l" . consult-line)
+   ("M-s L" . consult-line-multi)
+   ("M-s m" . consult-multi-occur)
+   ("M-s k" . consult-keep-lines)
+   ("M-s u" . consult-focus-lines)
+   ;; Isearch integration
+   ("M-s e" . consult-isearch)
+   :map isearch-mode-map
+   ("M-e" . consult-isearch)         ;; orig. isearch-edit-string
+   ("M-s e" . consult-isearch)       ;; orig. isearch-edit-string
+   ("M-s l" . consult-line)          ;; needed by consult-line to detect isearch
+   ("M-s L" . consult-line-multi))   ;; needed by consult-line to detect isearch
+
+  ;; Enable automatic preview at point in the *Completions* buffer.
+  ;; This is relevant when you use the default completion UI,
+  ;; and not necessary for Vertico, Selectrum, etc.
+  :hook
+  ((completion-list-mode . consult-preview-at-point-mode))
+
+  ;; The :init configuration is always executed (Not lazy)
+  :init
+
+  ;; Optionally configure the register formatting. This improves the register
+  ;; preview for `consult-register', `consult-register-load',
+  ;; `consult-register-store' and the Emacs built-ins.
+  (setq register-preview-delay 0
+        register-preview-function #'consult-register-format)
+
+  ;; Optionally tweak the register preview window.
+  ;; This adds thin lines, sorting and hides the mode line of the window.
+  (advice-add #'register-preview :override #'consult-register-window)
+
+  ;; Optionally replace `completing-read-multiple' with an enhanced version.
+  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
+  ;; Configure other variables and modes in the :config section,
+  ;; after lazily loading the package.
+  :config
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key (kbd "M-."))
+  ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-theme
+   :preview-key '(:debounce 0.2 any)
+   consult-ripgrep consult-git-grep consult-grep
+   consult-bookmark consult-recent-file consult-xref
+   consult--source-file consult--source-project-file consult--source-bookmark
+   :preview-key (kbd "M-."))
+
+  ;; Optionally configure the narrowing key.
+  ;; Both < and C-+ work reasonably well.
+  (setq consult-narrow-key "<") ;; (kbd "C-+")
+
+  ;; Optionally make narrowing help available in the minibuffer.
+  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+
+  ;; Optionally configure a function which returns the project root directory.
+  ;; There are multiple reasonable alternatives to chose from.
+;;;; 1. project.el (project-roots)
+  (setq consult-project-root-function
+        (lambda ()
+          (when-let (project (project-current))
+            (car (project-roots project)))))
+;;;; 2. projectile.el (projectile-project-root)
+  ;; (autoload 'projectile-project-root "projectile")
+  ;; (setq consult-project-root-function #'projectile-project-root)
+;;;; 3. vc.el (vc-root-dir)
+  ;; (setq consult-project-root-function #'vc-root-dir)
+;;;; 4. locate-dominating-file
+  ;; (setq consult-project-root-function (lambda () (locate-dominating-file "." ".git")))
+  )
+
+(use-package consult-company
+  :after
+  (company consult)
+
+  :init
+  (define-key company-mode-map [remap completion-at-point] #'consult-company))
+
+(use-package embark
+  :bind
+  (("C-." . embark-act)  ;; pick some comfortable binding
+   ("C-;" . embark-dwim) ;; good alternative: M-.
+   ;; ("M-." . embark-dwim)       ;; good alternative: M-.
+   ("C-h B" . embark-bindings) ;; alternative for `describe-bindings'
+   ;; :map minibuffer-mode-map
+   ;; ("M-." . embark-collect-live)
+   )
+
+  :init
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
+
+  :config
+  (setq embark-action-indicator
+        (lambda (map _target)
+          (which-key--show-keymap "Embark" map nil nil 'no-paging)
+          #'which-key--hide-popup-ignore-command)
+        embark-become-indicator embark-action-indicator)
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*" .
+                 (display-buffer-at-bottom . (window-parameters (mode-line-format . none)
+                                                                (window-height . 10))))))
+
+(use-package embark-consult
+  :after
+  (embark consult)
+
+  :hook
+  ((embark-collect-mode-hook . consult-preview-at-point-mode)))
+
+(use-package marginalia
+  :commands
+  (marginalia-mode)
+
+  :init
+  (setq marginalia-annotators
+        '(marginalia-annotators-heavy marginalia-annotators-light))
+
+  :hook
+  ((after-init-hook . marginalia-mode)))
+
+;; Choose a framework
 (cl-case j0ni/completion-system
-  ('ivy (require 'ivy-support))
   ('selectrum (require 'selectrum-support))
   ('vertico (require 'vertico-support))
   ('icomplete (require 'icomplete-support))
-  ('embark (require 'embark-support))
   ('mct (require 'mct-support))
-  ('builtin (require 'builtin-support))
   (t (message "Completion system [j0ni/completion-system] not set, nothing configured")))
 
 (use-package browse-kill-ring
@@ -768,20 +985,25 @@ frames with exactly two windows."
   (browse-kill-ring-default-keybindings))
 
 (use-package magit
-  :custom
-  (magit-completing-read-function #'completing-read)
-  (magit-diff-refine-hunk t)
-  (magit-bury-buffer-function #'magit-mode-quit-window)
-  :bind (("C-x g" . magit-status)
-         ("C-x M-g" . magit-dispatch-popup)))
+  :init
+  (setq magit-completing-read-function #'completing-read)
+  (setq magit-diff-refine-hunk t)
+  (setq magit-bury-buffer-function #'magit-mode-quit-window)
+
+  :bind
+  (("C-x g" . magit-status)
+   ("C-x M-g" . magit-dispatch-popup)))
 
 (use-package idle-highlight
-  :hook ((prog-mode-hook . idle-highlight)))
+  :hook
+  ((prog-mode-hook . idle-highlight)))
 
 (use-package projectile
-  :hook ((after-init-hook . projectile-mode))
-  :diminish ""
-  :bind-keymap ("C-c p" . projectile-command-map))
+  :hook
+  ((after-init-hook . projectile-mode))
+
+  :bind-keymap
+  ("C-c p" . projectile-command-map))
 
 (use-package ripgrep
   :config
@@ -807,19 +1029,25 @@ frames with exactly two windows."
 
 
 (use-package paredit
-  :diminish ""
-  :hook ((emacs-lisp-mode-hook . enable-paredit-mode)
-         (lisp-mode-hook . enable-paredit-mode)
-         (scheme-mode-hook . enable-paredit-mode))
-  :commands (enable-paredit-mode)
+  :hook
+  ((emacs-lisp-mode-hook . enable-paredit-mode)
+   (lisp-mode-hook . enable-paredit-mode)
+   (scheme-mode-hook . enable-paredit-mode))
+
+  :commands
+  (enable-paredit-mode)
+
   :config
   (define-key paredit-mode-map (kbd "C-M-s") #'paredit-splice-sexp)
   (define-key paredit-mode-map (kbd "M-s") nil))
 
 (use-package geiser
-  :commands (turn-on-geiser-mode)
-  :hook ((scheme-mode-hook . turn-on-geiser-mode)
-         (geiser-repl-mode-hook . enable-paredit-mode)))
+  :commands
+  (turn-on-geiser-mode)
+
+  :hook
+  ((scheme-mode-hook . turn-on-geiser-mode)
+   (geiser-repl-mode-hook . enable-paredit-mode)))
 
 (use-package geiser-chicken)
 (use-package geiser-guile)
@@ -827,34 +1055,40 @@ frames with exactly two windows."
 (use-package geiser-chez)
 
 (use-package racket-mode
-  :hook ((racket-mode-hook . enable-paredit-mode)
-         (racket-mode-hook . turn-on-geiser-mode)))
+  :hook
+  ((racket-mode-hook . enable-paredit-mode)
+   (racket-mode-hook . turn-on-geiser-mode)))
 
 (use-package which-key
-  :diminish ""
-  :hook (after-init-hook . which-key-mode))
+  :hook
+  (after-init-hook . which-key-mode))
 
 (use-package switch-window
-  :custom
-  (switch-window-shortcut-style 'qwerty)
-  (switch-window-shortcut-appearance 'text)
-  (switch-window-auto-resize-window nil)
-  (switch-window-background t)
-  (switch-window-default-window-size 0.8)
-  :hook ((after-init-hook . switch-window-mouse-mode))
-  :commands (switch-window switch-window-mouse-mode)
-  :bind ("C-x o" . switch-window))
+  :init
+  (setq switch-window-shortcut-style 'qwerty)
+  (setq switch-window-shortcut-appearance 'text)
+  (setq switch-window-auto-resize-window nil)
+  (setq switch-window-background t)
+  (setq switch-window-default-window-size 0.8)
+
+  :hook
+  ((after-init-hook . switch-window-mouse-mode))
+
+  :commands
+  (switch-window switch-window-mouse-mode)
+
+  :bind
+  (("C-x o" . switch-window)))
 
 (use-package yaml-mode)
 
 (use-package web-mode
-  :custom
-  (web-mode-markup-indent-offset 2)
-  (web-mode-js-indent-offset 2)
-  (web-mode-script-padding 0)
-  (web-mode-code-indent-offset 2)
-  (web-mode-css-indent-offset 2)
   :init
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-js-indent-offset 2)
+  (setq web-mode-script-padding 0)
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
   (add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.svelte\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
@@ -871,56 +1105,66 @@ frames with exactly two windows."
 (use-package restclient)
 
 (use-package lsp-mode
-  :commands (lsp lsp-register-custom-settings lsp-deferred)
-  :hook ((lsp-mode-hook . lsp-enable-which-key-integration))
-  :custom
-  (lsp-auto-configure nil)
-  (lsp-enable-snippet t)
-  (lsp-enable-folding nil)
-  (lsp-enable-file-watchers t)
-  (lsp-enable-links t)
-  (lsp-enable-imenu t)
-  (lsp-enable-dap-auto-configure t)
-  (lsp-enable-symbol-highlighting t)
-  (lsp-enable-xref t)
-  (lsp-enable-indentation t)
-  (lsp-enable-on-type-formatting nil)
-  (lsp-enable-text-document-color nil)
-  (lsp-modeline-code-actions-enable nil)
-  (lsp-modeline-diagnostics-enable t)
-  (lsp-modeline-workspace-status-enable nil)
-  (lsp-completion-enable t)
-  (lsp-auto-guess-root nil)
-  (lsp-eldoc-enable-hover nil)
-  (lsp-eldoc-render-all nil)
-  (lsp-signature-render-all t)
-  (lsp-idle-delay 0.8)
-  (lsp-lens-enable nil)
-  (lsp-prefer-flymake nil)
-  (lsp-file-watch-threshold 10000)
-  (lsp-signature-auto-activate nil)
-  (lsp-completion-provider :capf)
-  (lsp-keymap-prefix "C-c l")
-  :bind (:map lsp-mode-map
-              ("C-c C-l d" . lsp-describe-thing-at-point)
-              ("C-c C-l e" . lsp-execute-code-action)
-              ("C-c C-l r" . lsp-rename)
-              ("C-c C-l i" . lsp-find-implementation)
-              ("C-c C-l ." . lsp-find-type-definition)
-              ("C-c C-l x" . lsp-workspace-restart)))
+  :commands
+  (lsp lsp-register-custom-settings lsp-deferred)
+
+  :hook
+  ((lsp-mode-hook . lsp-enable-which-key-integration))
+
+  :init
+  (setq lsp-auto-configure nil)
+  (setq lsp-enable-snippet t)
+  (setq lsp-enable-folding nil)
+  (setq lsp-enable-file-watchers t)
+  (setq lsp-enable-links t)
+  (setq lsp-enable-imenu t)
+  (setq lsp-enable-dap-auto-configure t)
+  (setq lsp-enable-symbol-highlighting t)
+  (setq lsp-enable-xref t)
+  (setq lsp-enable-indentation t)
+  (setq lsp-enable-on-type-formatting nil)
+  (setq lsp-enable-text-document-color nil)
+  (setq lsp-modeline-code-actions-enable nil)
+  (setq lsp-modeline-diagnostics-enable t)
+  (setq lsp-modeline-workspace-status-enable nil)
+  (setq lsp-completion-enable t)
+  (setq lsp-auto-guess-root nil)
+  (setq lsp-eldoc-enable-hover nil)
+  (setq lsp-eldoc-render-all nil)
+  (setq lsp-signature-render-all t)
+  (setq lsp-idle-delay 0.8)
+  (setq lsp-lens-enable nil)
+  (setq lsp-prefer-flymake nil)
+  (setq lsp-file-watch-threshold 10000)
+  (setq lsp-signature-auto-activate nil)
+  (setq lsp-completion-provider :capf)
+  (setq lsp-keymap-prefix "C-c l")
+
+  :bind
+  (:map lsp-mode-map
+        ("C-c C-l d" . lsp-describe-thing-at-point)
+        ("C-c C-l e" . lsp-execute-code-action)
+        ("C-c C-l r" . lsp-rename)
+        ("C-c C-l i" . lsp-find-implementation)
+        ("C-c C-l ." . lsp-find-type-definition)
+        ("C-c C-l x" . lsp-workspace-restart)))
 
 ;;; Scala
 
 (use-package lsp-metals)
 
 (use-package scala-mode
-  :hook ((scala-mode-hook . lsp))
+  :hook
+  ((scala-mode-hook . lsp))
+
   :interpreter
   ("scala" . scala-mode))
 
 ;; Enable sbt mode for executing sbt commands
 (use-package sbt-mode
-  :commands (sbt-start sbt-command)
+  :commands
+  (sbt-start sbt-command)
+
   :config
   ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
   ;; allows using SPACE when in the minibuffer
@@ -932,22 +1176,23 @@ frames with exactly two windows."
   (setq sbt:program-options '("-Dsbt.supershell=false")))
 
 (use-package lsp-java
-  :init
-  (require 'lsp-java)
-  :hook ((java-mode-hook . lsp)))
+  :hook
+  ((java-mode-hook . lsp)))
 
 (use-package lsp-ui
   :config
   (require 'lsp-ui-imenu)
-  :custom
-  (lsp-ui-autoconfigure t)
-  (lsp-ui-sideline-enable nil)
-  (lsp-ui-doc-enable nil)
-  (lsp-ui-peek-enable t)
-  (lsp-ui-peek-always-show nil)
-  (lsp-ui-imenu-autorefresh t)
-  (lsp-ui-doc-show-with-cursor t)
-  (lsp-ui-doc-show-with-mouse nil)
+
+  :init
+  (setq lsp-ui-autoconfigure t)
+  (setq lsp-ui-sideline-enable nil)
+  (setq lsp-ui-doc-enable nil)
+  (setq lsp-ui-peek-enable t)
+  (setq lsp-ui-peek-always-show nil)
+  (setq lsp-ui-imenu-autorefresh t)
+  (setq lsp-ui-doc-show-with-cursor t)
+  (setq lsp-ui-doc-show-with-mouse nil)
+
   :bind
   (:map lsp-ui-mode-map
         ("C-c l I" . lsp-ui-imenu)
@@ -961,13 +1206,15 @@ frames with exactly two windows."
         ("C-c l e" . lsp-execute-code-action)))
 
 (use-package treemacs
-  :custom
-  (treemacs-space-between-root-nodes nil))
+  :init
+  (setq treemacs-space-between-root-nodes nil))
 
 (use-package lsp-treemacs)
 
 (use-package sly
-  :hook ((sly-mrepl-hook . company-mode))
+  :hook
+  ((sly-mrepl-hook . company-mode))
+
   :init
   (setq inferior-lisp-program "sbcl"))
 
@@ -983,26 +1230,29 @@ frames with exactly two windows."
 ;;          (inf-clojure-mode-hook . enable-paredit-mode)))
 
 (use-package cider
-  :commands (cider-mode)
-  :hook ((cider-mode-hook . turn-on-eldoc-mode)
-         (cider-repl-mode-hook . enable-paredit-mode))
-  :custom
-  (cider-repl-pop-to-buffer-on-connect t)
-  (cider-save-file-on-load t)
-  (cider-repl-display-help-banner nil)
-  (cider-use-overlays t)                ; display eval results inline
-  (cider-use-fringe-indicators nil)
-  (cider-stacktrace-default-filters '(tooling dup))
-  (cider-repl-history-size 10000)
-  (cider-prompt-for-symbol nil)
-  (cider-known-endpoints nil)
-  (cider-repl-history-file (concat user-emacs-directory ".cider-repl-history"))
-  (cider-prefer-local-resources t)
-  (cider-inject-dependencies-at-jack-in t)
-  (cider-eldoc-display-context-dependent-info t)
-  (cider-auto-mode t)
-  :config
-  (add-to-list 'cider-test-defining-forms "defruns")
+  :commands
+  (cider-mode)
+
+  :hook
+  ((cider-mode-hook . turn-on-eldoc-mode)
+   (cider-repl-mode-hook . enable-paredit-mode))
+
+  :init
+  (setq cider-repl-pop-to-buffer-on-connect t)
+  (setq cider-save-file-on-load t)
+  (setq cider-repl-display-help-banner nil)
+  (setq cider-use-overlays t)                ; display eval results inline
+  (setq cider-use-fringe-indicators nil)
+  (setq cider-stacktrace-default-filters '(tooling dup))
+  (setq cider-repl-history-size 10000)
+  (setq cider-prompt-for-symbol nil)
+  (setq cider-known-endpoints nil)
+  (setq cider-repl-history-file (concat user-emacs-directory ".cider-repl-history"))
+  (setq cider-prefer-local-resources t)
+  (setq cider-inject-dependencies-at-jack-in t)
+  (setq cider-eldoc-display-context-dependent-info t)
+  (setq cider-auto-mode t)
+
   :bind
   (:map cider-repl-mode-map
         ("RET" . cider-repl-newline-and-indent)
@@ -1011,17 +1261,19 @@ frames with exactly two windows."
 (use-package cider-eval-sexp-fu)
 
 (use-package clj-refactor
-  :diminish ""
-  :commands (clj-refactor-mode)
-  :custom
-  (cljr-add-ns-to-blank-clj-files t)
-  (cljr-warn-on-eval nil)
-  (cljr-suppress-middleware-warnings t)
-  (cljr-favor-prefix-notation nil)
-  (cljr-favor-private-functions nil)
-  (cljr-inject-dependencies-at-jack-in t)
-  (cljr-eagerly-build-asts-on-startup nil)
-  (cljr-ignore-analyzer-errors t)
+  :commands
+  (clj-refactor-mode)
+
+  :init
+  (setq cljr-add-ns-to-blank-clj-files t)
+  (setq cljr-warn-on-eval nil)
+  (setq cljr-suppress-middleware-warnings t)
+  (setq cljr-favor-prefix-notation nil)
+  (setq cljr-favor-private-functions nil)
+  (setq cljr-inject-dependencies-at-jack-in t)
+  (setq cljr-eagerly-build-asts-on-startup nil)
+  (setq cljr-ignore-analyzer-errors t)
+
   :config
   (cljr-add-keybindings-with-prefix "C-c C-j"))
 
@@ -1037,6 +1289,7 @@ frames with exactly two windows."
     ;; (require 'lsp-clojure)
     ;; (lsp)
     )
+
   :hook
   (((clojure-mode-hook
      clojurec-mode-hook
@@ -1045,119 +1298,142 @@ frames with exactly two windows."
     . j0ni/clojure-hook)))
 
 (use-package ruby-mode
-  :hook (ruby-mode-hook . flycheck-mode))
+  :hook
+  (ruby-mode-hook . flycheck-mode))
+
 (use-package inf-ruby)
+
 (use-package rbenv
-  :custom
-  (rbenv-show-active-ruby-in-modeline nil)
-  :commands (global-rbenv-mode rbenv-use-corresponding rbenv-use)
-  :hook ((after-init-hook . global-rbenv-mode)
-         (ruby-mode-hook . rbenv-use-corresponding)))
+  :init
+  (setq rbenv-show-active-ruby-in-modeline nil)
+
+  :commands
+  (global-rbenv-mode rbenv-use-corresponding rbenv-use)
+
+  :hook
+  ((after-init-hook . global-rbenv-mode)
+   (ruby-mode-hook . rbenv-use-corresponding)))
 
 (use-package json-mode)
 (use-package graphql-mode)
 
 (use-package purescript-mode
-  :hook ((purescript-mode-hook . turn-on-purescript-indentation)))
+  :hook
+  ((purescript-mode-hook . turn-on-purescript-indentation)))
 
 (use-package psc-ide
-  :hook ((purescript-mode-hook . psc-ide-mode)))
+  :hook
+  ((purescript-mode-hook . psc-ide-mode)))
 
 (use-package typescript-mode
-  :after (lsp-mode)
-  :hook ((typescript-mode-hook . lsp)))
+  :after
+  (lsp-mode)
+
+  :hook
+  ((typescript-mode-hook . lsp)))
 
 (use-package eros
-  :hook ((after-init-hook . eros-mode)))
+  :hook
+  ((after-init-hook . eros-mode)))
 
 (use-package flycheck
-  :hook ((prog-mode-hook . flycheck-mode))
-  :custom
-  (flycheck-indication-mode 'right-fringe)
-  (flycheck-disabled-checkers '(emacs-lisp-checkdoc clojure clojurescript))
-  (flycheck-check-syntax-automatically '(save idle-change mode-enabled))
+  :hook
+  ((prog-mode-hook . flycheck-mode))
+
+  :init
+  (setq flycheck-indication-mode 'right-fringe)
+  (setq flycheck-disabled-checkers '(emacs-lisp-checkdoc clojure clojurescript))
+  (setq flycheck-check-syntax-automatically '(save idle-change mode-enabled))
+
   :config
   (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
     [16 48 112 240 112 48 16] nil nil 'center))
 
 (use-package rustic
-  :commands (rustic-mode)
-  :hook ((rustic-mode-hook . lsp)
-         (rustic-mode-hook . electric-pair-mode))
-  :custom
-  (rustic-format-trigger 'on-save)
-  (rustic-indent-method-chain t)
-  (rustic-lsp-server 'rust-analyzer)
-  (rustic-lsp-format t)
-  ;; (rustic-lsp-client 'eglot)
-  (rustic-indent-method-chain nil)
-  :config
-  (setq indent-tabs-mode nil)
-  (require 'lsp-rust)
+  :commands
+  (rustic-mode)
+
+  :hook
+  ((rustic-mode-hook . lsp)
+   (rustic-mode-hook . electric-pair-mode))
+
+  :init
+  (setq rustic-format-trigger 'on-save)
+  (setq rustic-indent-method-chain t)
+  (setq rustic-lsp-server 'rust-analyzer)
+  (setq rustic-lsp-format t)
+  (setq rustic-indent-method-chain nil)
   (setq lsp-rust-server 'rust-analyzer)
+
+  :config
+  (require 'lsp-rust)
   (push 'rustic-clippy flycheck-checkers))
 
 (use-package eglot
-  :commands (eglot-ensure))
+  :commands
+  (eglot-ensure))
 
 (use-package org
-  :straight (:type built-in)
-  :bind (("C-c c" . org-capture)
-         ("C-c a" . org-agenda))
-  :custom
-  (org-startup-indented t)
+  :straight
+  (:type built-in)
+
+  :bind
+  (("C-c c" . org-capture)
+   ("C-c a" . org-agenda))
+
+  :init
+  (setq org-startup-indented t)
   ;; make it short to start with
-  (org-startup-folded t)
+  (setq org-startup-folded t)
   ;; where things live
-  (org-directory "~/Dropbox/OrgMode/")
+  (setq org-directory "~/Dropbox/OrgMode/")
   ;; Set agenda file(s)
-  (org-agenda-files (list (concat org-directory "journal.org")
-                          (concat org-directory "berlin.org")
-                          (concat org-directory "shrieks.org")))
-  (org-agenda-span 14)
+  (setq org-agenda-files (list (concat org-directory "journal.org")
+                               (concat org-directory "berlin.org")
+                               (concat org-directory "shrieks.org")))
+  (setq org-agenda-span 14)
   ;; prevent org-mode hijacking arrow keys
-  (org-replace-disputed-keys t)
+  (setq org-replace-disputed-keys t)
   ;; set our own todo keywords
-  (org-todo-keywords
-   '((sequence "TODO(t)" "WAITING(w!)" "PAUSED(p!)" "|" "DONE(d!)" "ABANDONED(a!)")))
-  (org-tag-persistent-alist
-   '((home . ?h)
-     (sanity . ?s)
-     (rachel . ?r)
-     (lauren . ?l)
-     (ari . ?a)
-     (grace . ?g)
-     (family . ?f)
-     (self . ?m)))
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "WAITING(w!)" "PAUSED(p!)" "|" "DONE(d!)" "ABANDONED(a!)")))
+  (setq org-tag-persistent-alist
+        '((home . ?h)
+          (sanity . ?s)
+          (rachel . ?r)
+          (lauren . ?l)
+          (ari . ?a)
+          (grace . ?g)
+          (family . ?f)
+          (self . ?m)))
   ;; switch quickly
-  (org-use-fast-todo-selection 'auto)
-  (org-priority-default ?C)
-  (org-log-done 'note)
-  (org-log-into-drawer t)
-  (org-special-ctrl-a/e t)
-  (org-special-ctrl-k t)
-  (org-use-speed-commands t)
-  (org-clock-persist t)
+  (setq org-use-fast-todo-selection 'auto)
+  (setq org-priority-default ?C)
+  (setq org-log-done 'note)
+  (setq org-log-into-drawer t)
+  (setq org-special-ctrl-a/e t)
+  (setq org-special-ctrl-k t)
+  (setq org-use-speed-commands t)
+  (setq org-clock-persist t)
   ;; extra indentation
-  (org-adapt-indentation t)
+  (setq org-adapt-indentation t)
   ;; Let's have pretty source code blocks
-  (org-edit-src-content-indentation 0)
-  (org-src-tab-acts-natively t)
-  (org-src-fontify-natively t)
-  (org-confirm-babel-evaluate nil)
-  (org-default-notes-file (concat org-directory "/berlin.org"))
-  (org-capture-templates
-   `(("j" "Journal" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
-      "* %T\n%?\n\n%a")
-     ("s" "Shriek" entry (file+headline ,(concat org-directory "/shrieks.org") "Shrieks")
-      "* %T\n%?\n")
-     ("t" "Task" entry (file+headline ,(concat org-directory "/berlin.org") "Inbox")
-      "* TODO %?\n  %a\n%i")
-     ("b" "BP Journal" entry (file+olp+datetree ,(concat org-directory "/bp.org") "Blood Pressure")
-      "* %T\n** Systolic: %^{systolic}\n** Diastolic: %^{diastolic}\n** Pulse: %^{pulse}\n** Notes\n%?\n")))
+  (setq org-edit-src-content-indentation 0)
+  (setq org-src-tab-acts-natively t)
+  (setq org-src-fontify-natively t)
+  (setq org-confirm-babel-evaluate nil)
+  (setq org-default-notes-file (concat org-directory "/berlin.org"))
+  (setq org-capture-templates
+        `(("j" "Journal" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
+           "* %T\n%?\n\n%a")
+          ("s" "Shriek" entry (file+headline ,(concat org-directory "/shrieks.org") "Shrieks")
+           "* %T\n%?\n")
+          ("t" "Task" entry (file+headline ,(concat org-directory "/berlin.org") "Inbox")
+           "* TODO %?\n  %a\n%i")
+          ("b" "BP Journal" entry (file+olp+datetree ,(concat org-directory "/bp.org") "Blood Pressure")
+           "* %T\n** Systolic: %^{systolic}\n** Diastolic: %^{diastolic}\n** Pulse: %^{pulse}\n** Notes\n%?\n")))
   ;; (org-publish-project-alist
   ;;  '(("")))
-  :init
   (defun j0ni/org-mode-hook ()
     ;; org exporting stuff
     (require 'ox-publish)
@@ -1168,20 +1444,28 @@ frames with exactly two windows."
     (org-clock-persistence-insinuate)
     (visual-line-mode 1)
     (add-hook 'before-save-hook 'org-update-all-dblocks nil 'local-only))
-  :hook ((org-mode-hook . j0ni/org-mode-hook)
-         (org-capture-mode-hook . j0ni/org-mode-hook)))
+
+  :hook
+  ((org-mode-hook . j0ni/org-mode-hook)
+   (org-capture-mode-hook . j0ni/org-mode-hook)))
 
 (use-package simple-httpd)
 
 (use-package org-super-agenda
-  :after (org-with-contrib)
-  :custom
-  (org-super-agenda-groups '((:auto-dir-name t)))
-  :hook ((org-agenda-mode-hook . org-super-agenda-mode)))
+  :after
+  (org-with-contrib)
+
+  :init
+  (setq org-super-agenda-groups '((:auto-dir-name t)))
+
+  :hook
+  ((org-agenda-mode-hook . org-super-agenda-mode)))
 
 (use-package org-roam
   :init
   (setq org-roam-v2-ack t)
+  (setq org-roam-directory (expand-file-name "org-roam" org-directory))
+
   :config
   (org-roam-db-autosync-mode)
   (add-to-list 'display-buffer-alist
@@ -1189,24 +1473,28 @@ frames with exactly two windows."
                  (display-buffer-in-direction)
                  (direction . right)
                  (window-width . 0.33)
-                 (window-height . fit-window-to-buffer)))
-  :diminish ""
-  :custom
-  (org-roam-directory (expand-file-name "org-roam" org-directory)))
+                 (window-height . fit-window-to-buffer))))
 
 (use-package elfeed
-  :custom
-  (elfeed-feeds '("https://pluralistic.net/feed/")))
+  :init
+  (setq elfeed-feeds '("https://pluralistic.net/feed/")))
 
 (use-package telega
-  :commands (telega
-             telega-mode-line-mode
-             telega-notifications-mode)
-  :bind (("C-x M-t" . telega))
-  :hook ((telega-chat-mode-hook . visual-line-mode))
-  :custom
+  :commands
+  (telega
+   telega-mode-line-mode
+   telega-notifications-mode)
+
+  :bind
+  (("C-x M-t" . telega))
+
+  :hook
+  ((telega-chat-mode-hook . visual-line-mode))
+
+  :init
   (when j0ni/is-mac
-    (telega-server-libs-prefix "/opt/homebrew"))
+    (setq telega-server-libs-prefix "/opt/homebrew"))
+
   :config
   (telega-mode-line-mode t)
   (telega-notifications-mode t)
@@ -1225,20 +1513,24 @@ frames with exactly two windows."
 ;;   :hook ((after-init-hook . doom-modeline-mode)))
 
 (use-package minions
-  :hook ((after-init-hook . minions-mode)))
+  :hook
+  ((after-init-hook . minions-mode)))
 
 (use-package markdown-mode
-  :hook ((markdown-mode-hook . visual-line-mode)))
+  :hook
+  ((markdown-mode-hook . visual-line-mode)))
 
 (use-package all-the-icons
-  :commands (all-the-icons-install-fonts))
+  :commands
+  (all-the-icons-install-fonts))
 
 (use-package haskell-mode
-  :hook ((haskell-mode-hook . electric-pair-mode)))
+  :hook
+  ((haskell-mode-hook . electric-pair-mode)))
 
 (use-package olivetti
-  :custom
-  (olivetti-body-width 120))
+  :init
+  (setq olivetti-body-width 120))
 
 ;; mu4e isn't packaged in the usual way, it gets installed as part of the `mu` system package.
 

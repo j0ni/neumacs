@@ -3,8 +3,12 @@
 (require 'use-package)
 
 (use-package mct
-  :hook ((after-init-hook . mct-mode))
-  :straight (mct.el :type git :host gitlab :repo "protesilaos/mct.el")
+  :hook
+  ((after-init-hook . mct-mode))
+
+  :straight
+  (mct.el :type git :host gitlab :repo "protesilaos/mct.el")
+
   :init
   (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
   (setq mct-hide-completion-mode-line nil)
@@ -37,7 +41,8 @@
           Info-index
           Info-menu
           vc-retrieve-tag
-          projectile-switch-project))
+          projectile-switch-project
+          consult-buffer))
 
   ;; You can place the Completions' buffer wherever you want, by following
   ;; the syntax of `display-buffer'.  For example, try this:
@@ -49,8 +54,5 @@
   ;;               (slot . 99)
   ;;               (window-width . 0.3))))
   )
-
-;; embark, consult, marginalia
-(require 'ecm)
 
 (provide 'mct-support)

@@ -2,19 +2,14 @@
 
 (require 'use-package)
 
-(require 'ecm)
-
-(setq read-file-name-completion-ignore-case t
-      read-buffer-completion-ignore-case t
-      completion-show-help nil
-      tab-always-indent 'complete)
-
-;; Switch on
 (use-package icomplete
-  :custom
-  (icomplete-prospects-height 10)
-  :commands (icomplete-vertical-mode)
   :init
-  (icomplete-vertical-mode 1))
+  (setq icomplete-prospects-height 10)
+
+  :commands
+  (icomplete-vertical-mode)
+
+  :hook
+  ((after-init-hook . icomplete-vertical-mode)))
 
 (provide 'icomplete-support)

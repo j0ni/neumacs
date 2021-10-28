@@ -3,9 +3,8 @@
 (require 'use-package)
 
 (use-package vertico
-  :custom
-  (vertico-count 10)
   :init
+  (setq vertico-count 10)
   ;; Add prompt indicator to `completing-read-multiple'.
   ;; Alternatively try `consult-completing-read-multiple'.
   (defun crm-indicator (args)
@@ -20,7 +19,5 @@
   (setq read-extended-command-predicate #'command-completion-default-include-p)
   ;; switch it on
   (vertico-mode 1))
-
-(require 'ecm)
 
 (provide 'vertico-support)
