@@ -760,9 +760,6 @@ frames with exactly two windows."
   :bind (("C-x g" . magit-status)
          ("C-x M-g" . magit-dispatch-popup)))
 
-(use-package gitignore-mode)
-(use-package gitconfig-mode)
-
 (use-package idle-highlight
   :hook ((prog-mode-hook . idle-highlight)))
 
