@@ -73,6 +73,7 @@
   (calendar-longitude 43.67066)
   (calendar-latitude -79.30211)
   (calendar-location-name "Toronto")
+  (minibuffer-eldef-shorten-default t)
   :init
   (defun j0ni/init-frame ()
     (when window-system
@@ -155,6 +156,13 @@
   (setq-default line-spacing 0)
   (setq-default truncate-lines t)
   (setq enable-recursive-minibuffers t)
+  (setq resize-mini-windows t)
+  (setq read-buffer-completion-ignore-case t)
+  (setq read-file-name-completion-ignore-case t)
+  (setq completion-cycle-threshold 3)
+  (setq completion-ignore-case t)
+  (setq completions-detailed t)
+  ;; handy fns
   (defun j0ni/disable-truncate-lines ()
     (interactive)
     (setq-local truncate-lines nil))
@@ -232,7 +240,6 @@ frames with exactly two windows."
   :hook ((before-save-hook . delete-trailing-whitespace))
   :config
   (dolist (mode '(recentf-mode
-                  savehist-mode
                   electric-indent-mode
                   show-paren-mode
                   save-place-mode
@@ -261,6 +268,14 @@ frames with exactly two windows."
   (("df" . previous-window-any-frame)
    ("jk" . next-window-any-frame)
    ("kl" . display-line-numbers-mode)))
+
+(use-package savehist
+  :custom
+  (savehist-save-minibuffer-history t)
+  :init
+  (setq history-length 10000)
+  (setq history-delete-duplicates t)
+  :hook ((after-init-hook . savehist-mode)))
 
 (use-package time
   ;; :hook ((after-init-hook . display-time-mode))
