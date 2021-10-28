@@ -14,6 +14,8 @@
   (setq mct-hide-completion-mode-line nil)
   (setq mct-show-completion-line-numbers nil)
   (setq mct-apply-completion-stripes t)
+
+  (setq mct-live-completion nil)
   (setq mct-minimum-input 3)
   (setq mct-live-update-delay 0.6)
 
@@ -42,7 +44,8 @@
           Info-menu
           vc-retrieve-tag
           projectile-switch-project
-          consult-buffer))
+          ;; consult-buffer
+          ))
 
   ;; You can place the Completions' buffer wherever you want, by following
   ;; the syntax of `display-buffer'.  For example, try this:
