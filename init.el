@@ -12,13 +12,20 @@
 ;; (debug-watch 'indent-tabs-mode)
 
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
+
 (require 'boot)
 
-(defvar j0ni/fixed-font nil "Should be a string like \"Fira Code Mono-11\" or such.")
-(defvar j0ni/variable-font nil "Should be a string like \"Fira Code-11\" or such.")
+(defvar j0ni/fixed-font nil
+  "Should be a string like \"Fira Code Mono-11\" or such.")
+
+(defvar j0ni/variable-font nil
+  "Should be a string like \"Fira Code-11\" or such.")
+
 (defvar j0ni/is-mac (memq window-system '(mac ns)))
+
 (defvar j0ni/completion-system 'builtin
-  "Should be a symbol, currently 'selectrum, 'ivy, 'icomplete, 'embark, 'vertico or 'builtin")
+  "Should be a symbol, currently 'selectrum, 'ivy, 'icomplete,
+'embark, 'vertico, 'mct or 'builtin")
 
 (use-package whitespace-mode
   :custom
@@ -101,7 +108,7 @@
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
-  (setq j0ni/completion-system 'vertico)
+  (setq j0ni/completion-system 'mct)
   ;; (setq j0ni/font "Monoisome-10")
   ;; (setq j0ni/fixed-font "OpenDyslexicMono Nerd Font-10")
   ;; (setq j0ni/variable-font "OpenDyslexic Nerd Font-11")
@@ -733,6 +740,7 @@ frames with exactly two windows."
   ('vertico (require 'vertico-support))
   ('icomplete (require 'icomplete-support))
   ('embark (require 'embark-support))
+  ('mct (require 'mct-support))
   ('builtin (require 'builtin-support))
   (t (message "Completion system [j0ni/completion-system] not set, nothing configured")))
 
