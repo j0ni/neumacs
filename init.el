@@ -971,16 +971,7 @@ frames with exactly two windows."
   :commands (cider-mode)
   :hook ((cider-mode-hook . turn-on-eldoc-mode)
          (cider-repl-mode-hook . enable-paredit-mode))
-  :init
-  (defun j0ni/cider-modeline-info ()
-    "Return info for the cider mode modeline.
-Info contains the connection type, project name and host:port endpoint."
-    (if-let* ((current-connection (ignore-errors (cider-current-repl))))
-        (with-current-buffer current-connection
-          (when cider-mode-line-show-connection "✓"))
-      "❌"))
   :custom
-  (cider-mode-line '(:eval (format " CIDER[%s]" (j0ni/cider-modeline-info))))
   (cider-repl-pop-to-buffer-on-connect t)
   (cider-save-file-on-load t)
   (cider-repl-display-help-banner nil)
