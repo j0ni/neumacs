@@ -601,19 +601,23 @@ frames with exactly two windows."
   :init
   (setq ffip-use-rust-fd t))
 
+(use-package erc
+  :custom
+  (erc-email-userid "j0ni")
+  :init
+  (defun j0ni/connect-srht-bouncer ()
+    (interactive)
+    (erc-tls
+     :server "chat.sr.ht"
+     :port "6697"
+     :nick "j0ni"
+     :full-name "Joni"
+     :password "b62b1c04a20613e49aa02f201eb4c8ea")))
+
 (use-package circe
   :init
   (setq circe-network-defaults
-        '(("Coldfront" :host "irc.coldfront.net" :port 6667 :use-tls t
-           :nickserv-mask "^NickServ!services@coldfront\\.net$"
-           :nickserv-identify-challenge "/msg\\s-NickServ\\s-IDENTIFY\\s-\C-_password\C-_"
-           :nickserv-identify-command "PRIVMSG NickServ :IDENTIFY {password}")
-          ("OFTC" :host "irc.oftc.net" :port 6697 :use-tls t
-           :nickserv-mask "^NickServ!services@services\\.oftc\\.net$"
-           :nickserv-identify-challenge "This nickname is registered and protected."
-           :nickserv-identify-command "PRIVMSG NickServ :IDENTIFY {password} {nick}"
-           :nickserv-identify-confirmation "^You are successfully identified as .*\\.$")
-          ("Libera Chat" :host "irc.libera.chat" :port 6697 :use-tls t :nick "j0ni")
+        '(("Libera Chat" :host "irc.libera.chat" :port 6697 :use-tls t :nick "j0ni")
           ("Sourcehut Bouncer" :host "chat.sr.ht" :port 6697 :use-tls t :nick "j0ni" :user "j0ni"
            :sasl-username "j0ni"
            :sasl-password "b62b1c04a20613e49aa02f201eb4c8ea"))))
