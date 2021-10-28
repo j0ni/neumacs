@@ -809,6 +809,11 @@ frames with exactly two windows."
   :hook ((scheme-mode-hook . turn-on-geiser-mode)
          (geiser-repl-mode-hook . enable-paredit-mode)))
 
+(use-package geiser-chicken)
+(use-package geiser-guile)
+(use-package geiser-racket)
+(use-package geiser-chez)
+
 (use-package racket-mode
   :hook ((racket-mode-hook . enable-paredit-mode)
          (racket-mode-hook . turn-on-geiser-mode)))
