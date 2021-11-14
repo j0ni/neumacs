@@ -15,9 +15,9 @@
   (setq mct-show-completion-line-numbers nil)
   (setq mct-apply-completion-stripes t)
 
-  (setq mct-live-completion nil)
+  (setq mct-live-completion 'visible)
   (setq mct-minimum-input 3)
-  (setq mct-live-update-delay 0.6)
+  (setq mct-live-update-delay 0.2)
 
   ;; NOTE: setting this variable with `setq', requires `mct-mode' to be
   ;; reloaded.

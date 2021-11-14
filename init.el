@@ -694,11 +694,11 @@ frames with exactly two windows."
   (setq modus-themes-slanted-constructs t)
   (setq modus-themes-syntax '(yellow-comments)) ;; 'faint
   (setq modus-themes-fringes nil)
-  (setq modus-themes-hl-line 'underline-neutral)
+  (setq modus-themes-hl-line '(underline neutral))
   (setq modus-themes-completions 'opinionated)
   (setq modus-themes-scale-headings t)
-  (setq modus-themes-mode-line nil)
-  (setq modus-themes-paren-match 'intense-bold)
+  (setq modus-themes-mode-line '(accented padded))
+  (setq modus-themes-paren-match '(intense bold underline))
 
   :config
   ;; (load-theme 'modus-operandi t)
@@ -1537,7 +1537,7 @@ frames with exactly two windows."
 (defvar j0ni/mu4e-path)
 
 (if j0ni/is-mac
-    (setq j0ni/mu4e-path "/opt/homebrew/share/emacs/site-lisp/mu/mu4e")
+    (setq j0ni/mu4e-path "/usr/local/share/emacs/site-lisp/mu/mu4e")
   (setq j0ni/mu4e-path "/usr/share/emacs/site-lisp/mu4e"))
 
 (add-to-list 'load-path j0ni/mu4e-path)
