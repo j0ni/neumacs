@@ -14,6 +14,7 @@
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
 
 (require 'boot)
+(require 'keys)
 
 (defvar j0ni/fixed-font nil
   "Should be a string like \"Fira Code Mono-11\" or such.")
@@ -78,9 +79,9 @@
   (setq minibuffer-eldef-shorten-default t)
   ;; some fns
   (defun j0ni/init-frame ()
+    (menu-bar-mode -1)
     (when window-system
       (fringe-mode 8)
-      (menu-bar-mode -1)
       (scroll-bar-mode -1)
       (tool-bar-mode -1)
       (tooltip-mode -1)))
@@ -119,11 +120,11 @@
   ;; (setq j0ni/font "Monoisome-10")
   ;; (setq j0ni/font "Lucida Grande Mono-11")
   ;; (setq j0ni/font "Lucida Console Patched-11")
-  (setq j0ni/fixed-font "Iosevka Snuggle-13")
+  (setq j0ni/fixed-font "Iosevka Snuggle-15")
   ;; (setq j0ni/fixed-font "PragmataPro Mono-12")
   ;; (setq j0ni/fixed-font "Monoid Nerd Font-10")
   ;; (setq j0ni/fixed-font "Monoid-10")
-  (setq j0ni/variable-font "Sans-11")
+  (setq j0ni/variable-font "Sans-13")
   ;; (setq j0ni/font "Fira Code-13")
   (set-face-font 'variable-pitch j0ni/variable-font nil)
   (set-frame-font j0ni/fixed-font t t)
@@ -276,7 +277,8 @@ frames with exactly two windows."
   :chords
   (("df" . previous-window-any-frame)
    ("jk" . next-window-any-frame)
-   ("kl" . display-line-numbers-mode)))
+   ("[]" . display-line-numbers-mode)
+   (";'" . j0ni/unicode-shortcut-map)))
 
 (use-package savehist
   :init
@@ -1297,6 +1299,15 @@ frames with exactly two windows."
      clojurex-mode-hook)
     . j0ni/clojure-hook)))
 
+(use-package fennel-mode
+  :hook
+  ((fennel-mode-hook . monroe-interaction-mode)
+   (fennel-mode-hook . enable-paredit-mode)))
+
+(use-package monroe
+  :commands
+  (monroe-interaction-mode))
+
 (use-package ruby-mode
   :hook
   (ruby-mode-hook . flycheck-mode))
@@ -1650,9 +1661,6 @@ frames with exactly two windows."
 (add-hook 'message-mode-hook #'mml-secure-message-sign-pgpmime)
 
 (use-package 2048-game)
-
-;; Do this last, since it may contain references to package functions
-(require 'keys)
 
 ;; everything is now loaded...
 (add-hook 'after-init-hook #'server-start)

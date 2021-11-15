@@ -3,11 +3,15 @@
 (require 'use-package)
 
 (use-package mct
-  :hook
-  ((after-init-hook . mct-mode))
-
   :straight
   (mct.el :type git :host gitlab :repo "protesilaos/mct.el")
+  ;; (:type built-in)
+
+  ;; :load-path
+  ;; ("~/Scratch/emacs/mct")
+
+  :hook
+  ((after-init-hook . mct-mode))
 
   :init
   (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
@@ -17,7 +21,7 @@
 
   (setq mct-live-completion 'visible)
   (setq mct-minimum-input 3)
-  (setq mct-live-update-delay 0.2)
+  (setq mct-live-update-delay 0.1)
 
   ;; NOTE: setting this variable with `setq', requires `mct-mode' to be
   ;; reloaded.
