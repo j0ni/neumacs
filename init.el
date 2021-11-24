@@ -45,13 +45,7 @@
   (setq auto-revert-verbose t)
   (setq vc-follow-symlinks t)
   (setq find-file-suppress-same-file-warnings t)
-  (setq read-file-name-completion-ignore-case t)
   (setq comint-prompt-read-only t)
-  ;; This defaults to a warning - abo-abo uses advice quite a bit, which is
-  ;; where this comes from; I don't see much in the way of warnings yet so let's
-  ;; leave this out for now.
-  ;; (ad-redefinition-action 'accept)
-  ;; hmm
   (setq select-enable-clipboard t)
   (setq select-enable-primary t)
   (setq uniquify-buffer-name-style 'forward)
@@ -62,7 +56,7 @@
   (setq mouse-yank-at-point t)
   (setq save-place-file (concat user-emacs-directory ".places"))
   (setq backup-directory-alist `(("." . ,(concat user-emacs-directory ".backups"))))
-  (setq enable-local-variables :all)
+  (setq enable-local-variables t) ;; :all
   (setq confirm-kill-emacs nil)
   (setq sentence-end-double-space nil)
   (setq delete-old-versions t)
@@ -83,12 +77,12 @@
       (fringe-mode 8)
       (scroll-bar-mode -1)
       (tool-bar-mode -1)
-      (tooltip-mode -1)))
+      (tooltip-mode -1)
+      (set-frame-parameter (selected-frame) 'alpha '(95 . 80))))
   (j0ni/init-frame)
   ;; This is an attempt to prevent the emacsclient frame from ignoring all this
-  ;; stuff. Unfortunately it does not appear to work.
-  ;; (add-to-list 'after-make-frame-functions #'j0ni/init-frame)
-  (set-frame-parameter (selected-frame) 'alpha '(95 . 80))
+  ;; stuff. Unfortunately it does not appear to work. ¯\_(ツ)_/¯
+  (add-to-list 'after-make-frame-functions #'j0ni/init-frame)
   ;; OS dependent modifier setup
   (when j0ni/is-mac
     ;; The left and right Option or Alt keys.
@@ -111,25 +105,26 @@
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
-  (setq j0ni/completion-system 'mct)
-  ;; (setq j0ni/font "Monoisome-10")
-  ;; (setq j0ni/fixed-font "OpenDyslexicMono Nerd Font-10")
-  ;; (setq j0ni/variable-font "OpenDyslexic Nerd Font-11")
-  ;; (setq j0ni/font "PT Mono-11")
-  ;; (setq j0ni/font "Monoisome-10")
-  ;; (setq j0ni/font "Lucida Grande Mono-11")
-  ;; (setq j0ni/font "Lucida Console Patched-11")
-  (setq j0ni/fixed-font "Iosevka Snuggle-15")
-  ;; (setq j0ni/fixed-font "PragmataPro Mono-12")
-  ;; (setq j0ni/fixed-font "Monoid Nerd Font-10")
-  ;; (setq j0ni/fixed-font "Monoid-10")
-  (setq j0ni/variable-font "Sans-13")
-  ;; (setq j0ni/font "Fira Code-13")
+  (setq j0ni/completion-system 'vertico)
+  ;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono" :size 18 :antialias t))
+  ;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono Nrw" :size 15.0 :antialias t))
+  (setq j0ni/fixed-font (font-spec :family "Iosevka Snuggle" :size 12.0 :antialias t))
+  ;; (setq j0ni/fixed-font (font-spec :family "PragmataPro Mono" :size 22 :antialias nil))
+  (setq j0ni/variable-font "Sans-11")
   (set-face-font 'variable-pitch j0ni/variable-font nil)
   (set-frame-font j0ni/fixed-font t t)
   (set-face-font 'fixed-pitch j0ni/fixed-font nil)
   (set-face-font 'fixed-pitch-serif j0ni/fixed-font nil)
   (set-fontset-font t 'unicode "Symbola" nil 'prepend)
+
+  ;; if the font is paying attention ¯\_(ツ)_/¯
+  (set-face-attribute
+   'default nil
+   :weight 'regular)
+  (set-face-attribute
+   'bold nil
+   :weight 'semi-bold)
+
   (when (string= system-type "gnu/linux")
     (setq x-super-keysym 'meta))
   (setq x-underline-at-descent-line t)
@@ -139,13 +134,13 @@
   ;; be sure to set this to 0 in any auto-scrolling buffers
   (setq scroll-conservatively 100000)
   (setq scroll-preserve-screen-position t)
-  (setq gc-cons-threshold (* 50 1024 1024))
+  ;; FIXME this is a test - let's see if I notice that I changed this
+  ;; (setq gc-cons-threshold (* 50 1024 1024))
   (setq create-lockfiles nil)
   (setq redisplay-dont-pause t)
   (setq disabled-command-function nil)
   (setq ring-bell-function 'ignore)
   (setq next-screen-context-lines 5)
-  (setq read-buffer-completion-ignore-case t)
   (setq-default indent-tabs-mode nil)
   (setq indent-tabs-mode nil)
   (setq tab-always-indent 'complete)
@@ -158,13 +153,7 @@
   (setq-default fill-column 80)
   (setq-default line-spacing 0)
   (setq-default truncate-lines t)
-  (setq enable-recursive-minibuffers t)
   (setq resize-mini-windows t)
-  (setq read-buffer-completion-ignore-case t)
-  (setq read-file-name-completion-ignore-case t)
-  (setq completion-cycle-threshold 3)
-  (setq completion-ignore-case t)
-  (setq completions-detailed t)
   (setq completion-show-help nil)
   ;; handy fns
   (defun j0ni/disable-truncate-lines ()
@@ -246,17 +235,14 @@ frames with exactly two windows."
   ((before-save-hook . delete-trailing-whitespace))
 
   :config
-  (dolist (mode '(recentf-mode
-                  electric-indent-mode
+  (dolist (mode '(electric-indent-mode
                   show-paren-mode
                   save-place-mode
-                  global-hl-line-mode
+                  size-indication-mode
+                  ;; global-hl-line-mode
                   column-number-mode
                   winner-mode
-                  global-auto-revert-mode
-                  file-name-shadow-mode
-                  minibuffer-depth-indicate-mode
-                  minibuffer-electric-default-mode))
+                  global-auto-revert-mode))
     (funcall mode 1))
   (blink-cursor-mode -1)
   (remove-hook 'minibuffer-setup-hook 'winner-save-unconditionally)
@@ -285,8 +271,26 @@ frames with exactly two windows."
   (setq history-length 10000)
   (setq history-delete-duplicates t)
 
-  :hook
-  ((after-init-hook . savehist-mode)))
+  (savehist-mode 1))
+
+(use-package recentf
+  :init
+  (recentf-mode 1))
+
+(use-package minibuffer
+  :straight (:type built-in)
+
+  :init
+  (setq enable-recursive-minibuffers t)
+  (setq completion-ignore-case t)
+  (setq read-file-name-completion-ignore-case t)
+  (setq read-buffer-completion-ignore-case t)
+  (setq completion-cycle-threshold 3)
+  (setq completions-detailed t)
+
+  (minibuffer-depth-indicate-mode 1)
+  (minibuffer-electric-default-mode 1)
+  (file-name-shadow-mode 1))
 
 (use-package time
   ;; :hook ((after-init-hook . display-time-mode))
@@ -305,6 +309,7 @@ frames with exactly two windows."
           ("Asia/Tokyo" "Tokyo"))))
 
 (use-package xref
+  :straight (:type built-in)
   ;;:init
   ;; WIP - I want to pop back to the buffer I was in before
   ;; (defvar j0ni/window-history-alist '() "keep track of where we are")
@@ -675,8 +680,8 @@ frames with exactly two windows."
    ("C-M-z" . undo-fu-only-redo)))
 
 (use-package undo-fu-session
-  :hook
-  ((after-init-hook . global-undo-fu-session-mode)))
+  :init
+  (global-undo-fu-session-mode 1))
 
 (use-package exec-path-from-shell
   :init
@@ -687,44 +692,37 @@ frames with exactly two windows."
     (setq j0ni/exec-path-from-shell-completed t)))
 
 (use-package modus-themes
-  :hook
-  ((after-init-hook . modus-themes-load-themes))
-
   :init
   (setq modus-themes-bold-constructs t)
   (setq modus-themes-slanted-constructs t)
-  (setq modus-themes-syntax '(yellow-comments)) ;; 'faint
+  (setq modus-themes-syntax '(faint))
   (setq modus-themes-fringes nil)
   (setq modus-themes-hl-line '(underline neutral))
   (setq modus-themes-completions 'opinionated)
   (setq modus-themes-scale-headings t)
-  (setq modus-themes-mode-line '(accented padded))
+  (setq modus-themes-mode-line '(3d borderless))
   (setq modus-themes-paren-match '(intense bold underline))
+  (modus-themes-load-themes)
 
   :config
   ;; (load-theme 'modus-operandi t)
-  (load-theme 'modus-vivendi t)
-  ;; if the font is paying attention ¯\_(ツ)_/¯
-  (set-face-attribute 'default nil :weight 'light)
-  (set-face-attribute 'bold nil :weight 'semibold))
+  (load-theme 'modus-vivendi t))
 
 (use-package hl-todo
-  :hook
-  ((after-init-hook . global-hl-todo-mode)))
+  :init
+  (global-hl-todo-mode 1))
 
 (use-package volatile-highlights
-  :config
-  (volatile-highlights-mode +1)
-  (diminish 'volatile-highlights-mode))
+  :init
+  (volatile-highlights-mode 1))
 
-(use-package doom-themes)
+(use-package doom-themes
+  :init
+  (setq doom-ir-black-brighter-comments nil))
 
-(use-package dracula-theme
-  ;; :init (load-theme 'dracula t))
-  :commands
-  (dracula-theme))
-
+(use-package color-theme-sanityinc-tomorrow)
 (use-package almost-mono-themes)
+(use-package dracula-theme)
 
 (use-package rainbow-mode
   :bind
@@ -737,8 +735,11 @@ frames with exactly two windows."
 (use-package browse-at-remote)
 
 (use-package diff-hl
-  :hook
-  ((after-init-hook . global-diff-hl-mode))
+  :commands
+  (global-diff-hl-mode)
+
+  :init
+  (global-diff-hl-mode 1)
 
   :config
   (eval-after-load 'magit
@@ -756,8 +757,8 @@ frames with exactly two windows."
   :commands
   (global-anzu-mode)
 
-  :hook
-  ((after-init-mode . global-anzu-mode)))
+  :init
+  (global-anzu-mode 1))
 
 ;;; Completion
 
@@ -805,9 +806,7 @@ frames with exactly two windows."
 
 (use-package consult
   :bind
-  (;; Everywhere
-   ("C-s" . consult-line)
-   ;; C-c bindings (mode-specific-map)
+  (;; C-c bindings (mode-specific-map)
    ("C-c h" . consult-history)
    ("C-c m" . consult-mode-command)
    ("C-c b" . consult-bookmark)
@@ -822,8 +821,8 @@ frames with exactly two windows."
    ("M-'" . consult-register-store) ;; orig. abbrev-prefix-mark (unrelated)
    ("C-M-#" . consult-register)
    ;; Other custom bindings
-   ;;("M-y" . consult-yank-pop)                ;; orig. yank-pop
-   ("<help> a" . consult-apropos) ;; orig. apropos-command
+   ("M-y" . consult-yank-pop)           ;; orig. yank-pop
+   ("<help> a" . consult-apropos)       ;; orig. apropos-command
    ;; M-g bindings (goto-map)
    ("M-g e" . consult-compile-error)
    ("M-g f" . consult-flymake)           ;; Alternative: consult-flycheck
@@ -846,18 +845,18 @@ frames with exactly two windows."
    ("M-s k" . consult-keep-lines)
    ("M-s u" . consult-focus-lines)
    ;; Isearch integration
-   ("M-s e" . consult-isearch)
+   ("M-s e" . consult-isearch-history)
    :map isearch-mode-map
-   ("M-e" . consult-isearch)         ;; orig. isearch-edit-string
-   ("M-s e" . consult-isearch)       ;; orig. isearch-edit-string
-   ("M-s l" . consult-line)          ;; needed by consult-line to detect isearch
-   ("M-s L" . consult-line-multi))   ;; needed by consult-line to detect isearch
+   ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+   ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+   ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+   ("M-s L" . consult-line-multi))           ;; needed by consult-line to detect isearch
 
   ;; Enable automatic preview at point in the *Completions* buffer.
   ;; This is relevant when you use the default completion UI,
   ;; and not necessary for Vertico, Selectrum, etc.
-  :hook
-  ((completion-list-mode . consult-preview-at-point-mode))
+  ;; :hook
+  ;; ((completion-list-mode-hook . consult-preview-at-point-mode))
 
   ;; The :init configuration is always executed (Not lazy)
   :init
@@ -885,18 +884,14 @@ frames with exactly two windows."
 
   ;; Optionally configure preview. The default value
   ;; is 'any, such that any key triggers the preview.
+  (setq consult-preview-key nil)
   ;; (setq consult-preview-key 'any)
   ;; (setq consult-preview-key (kbd "M-."))
   ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+
   ;; For some commands and buffer sources it is useful to configure the
   ;; :preview-key on a per-command basis using the `consult-customize' macro.
-  (consult-customize
-   consult-theme
-   :preview-key '(:debounce 0.2 any)
-   consult-ripgrep consult-git-grep consult-grep
-   consult-bookmark consult-recent-file consult-xref
-   consult--source-file consult--source-project-file consult--source-bookmark
-   :preview-key (kbd "M-."))
+  (consult-customize consult-theme :preview-key nil)
 
   ;; Optionally configure the narrowing key.
   ;; Both < and C-+ work reasonably well.
@@ -929,55 +924,45 @@ frames with exactly two windows."
   :init
   (define-key company-mode-map [remap completion-at-point] #'consult-company))
 
-(use-package embark
-  :bind
-  (("C-." . embark-act)  ;; pick some comfortable binding
-   ("C-;" . embark-dwim) ;; good alternative: M-.
-   ;; ("M-." . embark-dwim)       ;; good alternative: M-.
-   ("C-h B" . embark-bindings) ;; alternative for `describe-bindings'
-   ;; :map minibuffer-mode-map
-   ;; ("M-." . embark-collect-live)
-   )
-
-  :init
-  ;; Optionally replace the key help with a completing-read interface
-  (setq prefix-help-command #'embark-prefix-help-command)
-
-  :config
-  (setq embark-action-indicator
-        (lambda (map _target)
-          (which-key--show-keymap "Embark" map nil nil 'no-paging)
-          #'which-key--hide-popup-ignore-command)
-        embark-become-indicator embark-action-indicator)
-  ;; Hide the mode line of the Embark live/completions buffers
-  (add-to-list 'display-buffer-alist
-               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*" .
-                 (display-buffer-at-bottom . (window-parameters (mode-line-format . none)
-                                                                (window-height . 10))))))
-
-(use-package embark-consult
-  :after
-  (embark consult)
-
-  :hook
-  ((embark-collect-mode-hook . consult-preview-at-point-mode)))
-
 (use-package marginalia
-  :commands
-  (marginalia-mode)
+  :bind
+  (:map minibuffer-local-map
+        ("M-a" . marginalia-cycle))
 
   :init
-  (setq marginalia-annotators
-        '(marginalia-annotators-heavy marginalia-annotators-light))
+  (setq marginalia-truncate-width 100)
+  (marginalia-mode 1))
 
-  :hook
-  ((after-init-hook . marginalia-mode)))
+;; (use-package embark
+;;   :bind
+;;   (("C-." . embark-act)         ;; pick some comfortable binding
+;;    ("C-;" . embark-dwim)        ;; good alternative: M-.
+;;    ("C-h B" . embark-bindings)  ;; alternative for `describe-bindings'
+;;    ("C-l" . embark-collect-live))
+
+;;   :init
+
+;;   ;; Optionally replace the key help with a completing-read interface
+;;   (setq prefix-help-command #'embark-prefix-help-command))
+
+;; Consult users will also want the embark-consult package.
+;; (use-package embark-consult
+;;   :after (embark consult))
+
+;; Start off icomplete - it doesn't seem to cause problems in ido mode so far,
+;; but I'm ready to kill it if it does.
+;; (use-package icomplete
+;;   :init
+;;   (setq icomplete-prospects-height 15)
+;;   ;; (fido-vertical-mode 1)
+
+;;   :commands
+;;   (fido-mode fido-vertical-mode))
 
 ;; Choose a framework
 (cl-case j0ni/completion-system
   ('selectrum (require 'selectrum-support))
   ('vertico (require 'vertico-support))
-  ('icomplete (require 'icomplete-support))
   ('mct (require 'mct-support))
   (t (message "Completion system [j0ni/completion-system] not set, nothing configured")))
 
@@ -1135,20 +1120,21 @@ frames with exactly two windows."
   (setq lsp-signature-render-all t)
   (setq lsp-idle-delay 0.8)
   (setq lsp-lens-enable nil)
-  (setq lsp-prefer-flymake nil)
+  (setq lsp-prefer-flymake t)
   (setq lsp-file-watch-threshold 10000)
   (setq lsp-signature-auto-activate nil)
   (setq lsp-completion-provider :capf)
   (setq lsp-keymap-prefix "C-c l")
 
-  :bind
-  (:map lsp-mode-map
-        ("C-c C-l d" . lsp-describe-thing-at-point)
-        ("C-c C-l e" . lsp-execute-code-action)
-        ("C-c C-l r" . lsp-rename)
-        ("C-c C-l i" . lsp-find-implementation)
-        ("C-c C-l ." . lsp-find-type-definition)
-        ("C-c C-l x" . lsp-workspace-restart)))
+  ;; :bind
+  ;; (:map lsp-mode-map
+  ;;       ("C-c C-l d" . lsp-describe-thing-at-point)
+  ;;       ("C-c C-l e" . lsp-execute-code-action)
+  ;;       ("C-c C-l r" . lsp-rename)
+  ;;       ("C-c C-l i" . lsp-find-implementation)
+  ;;       ("C-c C-l ." . lsp-find-type-definition)
+  ;;       ("C-c C-l x" . lsp-workspace-restart))
+  )
 
 ;;; Scala
 
@@ -1279,24 +1265,20 @@ frames with exactly two windows."
   (cljr-add-keybindings-with-prefix "C-c C-j"))
 
 (use-package clojure-mode
-  :init
-  ;; (setq lsp-clojure-custom-server-command '("bash" "-c" "/usr/bin/clojure-lsp"))
-  (defun j0ni/clojure-hook ()
-    (cider-mode 1)
-    (clj-refactor-mode 1)
-    (enable-paredit-mode)
-    ;; (flycheck-mode 1)
-    (subword-mode 1)
-    ;; (require 'lsp-clojure)
-    ;; (lsp)
-    )
+  ;; :init
+  ;; ;; (setq lsp-clojure-custom-server-command '("bash" "-c" "/usr/bin/clojure-lsp"))
+  ;; (defun j0ni/clojure-hook ()
+  ;;   (enable-paredit-mode)
+  ;;   (subword-mode 1))
 
   :hook
   (((clojure-mode-hook
      clojurec-mode-hook
      clojurescript-mode-hook
      clojurex-mode-hook)
-    . j0ni/clojure-hook)))
+    . (lambda ()
+        (enable-paredit-mode)
+        (subword-mode 1)))))
 
 (use-package fennel-mode
   :hook
@@ -1346,18 +1328,12 @@ frames with exactly two windows."
   :hook
   ((after-init-hook . eros-mode)))
 
-(use-package flycheck
+(use-package flymake
   :hook
-  ((prog-mode-hook . flycheck-mode))
+  ((prog-mode-hook . flymake-mode-on))
 
   :init
-  (setq flycheck-indication-mode 'right-fringe)
-  (setq flycheck-disabled-checkers '(emacs-lisp-checkdoc clojure clojurescript))
-  (setq flycheck-check-syntax-automatically '(save idle-change mode-enabled))
-
-  :config
-  (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
-    [16 48 112 240 112 48 16] nil nil 'center))
+  (setq flymake-fringe-indicator-position 'right-fringe))
 
 (use-package rustic
   :commands
@@ -1472,18 +1448,21 @@ frames with exactly two windows."
   ((org-agenda-mode-hook . org-super-agenda-mode)))
 
 (use-package org-roam
+  :commands
+  (org-roam-db-autosync-mode)
+
   :init
   (setq org-roam-v2-ack t)
   (setq org-roam-directory (expand-file-name "org-roam" org-directory))
-
-  :config
   (org-roam-db-autosync-mode)
-  (add-to-list 'display-buffer-alist
-               '("\\*org-roam\\*"
-                 (display-buffer-in-direction)
-                 (direction . right)
-                 (window-width . 0.33)
-                 (window-height . fit-window-to-buffer))))
+
+  ;; :config
+  ;; (add-to-list 'display-buffer-alist
+  ;;              '("\\*org-roam\\*"
+  ;;                (display-buffer-at-top)
+  ;;                (window-width . 0.33)
+  ;;                (window-height . fit-window-to-buffer)))
+  )
 
 (use-package elfeed
   :init
@@ -1494,9 +1473,6 @@ frames with exactly two windows."
   (telega
    telega-mode-line-mode
    telega-notifications-mode)
-
-  :bind
-  (("C-x M-t" . telega))
 
   :hook
   ((telega-chat-mode-hook . visual-line-mode))
@@ -1523,8 +1499,14 @@ frames with exactly two windows."
 ;;   :hook ((after-init-hook . doom-modeline-mode)))
 
 (use-package minions
+  :commands
+  (minions-minor-modes-menu)
+
   :hook
-  ((after-init-hook . minions-mode)))
+  ((after-init-hook . minions-mode))
+
+  :bind
+  (("C-x C-m" . minions-minor-modes-menu)))
 
 (use-package markdown-mode
   :hook
@@ -1662,4 +1644,4 @@ frames with exactly two windows."
 (use-package 2048-game)
 
 ;; everything is now loaded...
-(add-hook 'after-init-hook #'server-start)
+;; (add-hook 'after-init-hook #'server-start)
