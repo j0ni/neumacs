@@ -762,29 +762,52 @@ frames with exactly two windows."
 
 ;;; Completion
 
-(use-package company
-  :hook
-  ((after-init-hook . global-company-mode))
+(use-package corfu
+  ;; Optional customizations
+  :custom
+  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  ;; (corfu-auto t)                 ;; Enable auto completion
+  (corfu-commit-predicate nil)   ;; Do not commit selected candidates on next input
+  (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
+  (corfu-quit-no-match t)        ;; Automatically quit if there is no match
+  (corfu-echo-documentation nil) ;; Do not show documentation in the echo area
+  (corfu-scroll-margin 5)        ;; Use scroll margin
+  ;; (corfu-preview-current nil)    ;; Do not preview current candidate
+
+  ;; Optionally use TAB for cycling, default is `corfu-complete'.
+  ;; :bind (:map corfu-map
+  ;;        ("TAB" . corfu-next)
+  ;;        ([tab] . corfu-next)
+  ;;        ("S-TAB" . corfu-previous)
+  ;;        ([backtab] . corfu-previous))
+
+  ;; You may want to enable Corfu only for certain modes.
+  ;; :hook ((prog-mode . corfu-mode)
+  ;;        (shell-mode . corfu-mode)
+  ;;        (eshell-mode . corfu-mode))
+
+  ;; Recommended: Enable Corfu globally.
+  ;; This is recommended since dabbrev can be used globally (M-/).
+  :init
+  (corfu-global-mode))
+
+(use-package cape
+  :straight
+  (cape :type git :host github :repo "minad/cape")
 
   :init
-  (setq company-global-modes '(not org-mode))
-  (setq company-tooltip-align-annotations t)
-  (setq company-minimum-prefix-length 1)
-  (setq company-idle-delay 1.0)
-  (setq company-tooltip-idle-delay 1.0)
-  (setq company-frontends '(company-pseudo-tooltip-unless-just-one-frontend
-                            company-preview-if-just-one-frontend
-                            company-echo-metadata-frontend))
+  ;; Add `completion-at-point-functions', used by `completion-at-point'.
+  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev-capf)
+  ;;(add-to-list 'completion-at-point-functions #'cape-ispell-capf)
+  ;;(add-to-list 'completion-at-point-functions #'cape-dict-capf)
+  (add-to-list 'completion-at-point-functions #'cape-file-capf)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev-capf)
+  (add-to-list 'completion-at-point-functions #'cape-keyword-capf))
 
-  :bind
-  (("M-\\" . company-complete)
-   ("C-\\" . company-complete)
-   :map company-active-map
-   ("M-\\" . company-complete-common-or-cycle)
-   ("C-\\" . company-complete-common-or-cycle)
-   ("C-j" . company-complete-selection)
-   ("C-n" . company-select-next)
-   ("C-p" . company-select-previous)))
+(use-package dabbrev
+  ;; Swap M-/ and C-M-/
+  :bind (("M-/" . dabbrev-completion)
+         ("C-M-/" . dabbrev-expand)))
 
 (use-package prescient
   :commands
@@ -793,16 +816,24 @@ frames with exactly two windows."
   :init
   (prescient-persist-mode 1))
 
-(use-package company-prescient
-  :hook
-  ((after-init-hook . company-prescient-mode)))
-
 (use-package orderless
   :init
   (setq orderless-matching-styles '(orderless-literal orderless-regexp))
-  (setq completion-styles '(orderless))
-  (setq completion-category-defaults nil)
-  (setq completion-category-overrides '((file (styles partial-completion)))))
+
+  ;; We make the SPC key insert a literal space and the same for the
+  ;; question mark.  Spaces are used to delimit orderless groups, while
+  ;; the quedtion mark is a valid regexp character.
+  (let ((map minibuffer-local-completion-map))
+    (define-key map (kbd "SPC") nil)
+    (define-key map (kbd "?") nil))
+
+  ;; Because SPC works for Orderless and is trivial to activate, I like to
+  ;; put `orderless' at the end of my `completion-styles'.  Like this:
+  (setq completion-styles
+        '(substring partial-completion orderless))
+  (setq completion-category-overrides
+        '((file (styles . (partial-completion orderless)))))
+  (setq completion-category-defaults nil))
 
 (use-package consult
   :bind
@@ -916,13 +947,6 @@ frames with exactly two windows."
 ;;;; 4. locate-dominating-file
   ;; (setq consult-project-root-function (lambda () (locate-dominating-file "." ".git")))
   )
-
-(use-package consult-company
-  :after
-  (company consult)
-
-  :init
-  (define-key company-mode-map [remap completion-at-point] #'consult-company))
 
 (use-package marginalia
   :bind
@@ -1199,9 +1223,6 @@ frames with exactly two windows."
 (use-package lsp-treemacs)
 
 (use-package sly
-  :hook
-  ((sly-mrepl-hook . company-mode))
-
   :init
   (setq inferior-lisp-program "sbcl"))
 
@@ -1291,7 +1312,7 @@ frames with exactly two windows."
 
 (use-package ruby-mode
   :hook
-  (ruby-mode-hook . flycheck-mode))
+  (ruby-mode-hook . flymake-mode))
 
 (use-package inf-ruby)
 
