@@ -24,9 +24,8 @@
 
 (defvar j0ni/is-mac (memq window-system '(mac ns)))
 
-(defvar j0ni/completion-system 'builtin
-  "Should be a symbol, currently 'selectrum, 'ivy, 'icomplete,
-'embark, 'vertico, 'mct or 'builtin")
+(defvar j0ni/completion-system 'vertico
+  "Should be a symbol, currently 'selectrum, 'vertico, 'mct.")
 
 (use-package whitespace-mode
   :init
