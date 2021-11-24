@@ -4,12 +4,12 @@
 
 (use-package icomplete
   :init
-  (setq icomplete-prospects-height 10)
+  (setq icomplete-prospects-height 1)
 
   :commands
-  (icomplete-vertical-mode)
+  (fido-mode fido-vertical-mode)
 
   :hook
-  ((after-init-hook . icomplete-vertical-mode)))
+  ((after-init-hook . fido-mode)))
 
 (provide 'icomplete-support)
