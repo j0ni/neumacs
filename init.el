@@ -43,7 +43,6 @@
   :init
   (setq warning-suppress-types '((comp)))
   (setq epa-pinentry-mode 'loopback)
-  (setq flymake-fringe-indicator-position 'right-fringe)
   (setq inhibit-startup-screen t)
   (setq auto-revert-verbose t)
   (setq vc-follow-symlinks t)
@@ -129,7 +128,7 @@
   ;; if the font is paying attention ¯\_(ツ)_/¯
   (set-face-attribute
    'default nil
-   :weight 'regular)
+   :weight 'light)
   (set-face-attribute
    'bold nil
    :weight 'semi-bold)
@@ -1438,7 +1437,9 @@ frames with exactly two windows."
   ;; extra indentation
   (setq org-adapt-indentation t)
   ;; Let's have pretty source code blocks
-  (setq org-edit-src-content-indentation 0)
+  (setq org-src-preserve-indentation t)
+  ;; This is ignored if `org-src-preserve-indentation` is set
+  ;; (setq org-edit-src-content-indentation 0)
   (setq org-src-tab-acts-natively t)
   (setq org-src-fontify-natively t)
   (setq org-confirm-babel-evaluate nil)
@@ -1488,15 +1489,7 @@ frames with exactly two windows."
   :init
   (setq org-roam-v2-ack t)
   (setq org-roam-directory (expand-file-name "org-roam" org-directory))
-  (org-roam-db-autosync-mode)
-
-  ;; :config
-  ;; (add-to-list 'display-buffer-alist
-  ;;              '("\\*org-roam\\*"
-  ;;                (display-buffer-at-top)
-  ;;                (window-width . 0.33)
-  ;;                (window-height . fit-window-to-buffer)))
-  )
+  (org-roam-db-autosync-mode))
 
 (use-package elfeed
   :init

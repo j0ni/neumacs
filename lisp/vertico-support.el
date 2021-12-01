@@ -21,9 +21,7 @@
   (vertico-mode 1)
   ;; Set up vertico buffer mode
   (setq vertico-buffer-display-action
-        `((display-buffer-in-direction
-           display-buffer-pop-up-window)
-          (direction . bottom)
+        `(display-buffer-at-bottom
           (window-min-height . ,(abs (- vertico-count 2)))
           (window-height . ,(+ 3 vertico-count))))
 
