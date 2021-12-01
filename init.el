@@ -1413,7 +1413,8 @@ frames with exactly two windows."
   ;; Set agenda file(s)
   (setq org-agenda-files (list (concat org-directory "journal.org")
                                (concat org-directory "berlin.org")
-                               (concat org-directory "shrieks.org")))
+                               (concat org-directory "shrieks.org")
+                               (concat org-directory "void.org")))
   (setq org-agenda-span 14)
   ;; prevent org-mode hijacking arrow keys
   (setq org-replace-disputed-keys t)
