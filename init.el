@@ -1385,11 +1385,12 @@ frames with exactly two windows."
   (setq rustic-lsp-server 'rust-analyzer)
   (setq rustic-lsp-format t)
   (setq rustic-indent-method-chain nil)
-  (setq lsp-rust-server 'rust-analyzer)
+  (setq rustic-lsp-client 'eglot)
 
   :config
   (require 'lsp-rust)
-  (push 'rustic-clippy flycheck-checkers))
+  ;; (push 'rustic-clippy flycheck-checkers)
+  )
 
 (use-package eglot
   :commands
