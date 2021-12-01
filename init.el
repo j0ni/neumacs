@@ -1473,7 +1473,7 @@ frames with exactly two windows."
 
 (use-package org-super-agenda
   :after
-  (org-with-contrib)
+  (org)
 
   :init
   (setq org-super-agenda-groups '((:auto-dir-name t)))
