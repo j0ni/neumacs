@@ -1662,7 +1662,7 @@ frames with exactly two windows."
                                                 ("/Well/Drafts" . ?d)
                                                 ("/Well/Trash" . ?t)
                                                 ("/Well/Archive" . ?a)))
-                     (mu4e-compose-signature . "https://j0ni.ca ~ https://keybase.io/j0ni")
+                     (mu4e-compose-signature . "In this world / we walk on the roof of hell / gazing at flowers\n    - Kobayashi Issa\n\nhttps://j0ni.ca ~ https://keybase.io/j0ni")
                      (mu4e-bookmarks . ,(list (j0ni/mu4e-bookmark "Well" "7" ?w)
                                               (j0ni/mu4e-bookmark "Well" "30" ?m)))
                      (smtpmail-smtp-user . "joni")
