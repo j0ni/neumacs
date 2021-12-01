@@ -36,6 +36,9 @@
   ((prog-mode-hook . whitespace-mode)
    (whitespace-mode-hook . (lambda () (diminish 'whitespace-mode)))))
 
+(use-package conf-mode
+  :hook ((conf-mode-hook . electric-pair-local-mode)))
+
 (use-package emacs
   :init
   (setq warning-suppress-types '((comp)))
