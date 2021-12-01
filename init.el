@@ -1163,7 +1163,6 @@ frames with exactly two windows."
   (setq lsp-prefer-flymake t)
   (setq lsp-file-watch-threshold 10000)
   (setq lsp-signature-auto-activate nil)
-  (setq lsp-completion-provider :capf)
   (setq lsp-keymap-prefix "C-c l")
 
   ;; :bind
