@@ -1474,7 +1474,7 @@ frames with exactly two windows."
   ((org-mode-hook . j0ni/org-mode-hook)
    (org-capture-mode-hook . j0ni/org-mode-hook)))
 
-(use-package simple-httpd)
+(straight-use-package 'simple-httpd)
 
 (use-package org-super-agenda
   :after
@@ -1672,7 +1672,7 @@ frames with exactly two windows."
 (add-hook 'message-mode-hook #'turn-on-auto-fill)
 (add-hook 'message-mode-hook #'mml-secure-message-sign-pgpmime)
 
-(use-package 2048-game)
+(straight-use-package '2048-game)
 
 ;; everything is now loaded...
 ;; (add-hook 'after-init-hook #'server-start)
