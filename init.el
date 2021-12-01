@@ -800,6 +800,10 @@ frames with exactly two windows."
 
   ;; Recommended: Enable Corfu globally.
   ;; This is recommended since dabbrev can be used globally (M-/).
+
+  ;; :hook
+  ;; ((prog-mode . corfu-mode))
+
   :init
   (corfu-global-mode))
 
