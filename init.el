@@ -762,6 +762,10 @@ frames with exactly two windows."
 
 ;;; Completion
 
+(use-package yasnippet
+  :init
+  (setq yas-snippet-dirs (concat user-emacs-directory "snippets")))
+
 (use-package corfu
   ;; Optional customizations
   :custom
