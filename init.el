@@ -1133,7 +1133,7 @@ frames with exactly two windows."
 
   :init
   (setq lsp-auto-configure nil)
-  (setq lsp-enable-snippet t)
+  (setq lsp-enable-snippet t) ;; I mean why not
   (setq lsp-enable-folding nil)
   (setq lsp-enable-file-watchers t)
   (setq lsp-enable-links t)
