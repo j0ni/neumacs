@@ -807,12 +807,12 @@ frames with exactly two windows."
 
   :init
   ;; Add `completion-at-point-functions', used by `completion-at-point'.
-  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev-capf)
-  ;;(add-to-list 'completion-at-point-functions #'cape-ispell-capf)
-  ;;(add-to-list 'completion-at-point-functions #'cape-dict-capf)
-  (add-to-list 'completion-at-point-functions #'cape-file-capf)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev-capf)
-  (add-to-list 'completion-at-point-functions #'cape-keyword-capf))
+  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;;(add-to-list 'completion-at-point-functions #'cape-ispell)
+  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-keyword))
 
 (use-package dabbrev
   ;; Swap M-/ and C-M-/
