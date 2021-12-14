@@ -50,10 +50,10 @@
   ;; You can place the Completions' buffer wherever you want, by following
   ;; the syntax of `display-buffer'.  For example, try this:
 
-  (setq mct-display-buffer-action
-        '((display-buffer-reuse-window
-           display-buffer-at-bottom)
-          (window-height . 0.3)))
+  ;; (setq mct-display-buffer-action
+  ;;       '((display-buffer-reuse-window
+  ;;          display-buffer-at-bottom)
+  ;;         (window-height . 0.3)))
 
   (mct-mode 1))
 

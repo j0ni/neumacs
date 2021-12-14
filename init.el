@@ -107,17 +107,21 @@
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
-  (setq j0ni/completion-system 'vertico)
-  ;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono" :size 18 :antialias t))
+  (setq j0ni/completion-system 'mct)
+  ;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono" :size 19 :antialias t))
   ;; (setq j0ni/fixed-font (font-spec :family "AurulentSansMono Nerd Font Mono" :size 11.0 :antialias t))
-  ;; (setq j0ni/fixed-font (font-spec :family "Iosevka Snuggle" :size 12.0 :antialias t))
-  ;; (setq j0ni/fixed-font (font-spec :family "D2Coding Ligature" :size 12.0 :antialias t))
-  (setq j0ni/fixed-font (font-spec :family "CaskaydiaCove Nerd Font Mono" :size 12.0 :antialias t))
-  (setq j0ni/fixed-font (font-spec :family "GoMono Nerd Font Mono" :size 12.0 :antialias t))
-  (setq j0ni/fixed-font (font-spec :family "Latin Modern Mono Light Cond" :size 25 :antialias nil))
-  (setq j0ni/fixed-font (font-spec :family "Lekton Nerd Font Mono" :size 25 :antialias t))
-  (setq j0ni/fixed-font (font-spec :family "Source Code Pro" :size 12.0 :antialias t))
-  (setq j0ni/fixed-font (font-spec :family "Monoisome" :size 11.0 :antialias t))
+  ;; (setq j0ni/fixed-font (font-spec :family "Iosevka Snuggle" :size 13.5 :antialias t))
+  ;; (setq j0ni/fixed-font (font-spec :family "Fira Code Nerd Font" :size 15.0 :antialias t))
+  (setq j0ni/fixed-font (font-spec :family "Envy Code R" :size 15.5 :antialias t))
+  ;; (setq j0ni/fixed-font (font-spec :family "CaskaydiaCove Nerd Font Mono" :size 14.0 :antialias t))
+  ;; (setq j0ni/fixed-font (font-spec :family "GoMono Nerd Font Mono" :size 12.0 :antialias t))
+  ;; (setq j0ni/fixed-font (font-spec :family "Lekton Nerd Font Mono" :size 25 :antialias t))
+  ;; (setq j0ni/fixed-font (font-spec :family "Source Code Pro" :size 12.0 :antialias t))
+  (setq j0ni/fixed-font (font-spec :family "Monoisome" :size 12.5 :antialias t))
+  ;; (setq j0ni/fixed-font (font-spec :family "Agave Nerd Font" :size 12.5 :antialias t))
+  ;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono Nrw" :size 15.0 :antialias t))
+  ;; (setq j0ni/fixed-font (font-spec :family "TerminessTTF Nerd Font Mono" :size 16.5 :antialias t))
+  ;; (setq j0ni/fixed-font (font-spec :family "Latin Modern Mono" :size 15.0 :antialias t))
   (setq j0ni/variable-font "Sans-11")
   (set-face-font 'variable-pitch j0ni/variable-font nil)
   (set-frame-font j0ni/fixed-font t t)
@@ -128,7 +132,7 @@
   ;; if the font is paying attention ¯\_(ツ)_/¯
   (set-face-attribute
    'default nil
-   :weight 'light)
+   :weight 'regular)
   (set-face-attribute
    'bold nil
    :weight 'semi-bold)
@@ -288,6 +292,13 @@ frames with exactly two windows."
 (use-package minibuffer
   :straight (:type built-in)
 
+  :commands
+  (minibuffer-depth-indicate-mode
+   minibuffer-electric-default-mode)
+
+  :hook
+  ((minibuffer-setup-hook . cursor-intangible-mode))
+
   :init
   (setq enable-recursive-minibuffers t)
   (setq completion-ignore-case t)
@@ -295,6 +306,9 @@ frames with exactly two windows."
   (setq read-buffer-completion-ignore-case t)
   (setq completion-cycle-threshold 3)
   (setq completions-detailed t)
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setq minibuffer-prompt-properties
+        '(read-only t cursor-intangible t face minibuffer-prompt))
 
   (minibuffer-depth-indicate-mode 1)
   (minibuffer-electric-default-mode 1)
@@ -598,6 +612,11 @@ frames with exactly two windows."
   ;; :hook ((prog-mode-hook . ligature-mode))
   )
 
+(use-package mini-modeline)
+(use-package mood-line
+  ;; :init (mood-line-mode 1)
+  )
+
 (use-package beacon
   :commands
   (beacon-blink)
@@ -780,10 +799,11 @@ frames with exactly two windows."
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   ;; (corfu-auto t)                 ;; Enable auto completion
   (corfu-commit-predicate nil)   ;; Do not commit selected candidates on next input
-  (corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
+  (corfu-quit-at-boundary nil)   ;; Automatically quit at word boundary
   (corfu-quit-no-match t)        ;; Automatically quit if there is no match
-  (corfu-echo-documentation nil) ;; Do not show documentation in the echo area
-  (corfu-scroll-margin 5)        ;; Use scroll margin
+  ;; (corfu-echo-documentation nil) ;; Do not show documentation in the echo area
+  (corfu-scroll-margin 2)        ;; Use scroll margin
+  (corfu-min-width 20)
   ;; (corfu-preview-current nil)    ;; Do not preview current candidate
 
   ;; Optionally use TAB for cycling, default is `corfu-complete'.
@@ -902,8 +922,8 @@ frames with exactly two windows."
   ;; Enable automatic preview at point in the *Completions* buffer.
   ;; This is relevant when you use the default completion UI,
   ;; and not necessary for Vertico, Selectrum, etc.
-  ;; :hook
-  ;; ((completion-list-mode-hook . consult-preview-at-point-mode))
+  :hook
+  ((completion-list-mode-hook . consult-preview-at-point-mode))
 
   ;; The :init configuration is always executed (Not lazy)
   :init
@@ -1053,7 +1073,6 @@ frames with exactly two windows."
 
 ;; C-M-SPC mark-sexp Put the mark at the end of the sexp.
 
-
 (use-package paredit
   :hook
   ((emacs-lisp-mode-hook . enable-paredit-mode)
@@ -1130,191 +1149,193 @@ frames with exactly two windows."
 
 (use-package restclient)
 
-(use-package lsp-mode
-  :commands
-  (lsp lsp-register-custom-settings lsp-deferred)
+;; (use-package lsp-mode
+;;   :commands
+;;   (lsp lsp-register-custom-settings lsp-deferred)
 
-  :hook
-  ((lsp-mode-hook . lsp-enable-which-key-integration))
+;;   :hook
+;;   ((lsp-mode-hook . lsp-enable-which-key-integration))
 
-  :init
-  (setq lsp-auto-configure nil)
-  (setq lsp-enable-snippet t) ;; I mean why not
-  (setq lsp-enable-folding nil)
-  (setq lsp-enable-file-watchers t)
-  (setq lsp-enable-links t)
-  (setq lsp-enable-imenu t)
-  (setq lsp-enable-dap-auto-configure t)
-  (setq lsp-enable-symbol-highlighting t)
-  (setq lsp-enable-xref t)
-  (setq lsp-enable-indentation t)
-  (setq lsp-enable-on-type-formatting nil)
-  (setq lsp-enable-text-document-color nil)
-  (setq lsp-modeline-code-actions-enable nil)
-  (setq lsp-modeline-diagnostics-enable t)
-  (setq lsp-modeline-workspace-status-enable nil)
-  (setq lsp-completion-enable t)
-  (setq lsp-auto-guess-root nil)
-  (setq lsp-eldoc-enable-hover nil)
-  (setq lsp-eldoc-render-all nil)
-  (setq lsp-signature-render-all t)
-  (setq lsp-idle-delay 0.8)
-  (setq lsp-lens-enable nil)
-  (setq lsp-prefer-flymake t)
-  (setq lsp-file-watch-threshold 10000)
-  (setq lsp-signature-auto-activate nil)
-  (setq lsp-keymap-prefix "C-c l")
+;;   :init
+;;   (setq lsp-auto-configure nil)
+;;   (setq lsp-enable-snippet t) ;; I mean why not
+;;   (setq lsp-enable-folding nil)
+;;   (setq lsp-enable-file-watchers t)
+;;   (setq lsp-enable-links t)
+;;   (setq lsp-enable-imenu t)
+;;   (setq lsp-enable-dap-auto-configure t)
+;;   (setq lsp-enable-symbol-highlighting t)
+;;   (setq lsp-enable-xref t)
+;;   (setq lsp-enable-indentation t)
+;;   (setq lsp-enable-on-type-formatting nil)
+;;   (setq lsp-enable-text-document-color nil)
+;;   (setq lsp-modeline-code-actions-enable nil)
+;;   (setq lsp-modeline-diagnostics-enable t)
+;;   (setq lsp-modeline-workspace-status-enable nil)
+;;   (setq lsp-completion-enable t)
+;;   (setq lsp-auto-guess-root nil)
+;;   (setq lsp-eldoc-enable-hover nil)
+;;   (setq lsp-eldoc-render-all nil)
+;;   (setq lsp-signature-render-all t)
+;;   (setq lsp-idle-delay 0.8)
+;;   (setq lsp-lens-enable nil)
+;;   (setq lsp-prefer-flymake t)
+;;   (setq lsp-file-watch-threshold 10000)
+;;   (setq lsp-signature-auto-activate nil)
+;;   (setq lsp-keymap-prefix "C-c l")
 
-  ;; :bind
-  ;; (:map lsp-mode-map
-  ;;       ("C-c C-l d" . lsp-describe-thing-at-point)
-  ;;       ("C-c C-l e" . lsp-execute-code-action)
-  ;;       ("C-c C-l r" . lsp-rename)
-  ;;       ("C-c C-l i" . lsp-find-implementation)
-  ;;       ("C-c C-l ." . lsp-find-type-definition)
-  ;;       ("C-c C-l x" . lsp-workspace-restart))
-  )
+;;   ;; :bind
+;;   ;; (:map lsp-mode-map
+;;   ;;       ("C-c C-l d" . lsp-describe-thing-at-point)
+;;   ;;       ("C-c C-l e" . lsp-execute-code-action)
+;;   ;;       ("C-c C-l r" . lsp-rename)
+;;   ;;       ("C-c C-l i" . lsp-find-implementation)
+;;   ;;       ("C-c C-l ." . lsp-find-type-definition)
+;;   ;;       ("C-c C-l x" . lsp-workspace-restart))
+;;   )
 
 ;;; Scala
 
-(use-package lsp-metals)
+;; (use-package lsp-metals)
 
-(use-package scala-mode
-  :hook
-  ((scala-mode-hook . lsp))
+;; (use-package scala-mode
+;;   :hook
+;;   ((scala-mode-hook . lsp))
 
-  :interpreter
-  ("scala" . scala-mode))
+;;   :interpreter
+;;   ("scala" . scala-mode))
 
-;; Enable sbt mode for executing sbt commands
-(use-package sbt-mode
-  :commands
-  (sbt-start sbt-command)
+;; ;; Enable sbt mode for executing sbt commands
+;; (use-package sbt-mode
+;;   :commands
+;;   (sbt-start sbt-command)
 
-  :config
-  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
-  ;; allows using SPACE when in the minibuffer
-  (substitute-key-definition
-   'minibuffer-complete-word
-   'self-insert-command
-   minibuffer-local-completion-map)
-  ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
-  (setq sbt:program-options '("-Dsbt.supershell=false")))
+;;   :config
+;;   ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+;;   ;; allows using SPACE when in the minibuffer
+;;   (substitute-key-definition
+;;    'minibuffer-complete-word
+;;    'self-insert-command
+;;    minibuffer-local-completion-map)
+;;   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+;;   (setq sbt:program-options '("-Dsbt.supershell=false")))
 
-(use-package lsp-java
-  :hook
-  ((java-mode-hook . lsp)))
+;; (use-package lsp-java
+;;   :hook
+;;   ((java-mode-hook . lsp)))
 
-(use-package lsp-ui
-  :config
-  (require 'lsp-ui-imenu)
+;; (use-package lsp-ui
+;;   :config
+;;   (require 'lsp-ui-imenu)
 
-  :init
-  (setq lsp-ui-autoconfigure t)
-  (setq lsp-ui-sideline-enable nil)
-  (setq lsp-ui-doc-enable nil)
-  (setq lsp-ui-peek-enable t)
-  (setq lsp-ui-peek-always-show nil)
-  (setq lsp-ui-imenu-autorefresh t)
-  (setq lsp-ui-doc-show-with-cursor t)
-  (setq lsp-ui-doc-show-with-mouse nil)
+;;   :init
+;;   (setq lsp-ui-autoconfigure t)
+;;   (setq lsp-ui-sideline-enable nil)
+;;   (setq lsp-ui-doc-enable nil)
+;;   (setq lsp-ui-peek-enable t)
+;;   (setq lsp-ui-peek-always-show nil)
+;;   (setq lsp-ui-imenu-autorefresh t)
+;;   (setq lsp-ui-doc-show-with-cursor t)
+;;   (setq lsp-ui-doc-show-with-mouse nil)
 
-  :bind
-  (:map lsp-ui-mode-map
-        ("C-c l I" . lsp-ui-imenu)
-        ("C-c l ." . lsp-ui-peek-find-definitions)
-        ("C-c l ?" . lsp-ui-peek-find-references)
-        ("C-c l r" . lsp-rename)
-        ("C-c l x" . lsp-workspace-restart)
-        ("C-c l w" . lsp-ui-peek-find-workspace-symbol)
-        ("C-c l i" . lsp-ui-peek-find-implementation)
-        ("C-c l d" . lsp-describe-thing-at-point)
-        ("C-c l e" . lsp-execute-code-action)))
+;;   :bind
+;;   (:map lsp-ui-mode-map
+;;         ("C-c l I" . lsp-ui-imenu)
+;;         ("C-c l ." . lsp-ui-peek-find-definitions)
+;;         ("C-c l ?" . lsp-ui-peek-find-references)
+;;         ("C-c l r" . lsp-rename)
+;;         ("C-c l x" . lsp-workspace-restart)
+;;         ("C-c l w" . lsp-ui-peek-find-workspace-symbol)
+;;         ("C-c l i" . lsp-ui-peek-find-implementation)
+;;         ("C-c l d" . lsp-describe-thing-at-point)
+;;         ("C-c l e" . lsp-execute-code-action)))
 
 (use-package treemacs
   :init
   (setq treemacs-space-between-root-nodes nil))
 
-(use-package lsp-treemacs)
+;; (use-package lsp-treemacs)
+
+;; (use-package hyperspec)
 
 (use-package sly
   :init
+  (setq sly-default-lisp "sbcl")
   (setq inferior-lisp-program "sbcl"))
 
-(use-package sly-quicklisp)
-(use-package sly-macrostep)
-(use-package sly-asdf)
+(straight-use-package 'sly-quicklisp)
+(straight-use-package 'sly-macrostep)
+(straight-use-package 'sly-asdf)
 
-;; (use-package inf-clojure
-;;   ;; :config
-;;   ;; (inf-clojure-update-feature 'clojure 'completion
-;;   ;;                             "(compliment.core/completions \"%s\")")
-;;   :hook ((inf-clojure-mode-hook . turn-on-eldoc-mode)
-;;          (inf-clojure-mode-hook . enable-paredit-mode)))
-
-(use-package cider
-  :commands
-  (cider-mode)
-
+(use-package inf-clojure
+  ;; :config
+  ;; (inf-clojure-update-feature 'clojure 'completion
+  ;;                             "(compliment.core/completions \"%s\")")
   :hook
-  ((cider-mode-hook . turn-on-eldoc-mode)
-   (cider-repl-mode-hook . enable-paredit-mode))
+  ((inf-clojure-mode-hook . turn-on-eldoc-mode)
+   (inf-clojure-mode-hook . enable-paredit-mode)))
 
-  :init
-  (setq cider-repl-pop-to-buffer-on-connect t)
-  (setq cider-save-file-on-load t)
-  (setq cider-repl-display-help-banner nil)
-  (setq cider-use-overlays t)                ; display eval results inline
-  (setq cider-use-fringe-indicators nil)
-  (setq cider-stacktrace-default-filters '(tooling dup))
-  (setq cider-repl-history-size 10000)
-  (setq cider-prompt-for-symbol nil)
-  (setq cider-known-endpoints nil)
-  (setq cider-repl-history-file (concat user-emacs-directory ".cider-repl-history"))
-  (setq cider-prefer-local-resources t)
-  (setq cider-inject-dependencies-at-jack-in t)
-  (setq cider-eldoc-display-context-dependent-info t)
-  (setq cider-auto-mode t)
 
-  :bind
-  (:map cider-repl-mode-map
-        ("RET" . cider-repl-newline-and-indent)
-        ("C-RET" . cider-repl-return)))
+;; (use-package cider
+;;   :commands
+;;   (cider-mode)
 
-(use-package cider-eval-sexp-fu)
+;;   :hook
+;;   ((cider-mode-hook . turn-on-eldoc-mode)
+;;    (cider-repl-mode-hook . enable-paredit-mode))
 
-(use-package clj-refactor
-  :commands
-  (clj-refactor-mode)
+;;   :init
+;;   (setq cider-repl-pop-to-buffer-on-connect t)
+;;   (setq cider-save-file-on-load t)
+;;   (setq cider-repl-display-help-banner nil)
+;;   (setq cider-use-overlays t)                ; display eval results inline
+;;   (setq cider-use-fringe-indicators nil)
+;;   (setq cider-stacktrace-default-filters '(tooling dup))
+;;   (setq cider-repl-history-size 10000)
+;;   (setq cider-prompt-for-symbol nil)
+;;   (setq cider-known-endpoints nil)
+;;   (setq cider-repl-history-file (concat user-emacs-directory ".cider-repl-history"))
+;;   (setq cider-prefer-local-resources t)
+;;   (setq cider-inject-dependencies-at-jack-in t)
+;;   (setq cider-eldoc-display-context-dependent-info t)
+;;   (setq cider-auto-mode t)
 
-  :init
-  (setq cljr-add-ns-to-blank-clj-files t)
-  (setq cljr-warn-on-eval nil)
-  (setq cljr-suppress-middleware-warnings t)
-  (setq cljr-favor-prefix-notation nil)
-  (setq cljr-favor-private-functions nil)
-  (setq cljr-inject-dependencies-at-jack-in t)
-  (setq cljr-eagerly-build-asts-on-startup nil)
-  (setq cljr-ignore-analyzer-errors t)
+;;   :bind
+;;   (:map cider-repl-mode-map
+;;         ("RET" . cider-repl-newline-and-indent)
+;;         ("C-RET" . cider-repl-return)))
 
-  :config
-  (cljr-add-keybindings-with-prefix "C-c C-j"))
+;; (use-package cider-eval-sexp-fu)
+
+;; (use-package clj-refactor
+;;   :commands
+;;   (clj-refactor-mode)
+
+;;   :init
+;;   (setq cljr-add-ns-to-blank-clj-files t)
+;;   (setq cljr-warn-on-eval nil)
+;;   (setq cljr-suppress-middleware-warnings t)
+;;   (setq cljr-favor-prefix-notation nil)
+;;   (setq cljr-favor-private-functions nil)
+;;   (setq cljr-inject-dependencies-at-jack-in t)
+;;   (setq cljr-eagerly-build-asts-on-startup nil)
+;;   (setq cljr-ignore-analyzer-errors t)
+
+;;   :config
+;;   (cljr-add-keybindings-with-prefix "C-c C-j"))
 
 (use-package clojure-mode
-  ;; :init
-  ;; ;; (setq lsp-clojure-custom-server-command '("bash" "-c" "/usr/bin/clojure-lsp"))
-  ;; (defun j0ni/clojure-hook ()
-  ;;   (enable-paredit-mode)
-  ;;   (subword-mode 1))
-
   :hook
   (((clojure-mode-hook
      clojurec-mode-hook
      clojurescript-mode-hook
      clojurex-mode-hook)
     . (lambda ()
+        (inf-clojure-minor-mode 1)
         (enable-paredit-mode)
         (subword-mode 1)))))
+
+(use-package lua-mode)
 
 (use-package fennel-mode
   :hook
@@ -1323,7 +1344,10 @@ frames with exactly two windows."
 
 (use-package monroe
   :commands
-  (monroe-interaction-mode))
+  (monroe-interaction-mode)
+
+  :init
+  (setq monroe-detail-stacktraces t))
 
 (use-package ruby-mode
   :hook
@@ -1388,17 +1412,15 @@ frames with exactly two windows."
   (setq rustic-lsp-client 'eglot)
 
   :config
-  (require 'lsp-rust)
-  ;; (push 'rustic-clippy flycheck-checkers)
-  )
+  (require 'lsp-rust))
 
 (use-package eglot
   :commands
   (eglot-ensure))
 
 (use-package org
-  :straight
-  (:type built-in)
+  ;; :straight
+  ;; (:type built-in)
 
   :bind
   (("C-c c" . org-capture)
@@ -1586,7 +1608,7 @@ frames with exactly two windows."
       mu4e-change-filenames-when-moving t
       mu4e-headers-hide-predicate nil
       mu4e-headers-include-related t
-      mu4e-split-view 'single-window
+      mu4e-split-view nil
       mu4e-headers-fields '((:human-date . 12)
                             (:flags . 6)
                             (:mailing-list . 16)
