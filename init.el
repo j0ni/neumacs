@@ -1237,6 +1237,9 @@ frames with exactly two windows."
 
 (setq org-startup-indented t)
 
+;; fix up encryption - not sure I want this
+;; (org-crypt-use-before-save-magic)
+
 ;; make it short to start with
 (setq org-startup-folded t)
 
@@ -1491,15 +1494,19 @@ frames with exactly two windows."
             (require 'server)
             (unless (server-running-p)
               (server-start))))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ignored-local-variable-values '((sly-load-failed-fasl . ask) (checkdoc-minor-mode . t))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+
+;; let's get encryption established - for exwm
+(setq auth-source-debug t)
+(epa-file-enable)
+
+(setenv "GPG_AGENT_INFO" nil) ;; use emacs pinentry
+(straight-use-package 'pinentry)
+(setq epa-pinentry-mode 'loopback)
+(setq epg-pinentry-mode 'loopback)
+
+(pinentry-start)
+
+(setq mouse-autoselect-window t
+      focus-follows-mouse t)
+
+(require 'wm)
