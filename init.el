@@ -11,6 +11,8 @@
 
 ;; (debug-watch 'indent-tabs-mode)
 
+;; (desktop-save-mode)
+
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
 
 (require 'boot)
@@ -28,7 +30,7 @@
   "Should be a symbol, currently 'selectrum, 'vertico, 'mct.")
 
 ;; whitespace-mode
-(setq whitespace-line-column 100)
+(setq whitespace-line-column 120)
 (setq whitespace-style '(face trailing lines-tail tabs))
 (add-hook 'prog-mode-hook #'whitespace-mode)
 
@@ -113,24 +115,27 @@
 
 ;;; Set our choice of interaction franework
 
-(setq j0ni/completion-system 'mct)
+(setq j0ni/completion-system 'vertico)
 
 ;;; Fonty fonty fonty fonty fonty LEAVE ME ALONE fonty fonty fonty
 
 ;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono" :size 19 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "AurulentSansMono Nerd Font Mono" :size 11.0 :antialias t))
-(setq j0ni/fixed-font (font-spec :family "Iosevka Nerd Font" :size 16.5 :antialias t))
+;; (setq j0ni/fixed-font (font-spec :family "AurulentSansMono Nerd Font Mono" :size 12.0 :antialias t))
+;; (setq j0ni/fixed-font (font-spec :family "Iosevka Nerd Font" :size 13.5 :antialias t))
 ;; (setq j0ni/fixed-font (font-spec :family "Fira Code Nerd Font" :size 15.0 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "Envy Code R" :size 17.5 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "CaskaydiaCove Nerd Font Mono" :size 14.0 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "GoMono Nerd Font Mono" :size 12.0 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "Lekton Nerd Font Mono" :size 25 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "Source Code Pro" :size 12.0 :antialias t))
+;; (setq j0ni/fixed-font (font-spec :family "FuraMono Nerd Font Mono" :size 12.0 :antialias t))
 ;; (setq j0ni/fixed-font (font-spec :family "Monoisome" :size 14.0 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "Agave Nerd Font" :size 12.5 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono Nrw" :size 15.0 :antialias t))
+;; (setq j0ni/fixed-font (font-spec :family "Agave Nerd Font" :size 16.0 :antialias t))
+;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono Nrw" :size 13.5 :antialias t))
 ;; (setq j0ni/fixed-font (font-spec :family "TerminessTTF Nerd Font Mono" :size 16.5 :antialias t))
 ;; (setq j0ni/fixed-font (font-spec :family "Latin Modern Mono" :size 15.0 :antialias t))
+;; (setq j0ni/fixed-font (font-spec :family "BlexMono Nerd Font Mono" :size 12.5 :antialias t))
+(setq j0ni/fixed-font (font-spec :family "Anonymice Nerd Font Mono" :size 13.5 :antialias t))
+;; (setq j0ni/fixed-font (font-spec :family "D2Coding" :size 14.0 :antialias t))
+;; (setq j0ni/fixed-font (font-spec :family "Envy Code R" :size 13.5 :antialias t))
+;; (setq j0ni/fixed-font (font-spec :family "GoMono Nerd Font Mono" :size 12.5 :antialias t))
+;; (setq j0ni/fixed-font (font-spec :family "PragmataPro Mono" :size 13.0 :antialias t))
+;; (setq j0ni/fixed-font (font-spec :family "Inconsolata Nerd Font Mono" :size 14.5 :antialias t))
 (setq j0ni/variable-font "Lucida Grande-15")
 
 (set-face-font 'variable-pitch j0ni/variable-font nil)
@@ -142,13 +147,13 @@
 ;; if the font is paying attention ¯\_(ツ)_/¯
 (set-face-attribute
  'default nil
- :weight 'regular)
+ :weight 'semi-light)
 (set-face-attribute
  'bold nil
  :weight 'semi-bold)
 
-(when (string= system-type "gnu/linux")
-  (setq x-super-keysym 'meta))
+;; (when (string= system-type "gnu/linux")
+;;   (setq x-super-keysym 'meta))
 
 ;; adds a little space with some fonts
 (setq x-underline-at-descent-line t)
@@ -206,7 +211,7 @@
 If BACKWARD-ONLY is non-nil, only delete them before point."
   (interactive "*P")
   (unless backward-only
-    (j0ni/backwward-delete-whitespace))
+    (j0ni/backward-delete-whitespace))
   (j0ni/forward-delete-whitespace)
   (unless backward-only (insert " ")))
 

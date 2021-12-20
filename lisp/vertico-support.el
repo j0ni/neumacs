@@ -5,7 +5,8 @@
            :repo "minad/vertico"
            :files ("*" (:exclude ".git") "extensions/*.el")))
 
-(keymap-set vertico-map "M-a" #'marginalia-cycle)
+(with-eval-after-load 'vertico
+  (keymap-set vertico-map "M-a" #'marginalia-cycle))
 
 (setq vertico-count 12)
 
