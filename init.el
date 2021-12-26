@@ -332,9 +332,19 @@ frames with exactly two windows."
 (setq xref-show-xrefs-function 'xref--show-xref-buffer) ; default
 (setq xref-show-definitions-function 'xref-show-definitions-completing-read)
 
-;;; Eglot for LSP - load early, use often
+(straight-use-package 'lsp-mode)
+(require 'lsp-mode)
 
-(straight-use-package 'eglot)
+;; default is t
+(setq lsp-enable-folding nil)
+;; default is t
+(setq lsp-eldoc-enable-hover t)
+;; default is t
+(setq lsp-enable-on-type-formatting t)
+;; default is t
+(setq lsp-before-save-edits t)
+
+(straight-use-package 'consult-lsp)
 
 (defvar pragmata-pro-ligatures
   (mapcar #'car
@@ -849,6 +859,7 @@ frames with exactly two windows."
 (setq completion-category-defaults nil)
 
 (straight-use-package 'consult)
+(straight-use-package 'consult-flycheck)
 
 (dolist (binding
          `( ;; C-c bindings (mode-specific-map)
@@ -870,7 +881,7 @@ frames with exactly two windows."
            ("<help> a" . ,#'consult-apropos) ;; orig. apropos-command
            ;; M-g bindings (goto-map)
            ("M-g e"    . ,#'consult-compile-error)
-           ("M-g f"    . ,#'consult-flymake)     ;; Alternative: consult-flycheck
+           ("M-g f"    . ,#'consult-flycheck)     ;; Alternative: consult-flycheck
            ("M-g g"    . ,#'consult-goto-line)   ;; orig. goto-line
            ("M-g M-g"  . ,#'consult-goto-line) ;; orig. goto-line
            ("M-g o"    . ,#'consult-outline) ;; Alternative: consult-org-heading
@@ -1129,7 +1140,7 @@ frames with exactly two windows."
 ;;; Ruby
 
 (straight-use-package 'ruby-mode)
-(add-hook 'ruby-mode-hook #'flymake-mode)
+(add-hook 'ruby-mode-hook #'flycheck-mode)
 
 (straight-use-package 'inf-ruby)
 (straight-use-package 'rbenv)
@@ -1153,32 +1164,42 @@ frames with exactly two windows."
 (add-hook 'purescript-mode-hook #'psc-ide-mode)
 
 (straight-use-package 'typescript-mode)
-(add-hook 'typescript-mode-hook #'eglot-ensure)
+(add-hook 'typescript-mode-hook #'lsp)
 
 ;;; Eval overlays
 
 (straight-use-package 'eros)
 (eros-mode 1)
 
+;;; Flycheck - I tried to use flycheck, but it is limited
+
+(straight-use-package 'flycheck)
+(setq flycheck-indication-mode 'right-fringe)
+(add-hook 'prog-mode-hook #'flycheck-mode)
+
 ;;; Flymake
 
-(require 'flymake)
+;; (require 'flymake)
 (setq flymake-fringe-indicator-position 'right-fringe)
-(add-hook 'prog-mode-hook #'flymake-mode-on)
+(setq flymake-no-changes-timeout nil)
+(setq flymake-start-on-flymake-mode nil)
+(setq flymake-start-on-save-buffer nil)
+;; (add-hook 'prog-mode-hook #'flymake-mode-on)
 
 ;;; Rust
 
 (straight-use-package 'rustic)
 
-(add-hook 'rustic-mode-hook #'eglot-ensure)
 (add-hook 'rustic-mode-hook #'electric-pair-local-mode)
 
-(setq rustic-format-trigger 'on-save)
-(setq rustic-indent-method-chain t)
+(setq rust-indent-method-chain nil)
+
+(setq rustic-format-trigger nil)
 (setq rustic-lsp-server 'rust-analyzer)
-(setq rustic-lsp-format t)
-(setq rustic-indent-method-chain nil)
-(setq rustic-lsp-client 'eglot)
+(setq rustic-lsp-format nil)
+(setq rustic-lsp-client 'lsp-mode)
+
+(rustic-flycheck-setup)
 
 ;;; Org Mode
 
