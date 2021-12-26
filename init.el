@@ -604,12 +604,13 @@ frames with exactly two windows."
 ;;               "--" ">=" ">>" "->" "<=" "<-" "<<" ".." "/*" "//" "__"))
 
 ;; Pragmata Pro
-;; (ligature-set-ligatures 'prog-mode pragmata-pro-ligatures)
+(ligature-set-ligatures 'prog-mode pragmata-pro-ligatures)
 ;; (add-hook 'prog-mode-hook #'ligature-mode)
+(remove-hook 'prog-mode-hook #'ligature-mode)
 
 ;; flash when we're lost
-(straight-use-package 'beacon)
-(global-set-key (kbd "C-x =") #'beacon-blink)
+;; (straight-use-package 'beacon)
+;; (global-set-key (kbd "C-x =") #'beacon-blink)
 
 ;; ibuffer looks much nicer than the default view
 (straight-use-package 'ibuffer)
@@ -741,13 +742,14 @@ frames with exactly two windows."
 (straight-use-package 'modus-themes)
 
 (setq modus-themes-bold-constructs t)
-(setq modus-themes-slanted-constructs t)
-(setq modus-themes-syntax '(faint))
+(setq modus-themes-italic-constructs nil)
+(setq modus-themes-syntax '(yellow-comments))
+;; (setq modus-themes-syntax nil)
 (setq modus-themes-fringes nil)
 (setq modus-themes-hl-line '(underline neutral))
 (setq modus-themes-completions 'opinionated)
 (setq modus-themes-scale-headings t)
-(setq modus-themes-mode-line '(3d borderless))
+(setq modus-themes-mode-line nil)
 (setq modus-themes-paren-match '(intense bold underline))
 
 (modus-themes-load-themes)
@@ -757,10 +759,20 @@ frames with exactly two windows."
 
 (straight-use-package 'doom-themes)
 (setq doom-ir-black-brighter-comments nil)
+;; (load-theme 'doom-meltbus t)
 
 (straight-use-package 'color-theme-sanityinc-tomorrow)
+;; (load-theme 'sanityinc-tomorrow-bright t)
+
 (straight-use-package 'almost-mono-themes)
+;; (load-theme 'almost-mono-black t)
+
+(straight-use-package 'gruvbox-theme)
+;; (load-theme 'gruvbox-dark-hard t)
+
 (straight-use-package 'dracula-theme)
+
+;; (load-theme 'dracula t)
 
 (straight-use-package 'rainbow-mode)
 (global-set-key (kbd "C-c r") #'rainbow-mode)
