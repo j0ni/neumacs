@@ -13,16 +13,15 @@
 
 ;; (desktop-save-mode)
 
+(j0ni/init-frame)
+
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
+
+(require 'wm)
+;; (j0ni/exwm-enable)
 
 (require 'boot)
 (require 'keys)
-
-(defvar j0ni/fixed-font nil
-  "Should be a string like \"Fira Code Mono-11\" or such.")
-
-(defvar j0ni/variable-font nil
-  "Should be a string like \"Fira Code-11\" or such.")
 
 (defvar j0ni/is-mac (memq window-system '(mac ns)))
 
@@ -70,23 +69,6 @@
 (setq calendar-location-name "Toronto")
 (setq minibuffer-eldef-shorten-default t)
 
-;; some useful fns
-(defun j0ni/init-frame ()
-  (menu-bar-mode -1)
-  (when window-system
-    (fringe-mode 8)
-    (scroll-bar-mode -1)
-    (tool-bar-mode -1)
-    (tooltip-mode -1)
-    (set-frame-parameter (selected-frame) 'alpha '(95 . 80))))
-
-;; might as well do it
-(j0ni/init-frame)
-
-;; This is an attempt to prevent the emacsclient frame from ignoring all this
-;; stuff. Unfortunately it does not appear to work. ¯\_(ツ)_/¯
-(add-to-list 'after-make-frame-functions #'j0ni/init-frame)
-
 ;; OS dependent modifier setup
 (when j0ni/is-mac
   ;; The left and right Option or Alt keys.
@@ -115,51 +97,16 @@
 
 ;;; Set our choice of interaction franework
 
-(setq j0ni/completion-system 'vertico)
+(setq j0ni/completion-system nil)
 
 ;;; Fonty fonty fonty fonty fonty LEAVE ME ALONE fonty fonty fonty
-
-;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono" :size 19 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "AurulentSansMono Nerd Font Mono" :size 12.0 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "Iosevka Nerd Font" :size 13.5 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "Fira Code Nerd Font" :size 15.0 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "FuraMono Nerd Font Mono" :size 12.0 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "Monoisome" :size 14.0 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "Agave Nerd Font" :size 16.0 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono Nrw" :size 13.5 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "TerminessTTF Nerd Font Mono" :size 16.5 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "Latin Modern Mono" :size 15.0 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "BlexMono Nerd Font Mono" :size 12.5 :antialias t))
-(setq j0ni/fixed-font (font-spec :family "Anonymice Nerd Font Mono" :size 13.5 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "D2Coding" :size 14.0 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "Envy Code R" :size 13.5 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "GoMono Nerd Font Mono" :size 12.5 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "PragmataPro Mono" :size 13.0 :antialias t))
-;; (setq j0ni/fixed-font (font-spec :family "Inconsolata Nerd Font Mono" :size 14.5 :antialias t))
-(setq j0ni/variable-font "Lucida Grande-15")
-
-(set-face-font 'variable-pitch j0ni/variable-font nil)
-(set-frame-font j0ni/fixed-font t t)
-(set-face-font 'fixed-pitch j0ni/fixed-font nil)
-(set-face-font 'fixed-pitch-serif j0ni/fixed-font nil)
-(set-fontset-font t 'unicode "Symbola" nil 'prepend)
-
-;; if the font is paying attention ¯\_(ツ)_/¯
-(set-face-attribute
- 'default nil
- :weight 'semi-light)
-(set-face-attribute
- 'bold nil
- :weight 'semi-bold)
-
-;; (when (string= system-type "gnu/linux")
-;;   (setq x-super-keysym 'meta))
+;; fonty has moved to early-init
 
 ;; adds a little space with some fonts
-(setq x-underline-at-descent-line t)
 (setq scroll-step 0)
 (setq scroll-margin 2)
 (setq auto-window-vscroll nil)
+(pixel-scroll-precision-mode 1)
 
 ;; be sure to set this to 0 in any auto-scrolling buffers
 (setq scroll-conservatively 100000)
@@ -1494,24 +1441,14 @@ frames with exactly two windows."
 
 (straight-use-package '2048-game)
 
-(add-hook 'after-init-hook
-          (lambda ()
-            (require 'server)
-            (unless (server-running-p)
-              (server-start))))
-
 ;; let's get encryption established - for exwm
 (setq auth-source-debug t)
 (epa-file-enable)
 
 (setenv "GPG_AGENT_INFO" nil) ;; use emacs pinentry
+
 (straight-use-package 'pinentry)
 (setq epa-pinentry-mode 'loopback)
 (setq epg-pinentry-mode 'loopback)
 
 (pinentry-start)
-
-(setq mouse-autoselect-window t
-      focus-follows-mouse t)
-
-(require 'wm)
