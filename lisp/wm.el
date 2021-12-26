@@ -4,7 +4,6 @@
 (add-to-list 'load-path (concat user-emacs-directory "xelb"))
 
 (require 'exwm)
-(require 'exwm-randr)
 
 (defun j0ni/exwm-enable ()
   (interactive)

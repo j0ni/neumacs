@@ -41,7 +41,9 @@
         Info-index
         Info-menu
         vc-retrieve-tag
-        ;;projectile-switch-project
+        projectile-switch-project
+        projectile-find-file-dwim
+        find-file-in-project
         ;; consult-buffer
         ))
 
