@@ -629,6 +629,7 @@ frames with exactly two windows."
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 
 (straight-use-package 'ibuffer-vc)
+(straight-use-package 'ibuffer-projectile)
 
 (setq ibuffer-formats
       '((mark modified read-only vc-status-mini " "
@@ -800,6 +801,8 @@ frames with exactly two windows."
 
 ;;; Completion
 
+(fido-vertical-mode 1)
+
 ;; Choose a framework
 (cl-case j0ni/completion-system
   ('selectrum (require 'selectrum-support))
@@ -811,6 +814,7 @@ frames with exactly two windows."
 (setq yas-snippet-dirs (concat user-emacs-directory "snippets"))
 
 (straight-use-package 'corfu)
+(require 'corfu)
 
 (setq corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
 ;; (setq corfu-auto t)              ;; Enable auto completion
@@ -822,11 +826,12 @@ frames with exactly two windows."
 (setq corfu-min-width 20)
 (setq corfu-preview-current nil)    ;; Do not preview current candidate
 
-(corfu-global-mode)
+(add-hook 'emacs-startup-hook #'corfu-global-mode)
 
 ;; Optionally use TAB for cycling, default is `corfu-complete'.
-(keymap-set corfu-map "<tab>" #'corfu-next)
-(keymap-set corfu-map "<backtab>" #'corfu-previous)
+(with-eval-after-load 'corfu
+  (keymap-set corfu-map "<tab>" #'corfu-next)
+  (keymap-set corfu-map "<backtab>" #'corfu-previous))
 
 (straight-use-package
  '(cape :type git :host github :repo "minad/cape"))
@@ -929,6 +934,8 @@ frames with exactly two windows."
 (with-eval-after-load 'consult
   (add-hook 'completion-list-mode-hook #'consult-preview-at-point-mode))
 
+(setq completion-in-region-function #'consult-completion-in-region)
+
 ;; Optionally configure the register formatting. This improves the register
 ;; preview for `consult-register', `consult-register-load',
 ;; `consult-register-store' and the Emacs built-ins.
@@ -982,10 +989,10 @@ frames with exactly two windows."
 ;; (setq consult-project-root-function (lambda () (locate-dominating-file "." ".git")))
 
 ;; Marginalia
-(straight-use-package 'marginalia)
-(keymap-set minibuffer-local-map "M-a" #'marginalia-cycle)
-(setq marginalia-truncate-width 100)
-(marginalia-mode 1)
+;; (straight-use-package 'marginalia)
+;; (keymap-set minibuffer-local-map "M-a" #'marginalia-cycle)
+;; (setq marginalia-truncate-width 150)
+;; (marginalia-mode 1)
 
 ;; (use-package embark
 ;;   :bind
@@ -1018,7 +1025,7 @@ frames with exactly two windows."
 
 ;;; Idle highlights
 (straight-use-package 'idle-highlight)
-(add-hook 'prog-mode-hook #'idle-highlight)
+;; (add-hook 'prog-mode-hook #'idle-highlight)
 
 ;;; Projectile - various git project narrowed functions
 (straight-use-package 'projectile)
@@ -1304,15 +1311,17 @@ frames with exactly two windows."
 
 (straight-use-package 'simple-httpd)
 
-(straight-use-package 'org-super-agenda)
-(setq org-super-agenda-groups '((:auto-dir-name t)))
-(add-hook 'org-agenda-mode-hook #'org-super-agenda-mode)
+;; (straight-use-package 'org-super-agenda)
+;; (setq org-super-agenda-groups '((:auto-dir-name t)))
+;; (add-hook 'org-agenda-mode-hook #'org-super-agenda-mode)
 
 (straight-use-package 'org-roam)
 (setq org-roam-v2-ack t)
 (setq org-roam-directory (expand-file-name "org-roam" org-directory))
 
 (org-roam-db-autosync-mode 1)
+
+(require 'org-habit)
 
 ;;; ELFeed - not sure really...
 
@@ -1321,21 +1330,15 @@ frames with exactly two windows."
 
 ;;; Telegram
 
-(straight-use-package 'telega)
-(add-hook 'telega-chat-mode-hook #'visual-line-mode)
+;; (straight-use-package 'telega)
+;; (add-hook 'telega-chat-mode-hook #'visual-line-mode)
+;; (add-hook 'telega-chat-mode-hook #'telega-mode-line-mode)
+;; (add-hook 'telega-chat-mode-hook #'telega-notifications-mode)
 
-(when j0ni/is-mac
-  (setq telega-server-libs-prefix "/opt/homebrew"))
-
-(with-eval-after-load 'telega
-  (progn
-    (telega-mode-line-mode t)
-    (telega-notifications-mode t)))
-
-(with-eval-after-load 'telega
-  (when (featurep 'modus-themes)
-    (defadvice modus-themes-toggle (after clear-telega-icon-cache activate)
-      (setq telega-mode-line--logo-image-cache nil))))
+;; (with-eval-after-load 'telega
+;;   (when (featurep 'modus-themes)
+;;     (defadvice modus-themes-toggle (after clear-telega-icon-cache activate)
+;;       (setq telega-mode-line--logo-image-cache nil))))
 
 ;;; Remove the annoying mode list
 
