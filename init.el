@@ -645,10 +645,13 @@ frames with exactly two windows."
 
 (defun j0ni/ibuffer-vc-hook ()
   (ibuffer-auto-mode 1)
-  (ibuffer-vc-set-filter-groups-by-vc-root)
+  (setq-local ibuffer-filter-groups
+              `(,(cons "group-by-vc" (ibuffer-vc-generate-filter-groups-by-vc-root))
+                ,(cons "group-by-project" (ibuffer-projectile-generate-filter-groups))))
   (unless (eq ibuffer-sorting-mode 'alphabetic)
     (ibuffer-do-sort-by-alphabetic)))
 
+(remove-hook 'ibuffer-hook #'j0ni/ibuffer-vc-hook)
 (add-hook 'ibuffer-hook #'j0ni/ibuffer-vc-hook)
 
 ;; ffip setup
