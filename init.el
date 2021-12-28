@@ -60,14 +60,12 @@
 (setq delete-old-versions t)
 (setq version-control t)
 (setq custom-safe-themes t)
-(setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ; one line at a time
 (setq mouse-wheel-progressive-speed t)              ; accelerate scrolling
 (setq shr-color-visible-luminance-min 90)
 ;; 43.67066, -79.30211 - location
-(setq calendar-longitude 43.67066)
-(setq calendar-latitude -79.30211)
-(setq calendar-location-name "Toronto")
-(setq minibuffer-eldef-shorten-default t)
+;; (setq calendar-longitude 43.67066)
+;; (setq calendar-latitude -79.30211)
+;; (setq calendar-location-name "Toronto")
 
 ;; OS dependent modifier setup
 (when j0ni/is-mac
@@ -77,9 +75,6 @@
   ;; The left and right Command keys.
   (setq ns-command-modifier 'meta)
   (setq ns-right-command-modifier 'super)
-  ;; The left and right Control keys.
-  ;; (setq ns-control-modifier 'control)
-  ;; (setq ns-right-control-modifier 'control)
   ;; The Function (fn) key.
   (setq ns-function-modifier 'none))
 
@@ -112,19 +107,23 @@
 (setq scroll-conservatively 100000)
 (setq scroll-preserve-screen-position t)
 
-;; FIXME this is a test - let's see if I notice that I changed this
+;; apparently the default is pretty small - like around 1MB
 (setq gc-cons-threshold (* 100 1024 1024))
 
 (setq create-lockfiles nil)
 (setq redisplay-dont-pause t)
 (setq disabled-command-function nil)
 (setq ring-bell-function 'ignore)
-(setq next-screen-context-lines 5)
+(setq next-screen-context-lines 3)
 
 ;; tabs
 (setq-default indent-tabs-mode nil)
+(setq-default tab-width 8)
 (setq indent-tabs-mode nil)
 (setq tab-always-indent 'complete)
+(setq require-final-newline t)
+
+(delete-selection-mode 1)
 
 (setq load-prefer-newer t)
 (setq highlight-nonselected-windows nil)
@@ -258,24 +257,44 @@ frames with exactly two windows."
 (remove-hook 'minibuffer-setup-hook 'winner-save-unconditionally)
 (advice-add #'shr-colorize-region :around (defun shr-no-colorise-region (&rest ignore)))
 
+;; dired - reuse current buffer by pressing 'a'
+(put 'dired-find-alternate-file 'disabled nil)
+
+;; always delete and copy recursively
+(setq dired-recursive-deletes 'always)
+(setq dired-recursive-copies 'always)
+
+;; if there is a dired buffer displayed in the next window, use its
+;; current subdir, instead of the current subdir of this dired buffer
+(setq dired-dwim-target t)
+
+;; enable some really cool extensions like C-x C-j (dired-jump)
+(require 'dired-x)
+
+;; a nice process editor - who knew (everyone but me no doubt)
+(global-set-key (kbd "C-x P") #'proced)
+
+(define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer)
+
 (dolist (binding
+         ;; one day I have to get rid of these two and find out what the
+         ;; original bindings were!
          `(("M-[" . ,#'beginning-of-buffer)
            ("M-]" . ,#'end-of-buffer)
            ("C-x C-r" . ,#'revert-buffer)
            ("C-x |" . ,#'j0ni/toggle-window-split)
-           ("C-c C-k" . ,#'eval-buffer)
            ("C-c ." . ,#'j0ni/delete-whitespace)
            ("C-c s" . ,#'j0ni/insert-shrug)
            ("C-=" . ,#'text-scale-increase)
            ("C--" . ,#'text-scale-decrease)))
   (j0ni/global-set-key (car binding) (cdr binding)))
 
-(with-eval-after-load 'chord-mode
-  (bind-chords
-   ("df" . previous-window-any-frame)
-   ("jk" . next-window-any-frame)
-   ("[]" . display-line-numbers-mode)
-   (";'" . j0ni/unicode-shortcut-map)))
+(with-eval-after-load 'key-chord
+  (key-chord-define-global "df" #'previous-window-any-frame)
+  (key-chord-define-global "jk" #'next-window-any-frame)
+  (key-chord-define-global ";'" #'j0ni/unicode-shortcut-map)
+  (key-chord-define prog-mode-map "[]" #'display-line-numbers-mode))
+
 
 ;; history
 (setq savehist-save-minibuffer-history t)
@@ -287,18 +306,25 @@ frames with exactly two windows."
 ;; minibuffer setup
 (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
-(setq enable-recursive-minibuffers t)
+(setq minibuffer-completion-confirm 'confirm)
+;; [ ... ] instead of (default ...
+(setq minibuffer-eldef-shorten-default t)
+;; I think this is bad for my impulsive fingers
+(setq enable-recursive-minibuffers nil)
+(minibuffer-depth-indicate-mode -1)
+
+;; some completion configuration
 (setq completion-ignore-case t)
 (setq read-file-name-completion-ignore-case t)
 (setq read-buffer-completion-ignore-case t)
 (setq completion-cycle-threshold 3)
 (setq completions-detailed t)
+(setq completions-format 'one-column)
 
 ;; Do not allow the cursor in the minibuffer prompt
 (setq minibuffer-prompt-properties
       '(read-only t cursor-intangible t face minibuffer-prompt))
 
-(minibuffer-depth-indicate-mode 1)
 (minibuffer-electric-default-mode 1)
 (file-name-shadow-mode 1)
 
@@ -318,22 +344,17 @@ frames with exactly two windows."
 
 ;; Set up xref
 
-;; WIP - I want to pop back to the buffer I was in before
-;; (defvar j0ni/window-history-alist '() "keep track of where we are")
-;; (defun j0ni/xref--show-xref-buffer (fetcher alist)
-;;   (let ((this-buffer (window-buffer))
-;;         (this-window (get-buffer-window this-buffer))
-;;         (current-window-list (assoc-default this-window j0ni/window-history-alist nil '())))
-;;     (append )
-;;     (setq j0ni/window-history-alist (cons '(this-window) ))))
-;; (lambda ()
-;;                                    (let ((buf (window-buffer)))))
 (setq xref-marker-ring-length 64)
 (setq xref-show-xrefs-function 'xref--show-xref-buffer) ; default
 (setq xref-show-definitions-function 'xref-show-definitions-completing-read)
 
 (straight-use-package 'lsp-mode)
 (require 'lsp-mode)
+
+;; turn off idle highlight, let lsp do it...maybe
+(add-hook 'lsp-managed-mode-hook
+          (lambda ()
+            (setq-local idle-highlight-timer nil)))
 
 ;; default is t
 (setq lsp-enable-folding nil)
@@ -343,274 +364,6 @@ frames with exactly two windows."
 (setq lsp-enable-on-type-formatting t)
 ;; default is t
 (setq lsp-before-save-edits t)
-
-(straight-use-package 'consult-lsp)
-
-(defvar pragmata-pro-ligatures
-  (mapcar #'car
-          '(("[ERROR]"    #XE2C0)
-            ("[DEBUG]"    #XE2C1)
-            ("[INFO]"     #XE2C2)
-            ("[WARN]"     #XE2C3)
-            ("[WARNING]"  #XE2C4)
-            ("[ERR]"      #XE2C5)
-            ("[FATAL]"    #XE2C6)
-            ("[TRACE]"    #XE2C7)
-            ("[FIXME]"    #XE2C8)
-            ("[TODO]"     #XE2C9)
-            ("[BUG]"      #XE2CA)
-            ("[NOTE]"     #XE2CB)
-            ("[HACK]"     #XE2CC)
-            ("[MARK]"     #XE2CD)
-            ("# ERROR"    #XE2F0)
-            ("# DEBUG"    #XE2F1)
-            ("# INFO"     #XE2F2)
-            ("# WARN"     #XE2F3)
-            ("# WARNING"  #XE2F4)
-            ("# ERR"      #XE2F5)
-            ("# FATAL"    #XE2F6)
-            ("# TRACE"    #XE2F7)
-            ("# FIXME"    #XE2F8)
-            ("# TODO"     #XE2F9)
-            ("# BUG"      #XE2FA)
-            ("# NOTE"     #XE2FB)
-            ("# HACK"     #XE2FC)
-            ("# MARK"     #XE2FD)
-            ("// ERROR"   #XE2E0)
-            ("// DEBUG"   #XE2E1)
-            ("// INFO"    #XE2E2)
-            ("// WARN"    #XE2E3)
-            ("// WARNING" #XE2E4)
-            ("// ERR"     #XE2E5)
-            ("// FATAL"   #XE2E6)
-            ("// TRACE"   #XE2E7)
-            ("// FIXME"   #XE2E8)
-            ("// TODO"    #XE2E9)
-            ("// BUG"     #XE2EA)
-            ("// NOTE"    #XE2EB)
-            ("// HACK"    #XE2EC)
-            ("// MARK"    #XE2ED)
-            ("!!"         #XE900)
-            ("!="         #XE901)
-            ("!=="        #XE902)
-            ("!!!"        #XE903)
-            ("!≡"         #XE904)
-            ("!≡≡"        #XE905)
-            ("!>"         #XE906)
-            ("!=<"        #XE907)
-            ("#("         #XE920)
-            ("#_"         #XE921)
-            ("#{"         #XE922)
-            ("#?"         #XE923)
-            ("#>"         #XE924)
-            ("##"         #XE925)
-            ("#_("        #XE926)
-            ("%="         #XE930)
-            ("%>"         #XE931)
-            ("%>%"        #XE932)
-            ("%<%"        #XE933)
-            ("&%"         #XE940)
-            ("&&"         #XE941)
-            ("&*"         #XE942)
-            ("&+"         #XE943)
-            ("&-"         #XE944)
-            ("&/"         #XE945)
-            ("&="         #XE946)
-            ("&&&"        #XE947)
-            ("&>"         #XE948)
-            ("$>"         #XE955)
-            ("***"        #XE960)
-            ("*="         #XE961)
-            ("*/"         #XE962)
-            ("*>"         #XE963)
-            ("++"         #XE970)
-            ("+++"        #XE971)
-            ("+="         #XE972)
-            ("+>"         #XE973)
-            ("++="        #XE974)
-            ("--"         #XE980)
-            ("-<"         #XE981)
-            ("-<<"        #XE982)
-            ("-="         #XE983)
-            ("->"         #XE984)
-            ("->>"        #XE985)
-            ("---"        #XE986)
-            ("-->"        #XE987)
-            ("-+-"        #XE988)
-            ("-\\/"       #XE989)
-            ("-|>"        #XE98A)
-            ("-<|"        #XE98B)
-            (".."         #XE990)
-            ("..."        #XE991)
-            ("..<"        #XE992)
-            (".>"         #XE993)
-            (".~"         #XE994)
-            (".="         #XE995)
-            ("/*"         #XE9A0)
-            ("//"         #XE9A1)
-            ("/>"         #XE9A2)
-            ("/="         #XE9A3)
-            ("/=="        #XE9A4)
-            ("///"        #XE9A5)
-            ("/**"        #XE9A6)
-            (":::"        #XE9AF)
-            ("::"         #XE9B0)
-            (":="         #XE9B1)
-            (":≡"         #XE9B2)
-            (":>"         #XE9B3)
-            (":=>"        #XE9B4)
-            (":("         #XE9B5)
-            (":-("        #XE9B6)
-            (":)"         #XE9B7)
-            (":-)"        #XE9B8)
-            (":/"         #XE9B9)
-            (":\\"        #XE9BA)
-            (":3"         #XE9BB)
-            (":D"         #XE9BC)
-            (":P"         #XE9BD)
-            (":>:"        #XE9BE)
-            (":<:"        #XE9BF)
-            ("<$>"        #XE9C0)
-            ("<*"         #XE9C1)
-            ("<*>"        #XE9C2)
-            ("<+>"        #XE9C3)
-            ("<-"         #XE9C4)
-            ("<<"         #XE9C5)
-            ("<<<"        #XE9C6)
-            ("<<="        #XE9C7)
-            ("<="         #XE9C8)
-            ("<=>"        #XE9C9)
-            ("<>"         #XE9CA)
-            ("<|>"        #XE9CB)
-            ("<<-"        #XE9CC)
-            ("<|"         #XE9CD)
-            ("<=<"        #XE9CE)
-            ("<~"         #XE9CF)
-            ("<~~"        #XE9D0)
-            ("<<~"        #XE9D1)
-            ("<$"         #XE9D2)
-            ("<+"         #XE9D3)
-            ("<!>"        #XE9D4)
-            ("<@>"        #XE9D5)
-            ("<#>"        #XE9D6)
-            ("<%>"        #XE9D7)
-            ("<^>"        #XE9D8)
-            ("<&>"        #XE9D9)
-            ("<?>"        #XE9DA)
-            ("<.>"        #XE9DB)
-            ("</>"        #XE9DC)
-            ("<\\>"       #XE9DD)
-            ("<\">"       #XE9DE)
-            ("<:>"        #XE9DF)
-            ("<~>"        #XE9E0)
-            ("<**>"       #XE9E1)
-            ("<<^"        #XE9E2)
-            ("<!"         #XE9E3)
-            ("<@"         #XE9E4)
-            ("<#"         #XE9E5)
-            ("<%"         #XE9E6)
-            ("<^"         #XE9E7)
-            ("<&"         #XE9E8)
-            ("<?"         #XE9E9)
-            ("<."         #XE9EA)
-            ("</"         #XE9EB)
-            ("<\\"        #XE9EC)
-            ("<\""        #XE9ED)
-            ("<:"         #XE9EE)
-            ("<->"        #XE9EF)
-            ("<!--"       #XE9F0)
-            ("<--"        #XE9F1)
-            ("<~<"        #XE9F2)
-            ("<==>"       #XE9F3)
-            ("<|-"        #XE9F4)
-            ("<<|"        #XE9F5)
-            ("<-<"        #XE9F7)
-            ("<-->"       #XE9F8)
-            ("<<=="       #XE9F9)
-            ("<=="        #XE9FA)
-            ("=<<"        #XEA00)
-            ("=="         #XEA01)
-            ("==="        #XEA02)
-            ("==>"        #XEA03)
-            ("=>"         #XEA04)
-            ("=~"         #XEA05)
-            ("=>>"        #XEA06)
-            ("=/="        #XEA07)
-            ("=~="        #XEA08)
-            ("==>>"       #XEA09)
-            ("≡≡"         #XEA10)
-            ("≡≡≡"        #XEA11)
-            ("≡:≡"        #XEA12)
-            (">-"         #XEA20)
-            (">="         #XEA21)
-            (">>"         #XEA22)
-            (">>-"        #XEA23)
-            (">>="        #XEA24)
-            (">>>"        #XEA25)
-            (">=>"        #XEA26)
-            (">>^"        #XEA27)
-            (">>|"        #XEA28)
-            (">!="        #XEA29)
-            (">->"        #XEA2A)
-            ("??"         #XEA40)
-            ("?~"         #XEA41)
-            ("?="         #XEA42)
-            ("?>"         #XEA43)
-            ("???"        #XEA44)
-            ("?."         #XEA45)
-            ("^="         #XEA48)
-            ("^."         #XEA49)
-            ("^?"         #XEA4A)
-            ("^.."        #XEA4B)
-            ("^<<"        #XEA4C)
-            ("^>>"        #XEA4D)
-            ("^>"         #XEA4E)
-            ("\\\\"       #XEA50)
-            ("\\>"        #XEA51)
-            ("\\/-"       #XEA52)
-            ("@>"         #XEA57)
-            ("|="         #XEA60)
-            ("||"         #XEA61)
-            ("|>"         #XEA62)
-            ("|||"        #XEA63)
-            ("|+|"        #XEA64)
-            ("|->"        #XEA65)
-            ("|-->"       #XEA66)
-            ("|=>"        #XEA67)
-            ("|==>"       #XEA68)
-            ("|>-"        #XEA69)
-            ("|<<"        #XEA6A)
-            ("||>"        #XEA6B)
-            ("|>>"        #XEA6C)
-            ("|-"         #XEA6D)
-            ("||-"        #XEA6E)
-            ("~="         #XEA70)
-            ("~>"         #XEA71)
-            ("~~>"        #XEA72)
-            ("~>>"        #XEA73)
-            ("[["         #XEA80)
-            ("]]"         #XEA81)
-            ("\">"        #XEA90)
-            ("_|_"        #XEA97))))
-
-
-(straight-use-package
- '(ligature :type git :host github :repo "mickeynp/ligature.el"))
-
-;; Cascadia Code
-;; (ligature-set-ligatures
-;;  'prog-mode '("=:=" "==>" "=<<" "!!." ">>=" "->>" "-->"
-;;               "<==" "<=>" "<--" "<<-" "::" ":=" "=>" "!="
-;;               "--" ">=" ">>" "->" "<=" "<-" "<<" ".." "/*" "//" "__"))
-
-;; Pragmata Pro
-(ligature-set-ligatures 'prog-mode pragmata-pro-ligatures)
-;; (add-hook 'prog-mode-hook #'ligature-mode)
-(remove-hook 'prog-mode-hook #'ligature-mode)
-
-;; flash when we're lost
-;; (straight-use-package 'beacon)
-;; (global-set-key (kbd "C-x =") #'beacon-blink)
 
 ;; ibuffer looks much nicer than the default view
 (straight-use-package 'ibuffer)
@@ -629,7 +382,6 @@ frames with exactly two windows."
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 
 (straight-use-package 'ibuffer-vc)
-(straight-use-package 'ibuffer-projectile)
 
 (setq ibuffer-formats
       '((mark modified read-only vc-status-mini " "
@@ -645,9 +397,7 @@ frames with exactly two windows."
 
 (defun j0ni/ibuffer-vc-hook ()
   (ibuffer-auto-mode 1)
-  (setq-local ibuffer-filter-groups
-              `(,(cons "group-by-vc" (ibuffer-vc-generate-filter-groups-by-vc-root))
-                ,(cons "group-by-project" (ibuffer-projectile-generate-filter-groups))))
+  (ibuffer-vc-set-filter-groups-by-vc-root)
   (unless (eq ibuffer-sorting-mode 'alphabetic)
     (ibuffer-do-sort-by-alphabetic)))
 
@@ -698,16 +448,18 @@ frames with exactly two windows."
 
 ;; ERC, needs a patch for sasl
 (straight-use-package 'erc)
+(require 'erc)
+(require 'erc-sasl)
 (require 'bandali-erc)
 
-(setq erc-email-userid "j0ni@tynan-erc")
+(setq erc-email-userid "j0ni/irc.libera.chat@tynan-erc")
 
 (defun j0ni/connect-srht-bouncer ()
   (interactive)
   (erc-tls
    :server "chat.sr.ht"
    :port "6697"
-   ;; :nick "j0ni"
+   :nick "j0ni"
    :full-name "Joni"
    :password "AJarkGMAAAAAFW1ldGEuc3IuaHQvUFJPRklMRTpSTwAEajBuaWlxCs3qju8plzUnzAFuGFEN3p2CU/rfKpUVHYsPMonq"))
 
@@ -753,30 +505,13 @@ frames with exactly two windows."
 (setq modus-themes-hl-line '(underline neutral))
 (setq modus-themes-completions 'opinionated)
 (setq modus-themes-scale-headings t)
-(setq modus-themes-mode-line nil)
+(setq modus-themes-mode-line '(3))
 (setq modus-themes-paren-match '(intense bold underline))
 
 (modus-themes-load-themes)
 
 ;; (load-theme 'modus-operandi t)
 (load-theme 'modus-vivendi t)
-
-(straight-use-package 'doom-themes)
-(setq doom-ir-black-brighter-comments nil)
-;; (load-theme 'doom-meltbus t)
-
-(straight-use-package 'color-theme-sanityinc-tomorrow)
-;; (load-theme 'sanityinc-tomorrow-bright t)
-
-(straight-use-package 'almost-mono-themes)
-;; (load-theme 'almost-mono-black t)
-
-(straight-use-package 'gruvbox-theme)
-;; (load-theme 'gruvbox-dark-hard t)
-
-(straight-use-package 'dracula-theme)
-
-;; (load-theme 'dracula t)
 
 (straight-use-package 'rainbow-mode)
 (global-set-key (kbd "C-c r") #'rainbow-mode)
@@ -794,6 +529,9 @@ frames with exactly two windows."
     (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)))
 
+(straight-use-package 'git-timemachine)
+(global-set-key (kbd "C-x C-g") #'git-timemachine)
+
 (straight-use-package 'expand-region)
 (global-set-key (kbd "C-x C-x") #'er/expand-region)
 
@@ -805,13 +543,16 @@ frames with exactly two windows."
 ;;; Completion
 
 (fido-vertical-mode 1)
+;; (fido-mode 1)
+
+(require 'imenu)
 
 ;; Choose a framework
-(cl-case j0ni/completion-system
-  ('selectrum (require 'selectrum-support))
-  ('vertico (require 'vertico-support))
-  ('mct (require 'mct-support))
-  (t (message "Completion system [j0ni/completion-system] not set, nothing configured")))
+;; (cl-case j0ni/completion-system
+;;   ('selectrum (require 'selectrum-support))
+;;   ('vertico (require 'vertico-support))
+;;   ('mct (require 'mct-support))
+;;   (t (message "Completion system [j0ni/completion-system] not set, nothing configured")))
 
 (straight-use-package 'yasnippet)
 (setq yas-snippet-dirs (concat user-emacs-directory "snippets"))
@@ -826,8 +567,8 @@ frames with exactly two windows."
 (setq corfu-quit-no-match t)        ;; Automatically quit if there is no match
 (setq corfu-echo-documentation t)   ;; Do not show documentation in the echo area
 (setq corfu-scroll-margin 2)        ;; Use scroll margin
-(setq corfu-min-width 20)
-(setq corfu-preview-current nil)    ;; Do not preview current candidate
+(setq corfu-min-width 40)
+(setq corfu-preview-current t)      ;; Preview current candidate
 
 (add-hook 'emacs-startup-hook #'corfu-global-mode)
 
@@ -847,171 +588,54 @@ frames with exactly two windows."
 (add-to-list 'completion-at-point-functions #'cape-file)
 (add-to-list 'completion-at-point-functions #'cape-dabbrev)
 (add-to-list 'completion-at-point-functions #'cape-keyword)
+(add-to-list 'completion-at-point-functions #'cape-symbol)
+;; (add-to-list 'completion-at-point-functions #'cape-line)
 
-(straight-use-package 'dabbrev)
+(require 'hippie-exp)
+(setq hippie-expand-try-functions-list
+      '(try-expand-dabbrev
+        try-expand-dabbrev-all-buffers
+        try-expand-dabbrev-from-kill
+        try-complete-file-name-partially
+        try-complete-file-name
+        try-expand-all-abbrevs
+        try-expand-list
+        try-expand-line
+        try-complete-lisp-symbol-partially
+        try-complete-lisp-symbol))
+
 ;; Swap M-/ and C-M-/
-(global-set-key (kbd "M-/") #'dabbrev-completion)
-(global-set-key (kbd "C-M-/") #'dabbrev-expand)
+(global-set-key (kbd "M-/") #'hippie-expand)
+(global-set-key (kbd "s-/") #'hippie-expand)
+(global-set-key (kbd "C-M-/") #'hippie-expand)
+
+(require 'abbrev)
+(setq save-abbrevs 'silently)
+(setq-default abbrev-mode t)
 
 (straight-use-package 'prescient)
 (require 'prescient)
 (prescient-persist-mode 1)
 
 (straight-use-package 'orderless)
-
-(setq orderless-matching-styles '(orderless-literal orderless-regexp))
+(require 'orderless)
+(setq orderless-matching-styles '(orderless-literal orderless-regexp orderless-flex))
 
 ;; We make the SPC key insert a literal space and the same for the
 ;; question mark.  Spaces are used to delimit orderless groups, while
 ;; the quedtion mark is a valid regexp character.
 
 (let ((map minibuffer-local-completion-map))
+  ;; stop popping up more completion buffers
+  (define-key map (kbd "TAB") #'icomplete-forward-completions)
+  ;; because SPC works for Orderless
   (define-key map (kbd "SPC") nil)
+  ;; and this is a legit regexp
   (define-key map (kbd "?") nil))
 
-;; Because SPC works for Orderless and is trivial to activate, I like to
-;; put `orderless' at the end of my `completion-styles'.  Like this:
-
-(setq completion-styles
-      '(substring partial-completion orderless))
-(setq completion-category-overrides
-      '((file (styles . (partial-completion orderless)))))
-(setq completion-category-defaults nil)
-
-(straight-use-package 'consult)
-(straight-use-package 'consult-flycheck)
-
-(dolist (binding
-         `( ;; C-c bindings (mode-specific-map)
-           ("C-c h"    . ,#'consult-history)
-           ("C-c m"    . ,#'consult-mode-command)
-           ("C-c b"    . ,#'consult-bookmark)
-           ("C-c k"    . ,#'consult-kmacro)
-           ;; C-x bindings (ctl-x-map)
-           ("C-x M-:"  . ,#'consult-complex-command) ;; orig. repeat-complex-command
-           ("C-x b"    . ,#'consult-buffer)            ;; orig. switch-to-buffer
-           ("C-x 4 b"  . ,#'consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-           ("C-x 5 b"  . ,#'consult-buffer-other-frame) ;; orig. switch-to-buffer-other-frame
-           ;; Custom M-# bindings for fast register access
-           ("M-#"      . ,#'consult-register-load)
-           ("M-'"      . ,#'consult-register-store) ;; orig. abbrev-prefix-mark (unrelated)
-           ("C-M-#"    . ,#'consult-register)
-           ;; Other custom bindings
-           ("M-y"      . ,#'consult-yank-pop)     ;; orig. yank-pop
-           ("<help> a" . ,#'consult-apropos) ;; orig. apropos-command
-           ;; M-g bindings (goto-map)
-           ("M-g e"    . ,#'consult-compile-error)
-           ("M-g f"    . ,#'consult-flycheck)     ;; Alternative: consult-flycheck
-           ("M-g g"    . ,#'consult-goto-line)   ;; orig. goto-line
-           ("M-g M-g"  . ,#'consult-goto-line) ;; orig. goto-line
-           ("M-g o"    . ,#'consult-outline) ;; Alternative: consult-org-heading
-           ("M-g m"    . ,#'consult-mark)
-           ("M-g k"    . ,#'consult-global-mark)
-           ("M-g i"    . ,#'consult-imenu)
-           ("M-g I"    . ,#'consult-imenu-multi)
-           ;; M-s bindings (search-map)
-           ("M-s f"    . ,#'consult-find)
-           ("M-s F"    . ,#'consult-locate)
-           ("M-s g"    . ,#'consult-grep)
-           ("M-s G"    . ,#'consult-git-grep)
-           ("M-s r"    . ,#'consult-ripgrep)
-           ("M-s l"    . ,#'consult-line)
-           ("M-s L"    . ,#'consult-line-multi)
-           ("M-s m"    . ,#'consult-multi-occur)
-           ("M-s k"    . ,#'consult-keep-lines)
-           ("M-s u"    . ,#'consult-focus-lines)
-           ;; Isearch integration
-           ("M-s e"    . ,#'consult-isearch-history)))
-  (j0ni/global-set-key (car binding) (cdr binding)))
-
-(dolist (binding
-         `(("M-e"      . ,#'consult-isearch-history) ; orig. isearch-edit-string
-           ("M-s e"    . ,#'consult-isearch-history) ; orig. isearch-edit-string
-           ("M-s l"    . ,#'consult-line)            ; needed by consult-line to detect isearch
-           ("M-s L"    . ,#'consult-line-multi)))    ; needed by consult-line to detect isearch
-  (keymap-set isearch-mode-map (car binding) (cdr binding)))
-
-;; Enable automatic preview at point in the *Completions* buffer.
-;; This is relevant when you use the default completion UI,
-;; and not necessary for Vertico, Selectrum, etc.
-(with-eval-after-load 'consult
-  (add-hook 'completion-list-mode-hook #'consult-preview-at-point-mode))
-
-(setq completion-in-region-function #'consult-completion-in-region)
-
-;; Optionally configure the register formatting. This improves the register
-;; preview for `consult-register', `consult-register-load',
-;; `consult-register-store' and the Emacs built-ins.
-(setq register-preview-delay 0)
-(setq register-preview-function #'consult-register-format)
-
-;; Optionally tweak the register preview window.
-;; This adds thin lines, sorting and hides the mode line of the window.
-(advice-add #'register-preview :override #'consult-register-window)
-
-;; Optionally replace `completing-read-multiple' with an enhanced version.
-(advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
-
-;; Use Consult to select xref locations with preview
-(setq xref-show-xrefs-function #'consult-xref)
-(setq xref-show-definitions-function #'consult-xref)
-
-;; Optionally configure preview. The default value
-;; is 'any, such that any key triggers the preview.
-;; (setq consult-preview-key "M-.")
-(setq consult-preview-key 'any)
-;; (setq consult-preview-key (kbd "M-."))
-;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
-
-;; For some commands and buffer sources it is useful to configure the
-;; :preview-key on a per-command basis using the `consult-customize' macro.
-;; (consult-customize consult-theme :preview-key nil)
-
-;; Optionally configure the narrowing key.
-;; Both < and C-+ work reasonably well.
-(setq consult-narrow-key "<") ;; (kbd "C-+")
-
-;; Optionally make narrowing help available in the minibuffer.
-;; You may want to use `embark-prefix-help-command' or which-key instead.
-;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
-
-;; Optionally configure a function which returns the project root directory.
-;; There are multiple reasonable alternatives to chose from.
-
-;;;; 1. project.el (project-roots)
-(setq consult-project-root-function
-      (lambda ()
-        (when-let (project (project-current))
-          (car (project-roots project)))))
-;;;; 2. projectile.el (projectile-project-root)
-;; (autoload 'projectile-project-root "projectile")
-;; (setq consult-project-root-function #'projectile-project-root)
-;;;; 3. vc.el (vc-root-dir)
-;; (setq consult-project-root-function #'vc-root-dir)
-;;;; 4. locate-dominating-file
-;; (setq consult-project-root-function (lambda () (locate-dominating-file "." ".git")))
-
-;; Marginalia
-;; (straight-use-package 'marginalia)
-;; (keymap-set minibuffer-local-map "M-a" #'marginalia-cycle)
-;; (setq marginalia-truncate-width 150)
-;; (marginalia-mode 1)
-
-;; (use-package embark
-;;   :bind
-;;   (("C-." . embark-act)         ;; pick some comfortable binding
-;;    ("C-;" . embark-dwim)        ;; good alternative: M-.
-;;    ("C-h B" . embark-bindings)  ;; alternative for `describe-bindings'
-;;    ("C-l" . embark-collect-live))
-
-;;   :init
-
-;;   ;; Optionally replace the key help with a completing-read interface
-;;   (setq prefix-help-command #'embark-prefix-help-command))
-
-;; Consult users will also want the embark-consult package.
-;; (use-package embark-consult
-;;   :after (embark consult))
+;; see completion-styles-alist for the defaults, if this turns out to
+;; not be quite right.
+(setq completion-styles '(orderless))
 
 (straight-use-package 'browse-kill-ring)
 (browse-kill-ring-default-keybindings)
@@ -1019,7 +643,6 @@ frames with exactly two windows."
 ;;; Magit
 
 (straight-use-package 'magit)
-;; (setq magit-completing-read-function #'completing-read)
 (setq magit-diff-refine-hunk t)
 (setq magit-bury-buffer-function #'magit-mode-quit-window)
 
@@ -1028,21 +651,25 @@ frames with exactly two windows."
 
 ;;; Idle highlights
 (straight-use-package 'idle-highlight)
-;; (add-hook 'prog-mode-hook #'idle-highlight)
+(add-hook 'prog-mode-hook #'idle-highlight)
 
 ;;; Projectile - various git project narrowed functions
 (straight-use-package 'projectile)
 (projectile-mode 1)
 (global-set-key (kbd "C-c p") #'projectile-command-map)
+(global-set-key (kbd "C-c C-p") #'projectile-command-map)
+(define-key projectile-command-map (kbd "C-p") #'projectile-switch-project)
 
-;;; Custom RIP grep searcher command
+;;; Custom RIP grep searcher command - better than silver searcher
 (straight-use-package 'ripgrep)
+(global-set-key (kbd "M-s r") #'ripgrep-regexp)
+
 (straight-use-package 'projectile-ripgrep)
 (grep-apply-setting
  'grep-find-command
  '("rg -n -H --no-heading -e '' $(git rev-parse --show-toplevel || pwd)" . 27))
 
-;; Useful knowledge, might deserve some extra binds
+;;; Useful knowledge, might deserve some extra binds
 
 ;; C-M-n forward-list Move forward over a parenthetical group
 ;; C-M-p backward-list Move backward over a parenthetical group
@@ -1066,7 +693,7 @@ frames with exactly two windows."
 ;;; Scheme
 (straight-use-package 'geiser)
 (add-hook 'scheme-mode-hook #'turn-on-geiser-mode)
-(add-hook 'geiser-repl-mode-hook #'enable-paredit-mode)
+(add-hook 'geiser-repl-mode-hook #'paredit-mode)
 
 (straight-use-package 'geiser-chicken)
 (straight-use-package 'geiser-guile)
@@ -1075,7 +702,7 @@ frames with exactly two windows."
 
 ;;; The other Scheme
 (straight-use-package 'racket-mode)
-(add-hook 'racket-mode-hook #'enable-paredit-mode)
+(add-hook 'racket-mode-hook #'paredit-mode)
 (add-hook 'racket-mode-hook #'turn-on-geiser-mode)
 
 ;;; Some guidance please
@@ -1090,15 +717,12 @@ frames with exactly two windows."
 (setq switch-window-auto-resize-window nil)
 (setq switch-window-background t)
 (setq switch-window-default-window-size 0.8)
-
 (switch-window-mouse-mode 1)
 (global-set-key (kbd "C-x o") #'switch-window)
 
 ;;; Some of the shit we just have to have
 (straight-use-package 'yaml-mode)
-
 (straight-use-package 'web-mode)
-
 (setq web-mode-markup-indent-offset 2)
 (setq web-mode-js-indent-offset 2)
 (setq web-mode-script-padding 0)
@@ -1119,9 +743,6 @@ frames with exactly two windows."
 
 (straight-use-package 'restclient)
 
-(straight-use-package 'treemacs)
-(setq treemacs-space-between-root-nodes nil)
-
 ;;; Common Lisp
 
 (straight-use-package 'sly)
@@ -1136,7 +757,7 @@ frames with exactly two windows."
 
 (straight-use-package 'inf-clojure)
 (add-hook 'inf-clojure-mode-hook #'turn-on-eldoc-mode)
-(add-hook 'inf-clojure-mode-hook #'enable-paredit-mode)
+(add-hook 'inf-clojure-mode-hook #'paredit-mode)
 
 (straight-use-package 'clojure-mode)
 (dolist (hook '(clojure-mode-hook
@@ -1144,20 +765,21 @@ frames with exactly two windows."
                 clojurescript-mode-hook
                 clojurex-mode-hook))
   (add-hook hook (lambda ()
-                   (enable-paredit-mode)
+                   (paredit-mode 1)
                    (inf-clojure-minor-mode 1)
-                   (subword-mode 1))))
+                   (subword-mode 1)
+                   (lsp))))
 
-';; Lua dna Fennel
+;;; Lua dna Fennel
 
 (straight-use-package 'lua-mode)
 
 (straight-use-package 'fennel-mode)
-(add-hook 'fennel-mode-hook #'monroe-interaction-mode)
-(add-hook 'fennel-mode-hook #'enable-paredit-mode)
-
 (straight-use-package 'monroe)
 (setq monroe-detail-stacktraces t)
+
+(add-hook 'fennel-mode-hook #'monroe-interaction-mode)
+(add-hook 'fennel-mode-hook #'paredit-mode)
 
 ;;; Ruby
 
@@ -1196,6 +818,7 @@ frames with exactly two windows."
 ;;; Flycheck - I tried to use flycheck, but it is limited
 
 (straight-use-package 'flycheck)
+(straight-use-package 'flycheck-eldev)
 (setq flycheck-indication-mode 'right-fringe)
 (add-hook 'prog-mode-hook #'flycheck-mode)
 
@@ -1225,7 +848,11 @@ frames with exactly two windows."
 
 ;;; Org Mode
 
-(straight-use-package 'org)
+;; (straight-use-package 'org)
+
+(require 'org)
+(require 'org-agenda)
+(require 'org-clock)
 
 (global-set-key (kbd "C-c c") #'org-capture)
 (global-set-key (kbd "C-c a") #'org-agenda)
@@ -1242,10 +869,11 @@ frames with exactly two windows."
 (setq org-directory "~/Dropbox/OrgMode/")
 
 ;; Set agenda file(s)
-(setq org-agenda-files (list (concat org-directory "journal.org")
-                             (concat org-directory "berlin.org")
-                             (concat org-directory "shrieks.org")
-                             (concat org-directory "void.org")))
+(setq org-agenda-files (list (expand-file-name "void.org" org-directory)
+                             (expand-file-name "org-roam" org-directory)
+                             (expand-file-name "berlin.org" org-directory)
+                             (expand-file-name "shrieks.org" org-directory)
+                             (expand-file-name "journal.org" org-directory)))
 (setq org-agenda-span 14)
 
 ;; prevent org-mode hijacking arrow keys
@@ -1253,7 +881,7 @@ frames with exactly two windows."
 
 ;; set our own todo keywords
 (setq org-todo-keywords
-      '((sequence "TODO(t)" "WAITING(w!)" "PAUSED(p!)" "|" "DONE(d!)" "ABANDONED(a!)")))
+      '((sequence "TODO(t!)" "WAITING(w!)" "PAUSED(p!)" "|" "DONE(d@)" "ABANDONED(a@)")))
 
 (setq org-tag-persistent-alist
       '((home . ?h)
@@ -1266,7 +894,7 @@ frames with exactly two windows."
         (self . ?m)))
 
 ;; switch quickly
-(setq org-use-fast-todo-selection 'auto)
+(setq org-use-fast-todo-selection 'expert)
 (setq org-priority-default ?C)
 (setq org-log-done 'note)
 (setq org-log-into-drawer t)
@@ -1287,13 +915,13 @@ frames with exactly two windows."
 (setq org-src-tab-acts-natively t)
 (setq org-src-fontify-natively t)
 (setq org-confirm-babel-evaluate nil)
-(setq org-default-notes-file (concat org-directory "/berlin.org"))
+(setq org-default-notes-file (concat org-directory "/void.org"))
 (setq org-capture-templates
       `(("j" "Journal" entry (file+olp+datetree ,(concat org-directory "/journal.org"))
          "* %T\n%?\n\n%a")
         ("s" "Shriek" entry (file+headline ,(concat org-directory "/shrieks.org") "Shrieks")
          "* %T\n%?\n")
-        ("t" "Task" entry (file+headline ,(concat org-directory "/berlin.org") "Inbox")
+        ("t" "Task" entry (file+headline ,(concat org-directory "/void.org") "Inbox")
          "* TODO %?\n  %a\n%i")
         ("b" "BP Journal" entry (file+olp+datetree ,(concat org-directory "/bp.org") "Blood Pressure")
          "* %T\n** Systolic: %^{systolic}\n** Diastolic: %^{diastolic}\n** Pulse: %^{pulse}\n** Notes\n%?\n")))
@@ -1319,7 +947,7 @@ frames with exactly two windows."
 ;; (add-hook 'org-agenda-mode-hook #'org-super-agenda-mode)
 
 (straight-use-package 'org-roam)
-(setq org-roam-v2-ack t)
+;; (setq org-roam-v2-ack t)
 (setq org-roam-directory (expand-file-name "org-roam" org-directory))
 
 (org-roam-db-autosync-mode 1)
@@ -1329,11 +957,12 @@ frames with exactly two windows."
 ;;; ELFeed - not sure really...
 
 (straight-use-package 'elfeed)
-(setq elfeed-feeds '("https://pluralistic.net/feed/"))
+(setq elfeed-feeds '("https://pluralistic.net/feed/" "https://theguardian.com/rss"))
 
 ;;; Telegram
 
 ;; (straight-use-package 'telega)
+;; (require 'telega)
 ;; (add-hook 'telega-chat-mode-hook #'visual-line-mode)
 ;; (add-hook 'telega-chat-mode-hook #'telega-mode-line-mode)
 ;; (add-hook 'telega-chat-mode-hook #'telega-notifications-mode)
@@ -1357,9 +986,16 @@ frames with exactly two windows."
 
 (straight-use-package 'haskell-mode)
 (add-hook 'haskell-mode-hook #'electric-pair-mode)
+(add-hook 'haskell-mode-hook #'subword-mode)
+(add-hook 'haskell-mode-hook #'interactive-haskell-mode)
+(add-hook 'haskell-mode-hook #'haskell-doc-mode)
 
 (straight-use-package 'olivetti)
 (setq olivetti-body-width 120)
+
+(straight-use-package 'move-text)
+(global-set-key (kbd "M-S-<up>") #'move-text-up)
+(global-set-key (kbd "M-S-<down>") #'move-text-down)
 
 ;; mu4e isn't packaged in the usual way, it gets installed as part of the `mu` system package.
 
@@ -1367,7 +1003,7 @@ frames with exactly two windows."
 
 (if j0ni/is-mac
     (setq j0ni/mu4e-path "/usr/local/share/emacs/site-lisp/mu/mu4e")
-  (setq j0ni/mu4e-path "/usr/share/emacs/site-lisp/mu4e"))
+  (setq j0ni/mu4e-path "/usr/local/share/emacs/site-lisp/mu4e"))
 
 (add-to-list 'load-path j0ni/mu4e-path)
 
@@ -1490,4 +1126,10 @@ frames with exactly two windows."
 (setq epa-pinentry-mode 'loopback)
 (setq epg-pinentry-mode 'loopback)
 
-(pinentry-start)
+(pinentry-start t) ;; don't complain if its already running
+
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
+(when (file-exists-p custom-file)
+  ;; don't (load custom-file)
+  (warn "There are customization settings in custom.el - give it a gander"))
