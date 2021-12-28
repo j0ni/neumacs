@@ -10,11 +10,11 @@
 
 (setq j0ni/fixed-font "AurulentSansMono Nerd Font Mono-9.0")
 ;; (setq j0ni/fixed-font (font-spec :family "Iosevka Nerd Font" :size 13.5 :antialias t))
-(setq j0ni/fixed-font "Fira Code Nerd Font-9.5")
+(setq j0ni/fixed-font "Fira Code-10.0")
 ;; (setq j0ni/fixed-font "FuraMono Nerd Font Mono-9.0")
 ;; (setq j0ni/fixed-font (font-spec :family "Monoisome" :size 9.5 :antialias t))
 ;; (setq j0ni/fixed-font (font-spec :family "Agave Nerd Font" :size 16.0 :antialias t))
-(setq j0ni/fixed-font "Lucida Grande Mono Nrw-11.0")
+;; (setq j0ni/fixed-font "Lucida Grande Mono Nrw-11.0")
 ;; (setq j0ni/fixed-font (font-spec :family "TerminessTTF Nerd Font Mono" :size 16.5 :antialias t))
 ;; (setq j0ni/fixed-font (font-spec :family "Latin Modern Mono" :size 15.0 :antialias t))
 ;; (setq j0ni/fixed-font (font-spec :family "BlexMono Nerd Font Mono" :size 12.5 :antialias t))
@@ -29,13 +29,6 @@
 (setq j0ni/variable-font "Lucida Grande-11.0")
 
 (set-frame-font j0ni/fixed-font nil t)
-
-(menu-bar-mode -1)
-
-(fringe-mode 8)
-(scroll-bar-mode -1)
-(tool-bar-mode -1)
-(tooltip-mode -1)
 
 (defun j0ni/init-frame (&optional frame)
   (interactive)
@@ -56,16 +49,25 @@
    'bold frame
    :weight 'semi-bold)
 
+  (menu-bar-mode -1)
+
+  (fringe-mode 8)
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+  (tooltip-mode -1)
+
   (setq x-underline-at-descent-line t)
 
-  ;; for when it matters
   (setq mouse-autoselect-window t)
   (setq focus-follows-mouse t))
 
 ;; This is an attempt to prevent the emacsclient frame from ignoring all this
 ;; stuff. Unfortunately it does not appear to work. ¯\_(ツ)_/¯
+
 ;; default value
 ;; (setq after-make-frame-functions '(select-frame exwm-init))
+
 (add-to-list 'after-make-frame-functions #'j0ni/init-frame)
-(add-to-list 'default-frame-alist `(font . ,j0ni/fixed-font))
-(add-hook 'after-init-hook #'j0ni/init-frame)
+(setq initial-frame-alist `((font . ,j0ni/fixed-font) (fullscreen . maximized)))
+(setq default-frame-alist `((font . ,j0ni/fixed-font) (height . 100) (width . 120)))
+(add-hook 'emacs-startup-hook #'j0ni/init-frame)
