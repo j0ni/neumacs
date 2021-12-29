@@ -274,7 +274,7 @@ frames with exactly two windows."
 ;; a nice process editor - who knew (everyone but me no doubt)
 (global-set-key (kbd "C-x P") #'proced)
 
-(define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer)
+(keymap-set emacs-lisp-mode-map "C-c C-k" #'eval-buffer)
 
 (dolist (binding
          ;; one day I have to get rid of these two and find out what the
@@ -505,7 +505,7 @@ frames with exactly two windows."
 (setq modus-themes-hl-line '(underline neutral))
 (setq modus-themes-completions 'opinionated)
 (setq modus-themes-scale-headings t)
-(setq modus-themes-mode-line '(3))
+(setq modus-themes-mode-line '(accented))
 (setq modus-themes-paren-match '(intense bold underline))
 
 (modus-themes-load-themes)
@@ -520,6 +520,9 @@ frames with exactly two windows."
 (add-hook 'paredit-mode-hook #'rainbow-delimiters-mode)
 
 (straight-use-package 'browse-at-remote)
+
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'forward)
 
 (straight-use-package 'diff-hl)
 (global-diff-hl-mode 1)
@@ -542,9 +545,7 @@ frames with exactly two windows."
 
 ;;; Completion
 
-(fido-vertical-mode 1)
-;; (fido-mode 1)
-
+(require 'icomplete)
 (require 'imenu)
 
 ;; Choose a framework
@@ -605,21 +606,101 @@ frames with exactly two windows."
         try-complete-lisp-symbol))
 
 ;; Swap M-/ and C-M-/
-(global-set-key (kbd "M-/") #'hippie-expand)
-(global-set-key (kbd "s-/") #'hippie-expand)
-(global-set-key (kbd "C-M-/") #'hippie-expand)
+(keymap-global-set "M-/" #'hippie-expand)
+(keymap-global-set "s-/" #'hippie-expand)
+(keymap-global-set "C-M-/" #'hippie-expand)
 
 (require 'abbrev)
 (setq save-abbrevs 'silently)
 (setq-default abbrev-mode t)
 
-(straight-use-package 'prescient)
-(require 'prescient)
-(prescient-persist-mode 1)
+(straight-use-package 'marginalia)
+(marginalia-mode 1)
 
 (straight-use-package 'orderless)
 (require 'orderless)
-(setq orderless-matching-styles '(orderless-literal orderless-regexp orderless-flex))
+(setq orderless-matching-styles '(orderless-literal orderless-regexp))
+
+;; see completion-styles-alist for the defaults, if this turns out to
+;; not be quite right.
+(setq completion-styles '(orderless))
+
+(orderless-define-completion-style orderless+initialism
+  (orderless-matching-styles '(orderless-initialism
+                               orderless-literal
+                               orderless-regexp)))
+(setq completion-category-overrides
+      '((command (styles orderless+initialism))
+        (symbol (styles orderless+initialism))
+        (variable (styles orderless+initialism))
+        (buffer (styles orderless+initialism))
+        (project-file (styles orderless+initialism))
+        (xref-location (styles orderless))
+        (symbol-help (styles orderless+initialism))
+        (info-menu (styles orderless+initialism))
+        (file (styles orderless+initialism))))
+
+(straight-use-package 'embark)
+(setq prefix-help-command #'embark-prefix-help-command)
+(keymap-global-set "C-." #'embark-act)
+(keymap-global-set "C-," #'embark-dwim)
+(keymap-global-set "C-h B" #'embark-bindings)
+
+(let ((map icomplete-minibuffer-map))
+  (keymap-set map "C-l" #'embark-collect-live)
+  (keymap-set map "M-l" #'embark-collect-snapshot)
+  (keymap-set map "M-s" #'embark-collect-snapshot)
+  (keymap-set map "C-." #'embark-act)
+  (keymap-set map "M-." #'embark-act)
+  (keymap-set map "C-," #'embark-dwim)
+  (keymap-set map "M-," #'embark-dwim))
+
+;; This is taken from the embark wiki, I like it better than
+(defun embark-which-key-indicator ()
+  "An embark indicator that displays keymaps using which-key.
+The which-key help message will show the type and value of the
+current target followed by an ellipsis if there are further
+targets."
+  (lambda (&optional keymap targets prefix)
+    (if (null keymap)
+        (which-key--hide-popup-ignore-command)
+      (which-key--show-keymap
+       (if (eq (plist-get (car targets) :type) 'embark-become)
+           "Become"
+         (format "Act on %s '%s'%s"
+                 (plist-get (car targets) :type)
+                 (embark--truncate-target (plist-get (car targets) :target))
+                 (if (cdr targets) "…" "")))
+       (if prefix
+           (pcase (lookup-key keymap prefix 'accept-default)
+             ((and (pred keymapp) km) km)
+             (_ (key-binding prefix 'accept-default)))
+         keymap)
+       nil nil t (lambda (binding)
+                   (not (string-suffix-p "-argument" (cdr binding))))))))
+
+(setq embark-indicators
+      '(embark-which-key-indicator
+        embark-highlight-indicator
+        embark-isearch-highlight-indicator))
+
+(defun embark-hide-which-key-indicator (fn &rest args)
+  "Hide the which-key indicator immediately when using the completing-read prompter."
+  (which-key--hide-popup-ignore-command)
+  (let ((embark-indicators
+         (remq #'embark-which-key-indicator embark-indicators)))
+    (apply fn args)))
+
+(advice-add #'embark-completing-read-prompter
+            :around #'embark-hide-which-key-indicator)
+
+(defun j0ni/shrink-mini-window ()
+  (when (eq embark-collect--kind :live)
+    (with-selected-window (active-minibuffer-window)
+      (setq-local icomplete-vertical-mode nil)
+      (setq-local max-mini-window-height 2))))
+
+(add-hook 'embark-collect-mode-hook #'j0ni/shrink-mini-window)
 
 ;; We make the SPC key insert a literal space and the same for the
 ;; question mark.  Spaces are used to delimit orderless groups, while
@@ -627,15 +708,17 @@ frames with exactly two windows."
 
 (let ((map minibuffer-local-completion-map))
   ;; stop popping up more completion buffers
-  (define-key map (kbd "TAB") #'icomplete-forward-completions)
+  (keymap-set map "TAB" #'icomplete-force-complete)
   ;; because SPC works for Orderless
-  (define-key map (kbd "SPC") nil)
+  (keymap-set map "SPC" nil)
   ;; and this is a legit regexp
-  (define-key map (kbd "?") nil))
+  (keymap-set map "?" nil))
 
-;; see completion-styles-alist for the defaults, if this turns out to
-;; not be quite right.
-(setq completion-styles '(orderless))
+(setq icomplete-tidy-shadowed-file-names t)
+
+;; (icomplete-vertical-mode 1)
+(fido-vertical-mode 1)
+;; (fido-mode 1)
 
 (straight-use-package 'browse-kill-ring)
 (browse-kill-ring-default-keybindings)

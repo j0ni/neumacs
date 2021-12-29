@@ -14,7 +14,7 @@
 ;; (setq j0ni/fixed-font "FuraMono Nerd Font Mono-9.0")
 ;; (setq j0ni/fixed-font (font-spec :family "Monoisome" :size 9.5 :antialias t))
 ;; (setq j0ni/fixed-font (font-spec :family "Agave Nerd Font" :size 16.0 :antialias t))
-;; (setq j0ni/fixed-font "Lucida Grande Mono Nrw-11.0")
+(setq j0ni/fixed-font "Lucida Grande Mono Nrw-11.5")
 ;; (setq j0ni/fixed-font (font-spec :family "TerminessTTF Nerd Font Mono" :size 16.5 :antialias t))
 ;; (setq j0ni/fixed-font (font-spec :family "Latin Modern Mono" :size 15.0 :antialias t))
 ;; (setq j0ni/fixed-font (font-spec :family "BlexMono Nerd Font Mono" :size 12.5 :antialias t))
@@ -23,6 +23,7 @@
 ;; (setq j0ni/fixed-font "Envy Code R-9.0")
 ;; (setq j0ni/fixed-font "GoMono Nerd Font Mono-9.0")
 ;; (setq j0ni/fixed-font (font-spec :family "PragmataPro Mono Liga" :size 11.5 :antialias t :hinting "full" :spacing 'm))
+(setq j0ni/fixed-font "PragmataPro Mono-12.0")
 ;; (setq j0ni/fixed-font (font-spec :family "Inconsolata Nerd Font" :size 13.5 :spacing 'm))
 ;; (setq j0ni/fixed-font "Inconsolata Nerd Font-13.0")
 ;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono" :size 11.0 :antialias t))
@@ -57,6 +58,7 @@
   (tooltip-mode -1)
 
   (setq x-underline-at-descent-line t)
+  (setq x-use-underline-position-properties nil)
 
   (setq mouse-autoselect-window t)
   (setq focus-follows-mouse t))
