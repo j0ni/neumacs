@@ -297,8 +297,8 @@ frames with exactly two windows."
 ;; [ ... ] instead of (default ...
 (setq minibuffer-eldef-shorten-default t)
 ;; I think this is bad for my impulsive fingers
-(setq enable-recursive-minibuffers nil)
-(minibuffer-depth-indicate-mode -1)
+(setq enable-recursive-minibuffers t)
+(minibuffer-depth-indicate-mode t)
 
 ;; some completion configuration
 (setq completion-ignore-case t)
@@ -329,14 +329,99 @@ frames with exactly two windows."
         ("Asia/Hong_Kong" "Hong Kong")
         ("Asia/Tokyo" "Tokyo")))
 
-;; Set up xref
+;;; Set up xref
 
 (setq xref-marker-ring-length 64)
 (setq xref-show-xrefs-function 'xref--show-xref-buffer) ; default
 (setq xref-show-definitions-function 'xref-show-definitions-completing-read)
 
+;;; Consult - handy featureful commands, sometimes too noisy
+
+(straight-use-package 'consult)
+(require 'consult)
+
+(consult-customize
+ consult-ripgrep consult-git-grep consult-grep consult-theme consult-buffer
+ consult-bookmark consult-recent-file consult-xref consult-locate
+ consult--source-recent-file consult--source-project-recent-file consult--source-bookmark
+ :preview-key (kbd "M-.")
+ :group nil)
+
+;; default value
+(setq consult-async-min-input 3)
+
+;; search map
+(dolist (binding '(;; search map
+                   ("M-s f" . consult-find)
+                   ("M-s F" . consult-locate)
+                   ("M-s g" . consult-grep)
+                   ("M-s G" . consult-git-grep)
+                   ("M-s r" . consult-ripgrep)
+                   ("M-s l" . consult-line)
+                   ("M-s L" . consult-line-multi)
+                   ("M-s m" . consult-multi-occur)
+                   ("M-s k" . consult-keep-lines)
+                   ("M-s u" . consult-focus-lines)
+                   ;; goto map
+                   ("M-g e" . consult-compile-error)
+                   ("M-g f" . consult-flycheck)
+                   ("M-g g" . consult-goto-line)
+                   ("M-g M-g" . consult-goto-line)
+                   ("M-g o" . consult-org-heading)
+                   ("M-g m" . consult-mark)
+                   ("M-g k" . consult-global-mark)
+                   ("M-g i" . consult-imenu)
+                   ("M-g I" . consult-imenu-multi)
+                   ("M-s e" . consult-isearch-history)
+                   ;; extras, which stomp on command commands
+                   ("C-c h" . consult-history)
+                   ("C-c m" . consult-mode-command)
+                   ("C-c b" . consult-bookmark)
+                   ("C-c k" . consult-kmacro)
+                   ;; C-x bindings (ctl-x-map)
+                   ("C-x M-:" . consult-complex-command)
+                   ("C-x b" . consult-buffer)
+                   ("C-x 4 b" . consult-buffer-other-window)
+                   ("C-x 5 b" . consult-buffer-other-frame)
+                   ;; no idea what registers are for, I will read about it :P
+                   ("M-#" . consult-register-load)
+                   ("M-'" . consult-register-store) ;; orig. abbrev-prefix-mark (unrelated)
+                   ("C-M-#" . consult-register)))
+  (keymap-global-set (car binding) (cdr binding)))
+
+;; isearch related commands
+(dolist (binding '(("M-e" . consult-isearch-history)
+                   ("M-s e" . consult-isearch-history)
+                   ("M-s l" . consult-line)
+                   ("M-s L" . consult-line-multi)))
+  (keymap-set isearch-mode-map (car binding) (cdr binding)))
+
+(keymap-global-set "C-s" #'consult-line)
+
+(add-hook 'completion-list-mode-hook #'consult-preview-at-point-mode)
+
+;; This adds thin lines, sorting and hides the mode line of the window.
+(advice-add #'register-preview :override #'consult-register-window)
+;; (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+;; Use Consult to select xref locations with preview
+(setq xref-show-xrefs-function #'consult-xref)
+(setq xref-show-definitions-function #'consult-xref)
+;; find the project root
+(with-eval-after-load 'projectile
+  (setq consult-project-root-function #'projectile-project-root))
+;; when multiple result types are collected in one completion set, hit this key
+;; to subset to only those of the type at point.
+(setq consult-narrow-key "<")
+
+;;; LSP
+
 (straight-use-package 'lsp-mode)
 (require 'lsp-mode)
+
+(straight-use-package 'lsp-ui)
+(straight-use-package 'consult-lsp)
+(require 'lsp-ui)
+(require 'consult-lsp)
 
 ;; turn off idle highlight, let lsp do it...maybe
 (add-hook 'lsp-managed-mode-hook
@@ -592,6 +677,8 @@ frames with exactly two windows."
 (setq-default abbrev-mode t)
 
 (straight-use-package 'marginalia)
+(setq marginalia-margin-min 10)
+(setq marginalia-align-offset 3)
 (marginalia-mode 1)
 
 (straight-use-package 'orderless)
@@ -618,6 +705,8 @@ frames with exactly two windows."
         (file (styles orderless+initialism))))
 
 (straight-use-package 'embark)
+(straight-use-package 'embark-consult)
+(require 'embark-consult)
 (setq prefix-help-command #'embark-prefix-help-command)
 (keymap-global-set "C-." #'embark-act)
 (keymap-global-set "C-," #'embark-dwim)
