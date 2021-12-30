@@ -225,10 +225,6 @@ frames with exactly two windows."
     (insert-file-contents file-path)
     (buffer-string)))
 
-(defun j0ni/global-set-key (k command)
-  (let ((k (if (stringp k) (kbd k) k)))
-    (global-set-key k command)))
-
 (defun j0ni/keymap-set (map k command)
   (let ((k (if (stringp k) (kbd k) k)))
     (keymap-set map k command)))
@@ -267,22 +263,18 @@ frames with exactly two windows."
 (require 'dired-x)
 
 ;; a nice process editor - who knew (everyone but me no doubt)
-(global-set-key (kbd "C-x P") #'proced)
+(keymap-global-set "C-x P" #'proced)
 
-(keymap-set emacs-lisp-mode-map "C-c C-k" #'eval-buffer)
+(keymap-set lisp-mode-shared-map "C-c C-k" #'eval-buffer)
 
 (dolist (binding
-         ;; one day I have to get rid of these two and find out what the
-         ;; original bindings were!
-         `(("M-[" . ,#'beginning-of-buffer)
-           ("M-]" . ,#'end-of-buffer)
-           ("C-x C-r" . ,#'revert-buffer)
-           ("C-x |" . ,#'j0ni/toggle-window-split)
-           ("C-c ." . ,#'j0ni/delete-whitespace)
-           ("C-c s" . ,#'j0ni/insert-shrug)
-           ("C-=" . ,#'text-scale-increase)
-           ("C--" . ,#'text-scale-decrease)))
-  (j0ni/global-set-key (car binding) (cdr binding)))
+         '(("C-x C-r" . revert-buffer)
+           ("C-x |" . j0ni/toggle-window-split)
+           ("C-c ." . j0ni/delete-whitespace)
+           ("C-c s" . j0ni/insert-shrug)
+           ("C-=" . text-scale-increase)
+           ("C--" . text-scale-decrease)))
+  (keymap-global-set (car binding) (cdr binding)))
 
 (with-eval-after-load 'key-chord
   (key-chord-define-global "df" #'previous-window-any-frame)
@@ -374,7 +366,7 @@ frames with exactly two windows."
 (setq ibuffer-saved-filter-groups nil)
 (setq ibuffer-old-time 48)
 
-(global-set-key (kbd "C-x C-b") #'ibuffer)
+(keymap-global-set "C-x C-b" #'ibuffer)
 
 (straight-use-package 'ibuffer-vc)
 
@@ -402,7 +394,7 @@ frames with exactly two windows."
 ;; ffip setup
 (straight-use-package 'find-file-in-project)
 (setq ffip-use-rust-fd t)
-(global-set-key (kbd "C-c f") #'find-file-in-project-by-selected)
+(keymap-global-set "C-c f" #'find-file-in-project-by-selected)
 
 ;; IRC, sigh...
 (require 'rcirc)
@@ -509,7 +501,7 @@ frames with exactly two windows."
 (load-theme 'modus-vivendi t)
 
 (straight-use-package 'rainbow-mode)
-(global-set-key (kbd "C-c r") #'rainbow-mode)
+(keymap-global-set "C-c r" #'rainbow-mode)
 
 (straight-use-package 'rainbow-delimiters)
 (add-hook 'paredit-mode-hook #'rainbow-delimiters-mode)
@@ -528,10 +520,10 @@ frames with exactly two windows."
     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)))
 
 (straight-use-package 'git-timemachine)
-(global-set-key (kbd "C-x C-g") #'git-timemachine)
+(keymap-global-set "C-x C-g" #'git-timemachine)
 
 (straight-use-package 'expand-region)
-(global-set-key (kbd "C-x C-x") #'er/expand-region)
+(keymap-global-set "C-x C-x" #'er/expand-region)
 
 (straight-use-package 'dockerfile-mode)
 
@@ -699,23 +691,21 @@ targets."
 (setq magit-diff-refine-hunk t)
 (setq magit-bury-buffer-function #'magit-mode-quit-window)
 
-(global-set-key (kbd "C-x g") #'magit-status)
-(global-set-key (kbd "C-x M-g") #'magit-dispatch-popup)
+(keymap-global-set "C-x g" #'magit-status)
+(keymap-global-set "C-x M-g" #'magit-dispatch-popup)
 
 ;;; Idle highlights
+
 (straight-use-package 'idle-highlight)
 (add-hook 'prog-mode-hook #'idle-highlight)
 
 ;;; Projectile - various git project narrowed functions
+
 (straight-use-package 'projectile)
 (projectile-mode 1)
-(global-set-key (kbd "C-c p") #'projectile-command-map)
-(global-set-key (kbd "C-c C-p") #'projectile-command-map)
-(define-key projectile-command-map (kbd "C-p") #'projectile-switch-project)
-
-;;; Custom RIP grep searcher command - better than silver searcher
-(straight-use-package 'ripgrep)
-(global-set-key (kbd "M-s r") #'ripgrep-regexp)
+(keymap-global-set "C-c p" #'projectile-command-map)
+(keymap-global-set "C-c C-p" #'projectile-command-map)
+(keymap-set projectile-command-map "C-p" #'projectile-switch-project)
 
 (straight-use-package 'projectile-ripgrep)
 (grep-apply-setting
@@ -771,7 +761,7 @@ targets."
 (setq switch-window-background t)
 (setq switch-window-default-window-size 0.8)
 (switch-window-mouse-mode 1)
-(global-set-key (kbd "C-x o") #'switch-window)
+(keymap-global-set "C-x o" #'switch-window)
 
 ;;; Some of the shit we just have to have
 (straight-use-package 'yaml-mode)
@@ -907,8 +897,8 @@ targets."
 (require 'org-agenda)
 (require 'org-clock)
 
-(global-set-key (kbd "C-c c") #'org-capture)
-(global-set-key (kbd "C-c a") #'org-agenda)
+(keymap-global-set "C-c c" #'org-capture)
+(keymap-global-set "C-c a" #'org-agenda)
 
 (setq org-startup-indented t)
 
@@ -1029,7 +1019,7 @@ targets."
 
 (straight-use-package 'minions)
 (minions-mode 1)
-(global-set-key (kbd "C-x C-m") #'minions-minor-modes-menu)
+(keymap-global-set "C-x C-m" #'minions-minor-modes-menu)
 
 ;;; icons for noisy modes
 
@@ -1047,8 +1037,8 @@ targets."
 (setq olivetti-body-width 120)
 
 (straight-use-package 'move-text)
-(global-set-key (kbd "M-S-<up>") #'move-text-up)
-(global-set-key (kbd "M-S-<down>") #'move-text-down)
+(keymap-global-set "M-S-<up>" #'move-text-up)
+(keymap-global-set "M-S-<down>" #'move-text-down)
 
 ;; mu4e isn't packaged in the usual way, it gets installed as part of the `mu` system package.
 
