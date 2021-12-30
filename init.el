@@ -494,7 +494,7 @@ frames with exactly two windows."
          :channels nil)))
 
 (setq rcirc-authinfo
-      '(("chat.sr.ht" sasl "joni" "AJarkGMAAAAAFW1ldGEuc3IuaHQvUFJPRklMRTpSTwAEajBuaWlxCs3qju8plzUnzAFuGFEN3p2CU/rfKpUVHYsPMonq")))
+      '(("chat.sr.ht" sasl "joni" "")))
 
 (defun rcirc-handler-AUTHENTICATE (process _cmd _args _text)
   "Respond to authentication request.
@@ -524,7 +524,7 @@ frames with exactly two windows."
 (require 'erc-sasl)
 (require 'bandali-erc)
 
-(setq erc-email-userid "j0ni/irc.libera.chat@tynan-erc")
+(setq erc-email-userid "j0ni@tynan-erc/irc.libera.chat")
 
 (defun j0ni/connect-srht-bouncer ()
   (interactive)
@@ -533,7 +533,7 @@ frames with exactly two windows."
    :port "6697"
    :nick "j0ni"
    :full-name "Joni"
-   :password "AJarkGMAAAAAFW1ldGEuc3IuaHQvUFJPRklMRTpSTwAEajBuaWlxCs3qju8plzUnzAFuGFEN3p2CU/rfKpUVHYsPMonq"))
+   :password ""))
 
 ;; undo-fu, ripped from doom
 (straight-use-package 'undo-fu)
