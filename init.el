@@ -473,7 +473,7 @@ frames with exactly two windows."
   (unless (eq ibuffer-sorting-mode 'alphabetic)
     (ibuffer-do-sort-by-alphabetic)))
 
-(remove-hook 'ibuffer-hook #'j0ni/ibuffer-vc-hook)
+;; (remove-hook 'ibuffer-hook #'j0ni/ibuffer-vc-hook)
 (add-hook 'ibuffer-hook #'j0ni/ibuffer-vc-hook)
 
 ;; ffip setup
@@ -813,9 +813,9 @@ targets."
 ;;; Paredit, always Paredit
 (straight-use-package 'paredit)
 ;; yer basic lisps
-(add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
-(add-hook 'lisp-mode-hook #'enable-paredit-mode)
-(add-hook 'scheme-mode-hook #'enable-paredit-mode)
+(add-hook 'emacs-lisp-mode-hook #'paredit-mode)
+(add-hook 'lisp-mode-hook #'paredit-mode)
+(add-hook 'scheme-mode-hook #'paredit-mode)
 
 (with-eval-after-load 'paredit
   (progn
@@ -824,7 +824,7 @@ targets."
 
 ;;; Scheme
 (straight-use-package 'geiser)
-(add-hook 'scheme-mode-hook #'turn-on-geiser-mode)
+(add-hook 'scheme-mode-hook #'geiser-mode)
 (add-hook 'geiser-repl-mode-hook #'paredit-mode)
 
 (straight-use-package 'geiser-chicken)
@@ -835,7 +835,7 @@ targets."
 ;;; The other Scheme
 (straight-use-package 'racket-mode)
 (add-hook 'racket-mode-hook #'paredit-mode)
-(add-hook 'racket-mode-hook #'turn-on-geiser-mode)
+(add-hook 'racket-mode-hook #'geiser-mode)
 
 ;;; Some guidance please
 (straight-use-package 'which-key)
