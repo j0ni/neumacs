@@ -248,6 +248,8 @@ frames with exactly two windows."
 (remove-hook 'minibuffer-setup-hook 'winner-save-unconditionally)
 (advice-add #'shr-colorize-region :around (defun shr-no-colorise-region (&rest ignore)))
 
+;;; Dired
+
 ;; dired - reuse current buffer by pressing 'a'
 (put 'dired-find-alternate-file 'disabled nil)
 
@@ -281,7 +283,6 @@ frames with exactly two windows."
   (key-chord-define-global "jk" #'next-window-any-frame)
   (key-chord-define-global ";'" #'j0ni/unicode-shortcut-map)
   (key-chord-define prog-mode-map "[]" #'display-line-numbers-mode))
-
 
 ;; history
 (setq savehist-save-minibuffer-history t)
@@ -438,7 +439,7 @@ frames with exactly two windows."
 (setq lsp-before-save-edits t)
 
 ;; ibuffer looks much nicer than the default view
-(straight-use-package 'ibuffer)
+(require 'ibuffer)
 
 (setq ibuffer-expert t)
 (setq ibuffer-display-summary nil)
@@ -454,6 +455,7 @@ frames with exactly two windows."
 (keymap-global-set "C-x C-b" #'ibuffer)
 
 (straight-use-package 'ibuffer-vc)
+(require 'ibuffer-vc)
 
 (setq ibuffer-formats
       '((mark modified read-only vc-status-mini " "
@@ -568,11 +570,11 @@ frames with exactly two windows."
 
 ;; Themes!
 (straight-use-package 'modus-themes)
+(require 'modus-themes)
 
 (setq modus-themes-bold-constructs t)
 (setq modus-themes-italic-constructs nil)
 (setq modus-themes-syntax '(yellow-comments))
-;; (setq modus-themes-syntax nil)
 (setq modus-themes-fringes nil)
 (setq modus-themes-hl-line '(underline neutral))
 (setq modus-themes-completions 'opinionated)
@@ -902,7 +904,7 @@ targets."
                    (subword-mode 1)
                    (lsp))))
 
-;;; Lua dna Fennel
+;;; Lua and Fennel
 
 (straight-use-package 'lua-mode)
 
@@ -947,20 +949,21 @@ targets."
 (straight-use-package 'eros)
 (eros-mode 1)
 
-;;; Flycheck - I tried to use flycheck, but it is limited
+;;; Flycheck - I tried to use flymake, but it is limited
 
 (straight-use-package 'flycheck)
 (straight-use-package 'flycheck-eldev)
 (setq flycheck-indication-mode 'right-fringe)
+(setq flycheck-checker-error-threshold nil)
 (add-hook 'prog-mode-hook #'flycheck-mode)
 
 ;;; Flymake
 
 ;; (require 'flymake)
-(setq flymake-fringe-indicator-position 'right-fringe)
-(setq flymake-no-changes-timeout nil)
-(setq flymake-start-on-flymake-mode nil)
-(setq flymake-start-on-save-buffer nil)
+;; (setq flymake-fringe-indicator-position 'right-fringe)
+;; (setq flymake-no-changes-timeout nil)
+;; (setq flymake-start-on-flymake-mode nil)
+;; (setq flymake-start-on-save-buffer nil)
 ;; (add-hook 'prog-mode-hook #'flymake-mode-on)
 
 ;;; Rust
@@ -979,8 +982,6 @@ targets."
 (rustic-flycheck-setup)
 
 ;;; Org Mode
-
-;; (straight-use-package 'org)
 
 (require 'org)
 (require 'org-agenda)
@@ -1074,9 +1075,9 @@ targets."
 
 (straight-use-package 'simple-httpd)
 
-;; (straight-use-package 'org-super-agenda)
-;; (setq org-super-agenda-groups '((:auto-dir-name t)))
-;; (add-hook 'org-agenda-mode-hook #'org-super-agenda-mode)
+(straight-use-package 'org-super-agenda)
+(setq org-super-agenda-groups '((:auto-dir-name t)))
+(add-hook 'org-agenda-mode-hook #'org-super-agenda-mode)
 
 (straight-use-package 'org-roam)
 ;; (setq org-roam-v2-ack t)
@@ -1086,10 +1087,20 @@ targets."
 
 (require 'org-habit)
 
-;;; ELFeed - not sure really...
+;;; ELFeed
 
 (straight-use-package 'elfeed)
-(setq elfeed-feeds '("https://pluralistic.net/feed/" "https://theguardian.com/rss"))
+(setq elfeed-feeds '("https://pluralistic.net/feed/"
+                     "https://theguardian.com/rss"
+                     "https://www.space.com/feeds/all"
+                     "https://www.sciencedaily.com/rss/all.xml"
+                     "https://spectrum.ieee.org/feeds/feed.rss"
+                     "https://journals.plos.org/plosbiology/feed/atom"
+                     "http://feeds.feedburner.com/pnas/UJrK?format=xml"
+                     "https://www.alternet.org/feeds/feed.rss"
+                     "https://www.democracynow.org/democracynow.rss"
+                     "https://www.anarchistnews.org/rss.xml"
+                     "https://www.anarchistfederation.net/feed/"))
 
 ;;; Telegram
 
@@ -1116,14 +1127,20 @@ targets."
 (eval-when-compile
   '(all-the-icons-install-fonts))
 
+;;; Haskell
+
 (straight-use-package 'haskell-mode)
 (add-hook 'haskell-mode-hook #'electric-pair-mode)
 (add-hook 'haskell-mode-hook #'subword-mode)
 (add-hook 'haskell-mode-hook #'interactive-haskell-mode)
 (add-hook 'haskell-mode-hook #'haskell-doc-mode)
 
+;;; Declutter
+
 (straight-use-package 'olivetti)
 (setq olivetti-body-width 120)
+
+;;; I remember this from Netbeans!
 
 (straight-use-package 'move-text)
 (keymap-global-set "M-S-<up>" #'move-text-up)
@@ -1131,7 +1148,7 @@ targets."
 
 ;; mu4e isn't packaged in the usual way, it gets installed as part of the `mu` system package.
 
-(defvar j0ni/mu4e-path)
+(defvar j0ni/mu4e-path nil "Find a mu4e client to run")
 
 (if j0ni/is-mac
     (setq j0ni/mu4e-path "/usr/local/share/emacs/site-lisp/mu/mu4e")
@@ -1166,6 +1183,7 @@ targets."
                             (:from-or-to . 25)
                             (:thread-subject))
       mu4e-compose-complete-only-after "2012-01-01"
+      mu4e-compose-signature "In this world / we walk on the roof of hell / gazing at flowers\n    - Kobayashi Issa\n\nhttps://j0ni.ca ~ https://keybase.io/j0ni"
       mu4e-view-show-addresses t
       mm-inline-large-images 'resize
       message-send-mail-function 'smtpmail-send-it
@@ -1207,7 +1225,6 @@ targets."
                                                 ("/Fastmail/sent-mail" . ?s)
                                                 ("/Fastmail/drafts" . ?d)
                                                 ("/Fastmail/trash" . ?t)))
-                     (mu4e-compose-signature . "In this world / we walk on the roof of hell / gazing at flowers\n    - Kobayashi Issa\n\nhttps://j0ni.ca ~ https://keybase.io/j0ni")
                      (mu4e-bookmarks . ,(list (j0ni/mu4e-bookmark "Fastmail" "7" ?w)
                                               (j0ni/mu4e-bookmark "Fastmail" "30" ?m)))
                      (smtpmail-smtp-user . "j0ni@fastmail.com")
@@ -1235,7 +1252,6 @@ targets."
                                                 ("/Well/Drafts" . ?d)
                                                 ("/Well/Trash" . ?t)
                                                 ("/Well/Archive" . ?a)))
-                     (mu4e-compose-signature . "In this world / we walk on the roof of hell / gazing at flowers\n    - Kobayashi Issa\n\nhttps://j0ni.ca ~ https://keybase.io/j0ni")
                      (mu4e-bookmarks . ,(list (j0ni/mu4e-bookmark "Well" "7" ?w)
                                               (j0ni/mu4e-bookmark "Well" "30" ?m)))
                      (smtpmail-smtp-user . "joni")
