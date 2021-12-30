@@ -25,9 +25,6 @@
 
 (defvar j0ni/is-mac (memq window-system '(mac ns)))
 
-(defvar j0ni/completion-system 'vertico
-  "Should be a symbol, currently 'selectrum, 'vertico, 'mct.")
-
 ;; whitespace-mode
 (setq whitespace-line-column 120)
 (setq whitespace-style '(face trailing lines-tail tabs))
@@ -89,10 +86,6 @@
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
-
-;;; Set our choice of interaction franework
-
-(setq j0ni/completion-system nil)
 
 ;;; Fonty fonty fonty fonty fonty LEAVE ME ALONE fonty fonty fonty
 ;; fonty has moved to early-init
@@ -545,16 +538,6 @@ frames with exactly two windows."
 
 ;;; Completion
 
-(require 'icomplete)
-(require 'imenu)
-
-;; Choose a framework
-;; (cl-case j0ni/completion-system
-;;   ('selectrum (require 'selectrum-support))
-;;   ('vertico (require 'vertico-support))
-;;   ('mct (require 'mct-support))
-;;   (t (message "Completion system [j0ni/completion-system] not set, nothing configured")))
-
 (straight-use-package 'yasnippet)
 (setq yas-snippet-dirs (concat user-emacs-directory "snippets"))
 
@@ -646,14 +629,17 @@ frames with exactly two windows."
 (keymap-global-set "C-," #'embark-dwim)
 (keymap-global-set "C-h B" #'embark-bindings)
 
-(let ((map icomplete-minibuffer-map))
-  (keymap-set map "C-l" #'embark-collect-live)
-  (keymap-set map "M-l" #'embark-collect-snapshot)
-  (keymap-set map "M-s" #'embark-collect-snapshot)
-  (keymap-set map "C-." #'embark-act)
-  (keymap-set map "M-." #'embark-act)
-  (keymap-set map "C-," #'embark-dwim)
-  (keymap-set map "M-," #'embark-dwim))
+;; just in case I guess
+(with-eval-after-load 'icomplete
+  (let ((map icomplete-minibuffer-map))
+    (keymap-set map "SPC" nil)
+    (keymap-set map "?" nil)
+    (keymap-set map "TAB" #'icomplete-force-complete)
+    (keymap-set map "C-l" #'embark-collect-live)
+    (keymap-set map "M-l" #'embark-collect-snapshot)
+    (keymap-set map "M-s" #'embark-collect-snapshot)
+    (keymap-set map "C-." #'embark-act)
+    (keymap-set map "C-," #'embark-dwim)))
 
 ;; This is taken from the embark wiki, I like it better than
 (defun embark-which-key-indicator ()
@@ -694,31 +680,13 @@ targets."
 (advice-add #'embark-completing-read-prompter
             :around #'embark-hide-which-key-indicator)
 
-(defun j0ni/shrink-mini-window ()
-  (when (eq embark-collect--kind :live)
-    (with-selected-window (active-minibuffer-window)
-      (setq-local icomplete-vertical-mode nil)
-      (setq-local max-mini-window-height 2))))
+;;; Vertico
 
-(add-hook 'embark-collect-mode-hook #'j0ni/shrink-mini-window)
+(straight-use-package 'vertico)
+(setq vertico-cycle t)
+(vertico-mode 1)
 
-;; We make the SPC key insert a literal space and the same for the
-;; question mark.  Spaces are used to delimit orderless groups, while
-;; the quedtion mark is a valid regexp character.
-
-(let ((map minibuffer-local-completion-map))
-  ;; stop popping up more completion buffers
-  (keymap-set map "TAB" #'icomplete-force-complete)
-  ;; because SPC works for Orderless
-  (keymap-set map "SPC" nil)
-  ;; and this is a legit regexp
-  (keymap-set map "?" nil))
-
-(setq icomplete-tidy-shadowed-file-names t)
-
-;; (icomplete-vertical-mode 1)
-(fido-vertical-mode 1)
-;; (fido-mode 1)
+;;; Kill ring
 
 (straight-use-package 'browse-kill-ring)
 (browse-kill-ring-default-keybindings)
