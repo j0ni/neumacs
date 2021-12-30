@@ -23,7 +23,7 @@
 ;; (setq j0ni/fixed-font "Envy Code R-9.0")
 ;; (setq j0ni/fixed-font "GoMono Nerd Font Mono-9.0")
 ;; (setq j0ni/fixed-font (font-spec :family "PragmataPro Mono Liga" :size 11.5 :antialias t :hinting "full" :spacing 'm))
-(setq j0ni/fixed-font "PragmataPro Mono-12.0")
+(setq j0ni/fixed-font "PragmataPro-12.0")
 ;; (setq j0ni/fixed-font (font-spec :family "Inconsolata Nerd Font" :size 13.5 :spacing 'm))
 ;; (setq j0ni/fixed-font "Inconsolata Nerd Font-13.0")
 ;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono" :size 11.0 :antialias t))
