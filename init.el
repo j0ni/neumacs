@@ -538,20 +538,20 @@ frames with exactly two windows."
    :password ""))
 
 ;; undo-fu, ripped from doom
-(straight-use-package 'undo-fu)
-(setq undo-fu-allow-undo-in-region t)
-(dolist (binding
-         `(("C-_"    . ,#'undo-fu-only-undo)
-           ("C-/"    . ,#'undo-fu-only-undo)
-           ("C-z"    . ,#'undo-fu-only-undo)
-           ("<undo>" . ,#'undo-fu-only-undo)
-           ("C-x u"  . ,#'undo-fu-only-undo)
-           ("M-_"    . ,#'undo-fu-only-redo)
-           ("C-M-z"  . ,#'undo-fu-only-redo)))
-  (j0ni/global-set-key (car binding) (cdr binding)))
+;; (straight-use-package 'undo-fu)
+;; (setq undo-fu-allow-undo-in-region t)
+;; (dolist (binding
+;;          `(("C-_"    . ,#'undo-fu-only-undo)
+;;            ("C-/"    . ,#'undo-fu-only-undo)
+;;            ("C-z"    . ,#'undo-fu-only-undo)
+;;            ("<undo>" . ,#'undo-fu-only-undo)
+;;            ("C-x u"  . ,#'undo-fu-only-undo)
+;;            ("M-_"    . ,#'undo-fu-only-redo)
+;;            ("C-M-z"  . ,#'undo-fu-only-redo)))
+;;   (j0ni/global-set-key (car binding) (cdr binding)))
 
-(straight-use-package 'undo-fu-session)
-(global-undo-fu-session-mode 1)
+;; (straight-use-package 'undo-fu-session)
+;; (global-undo-fu-session-mode 1)
 
 ;; This is a bit clumsy, but it works
 (straight-use-package 'exec-path-from-shell)
