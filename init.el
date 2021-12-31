@@ -78,6 +78,7 @@
 (setq-default browse-url-browser-function
               (cl-case system-type
                 ((darwin macos) 'browse-url-default-macosx-browser)
+                ((gnu/linux) 'eww-browse-url)
                 (t 'browse-url-default-browser)))
 
 (defalias 'yes-or-no-p 'y-or-n-p)
