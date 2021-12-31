@@ -1,4 +1,4 @@
-;;; init.el --- emacs config -*- no-byte-compile: t -*-
+;;; init.el --- emacs config -*- no-byte-compile: t ; lexical-binding: t; -*-
 ;;;
 ;;; Commentary:
 ;;;
@@ -619,6 +619,10 @@ frames with exactly two windows."
 
 ;;; Completion
 
+(straight-use-package 'vertico)
+(require 'vertico)
+(setq vertico-cycle t)
+
 (straight-use-package 'yasnippet)
 (setq yas-snippet-dirs (concat user-emacs-directory "snippets"))
 
@@ -714,6 +718,32 @@ frames with exactly two windows."
 (keymap-global-set "C-," #'embark-dwim)
 (keymap-global-set "C-h B" #'embark-bindings)
 
+(defun with-minibuffer-keymap (keymap)
+  (lambda (fn &rest args)
+    (minibuffer-with-setup-hook
+        (lambda ()
+          (use-local-map
+           (make-composed-keymap keymap (current-local-map))))
+      (apply fn args))))
+
+(defvar embark-completing-read-prompter-map nil)
+(setq embark-completing-read-prompter-map
+      (let ((map (make-sparse-keymap)))
+        (keymap-set map "TAB" #'abort-recursive-edit)
+        map))
+
+(advice-add 'embark-completing-read-prompter :around
+            (with-minibuffer-keymap embark-completing-read-prompter-map))
+
+(defun embark-act-with-completing-read (&optional arg)
+  (interactive "P")
+  (let* ((embark-prompter 'embark-completing-read-prompter)
+         (act (propertize "Act" 'face 'highlight))
+         (embark-indicator (lambda (_keymap targets) nil)))
+    (embark-act arg)))
+
+(keymap-set vertico-map "TAB" #'embark-act-with-completing-read)
+
 ;; just in case I guess
 (with-eval-after-load 'icomplete
   (let ((map icomplete-minibuffer-map))
@@ -767,8 +797,6 @@ targets."
 
 ;;; Vertico
 
-(straight-use-package 'vertico)
-(setq vertico-cycle t)
 (vertico-mode 1)
 
 ;;; Kill ring
