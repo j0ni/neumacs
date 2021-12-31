@@ -481,6 +481,11 @@ frames with exactly two windows."
 (keymap-global-set "C-c f" #'find-file-in-project-by-selected)
 
 ;; IRC, sigh...
+
+(defvar j0ni/irc-auth-spec nil)
+(setq j0ni/srht-sasl-pass
+      (funcall (plist-get (car (auth-source-search :host "chat.sr.ht")) :secret)))
+
 (require 'rcirc)
 (setq rcirc-debug-flag t)
 (setq rcirc-server-alist
@@ -492,8 +497,7 @@ frames with exactly two windows."
          :encryption tls
          :channels nil)))
 
-(setq rcirc-authinfo
-      '(("chat.sr.ht" sasl "joni" "")))
+(setq rcirc-authinfo `(("chat.sr.ht" sasl "joni" ,j0ni/srht-sasl-pass)))
 
 (defun rcirc-handler-AUTHENTICATE (process _cmd _args _text)
   "Respond to authentication request.
@@ -532,7 +536,7 @@ frames with exactly two windows."
    :port "6697"
    :nick "j0ni"
    :full-name "Joni"
-   :password ""))
+   :password j0ni/srht-sasl-pass))
 
 ;; undo-fu, ripped from doom
 ;; (straight-use-package 'undo-fu)
