@@ -226,10 +226,6 @@ frames with exactly two windows."
     (insert-file-contents file-path)
     (buffer-string)))
 
-(defun j0ni/keymap-set (map k command)
-  (let ((k (if (stringp k) (kbd k) k)))
-    (keymap-set map k command)))
-
 ;; because I honestly don't care about anyone else
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 
