@@ -1129,7 +1129,8 @@ targets."
                      "https://www.alternet.org/feeds/feed.rss"
                      "https://www.democracynow.org/democracynow.rss"
                      "https://www.anarchistnews.org/rss.xml"
-                     "https://www.anarchistfederation.net/feed/"))
+                     "https://www.anarchistfederation.net/feed/"
+                     "https://www.no-gods-no-masters.com/blog/rss"))
 
 ;;; Telegram
 
