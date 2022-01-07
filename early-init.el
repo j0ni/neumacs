@@ -3,6 +3,9 @@
 (defvar j0ni/fixed-font nil
   "Should be a string like \"Fira Code Mono-11\" or such.")
 
+(defvar j0ni/fixed-font-serif nil
+  "Should be a string like \"Fira Code Mono-11\" or such.")
+
 (defvar j0ni/variable-font nil
   "Should be a string like \"Fira Code-11\" or such.")
 
@@ -14,7 +17,7 @@
 ;; (setq j0ni/fixed-font "FuraMono Nerd Font Mono-9.0")
 (setq j0ni/fixed-font "Monoisome-8.5")
 ;; (setq j0ni/fixed-font (font-spec :family "Agave Nerd Font" :size 16.0 :antialias t))
-;; (setq j0ni/fixed-font "Lucida Grande Mono Nrw-11.5")
+(setq j0ni/fixed-font "Lucida Grande Mono Nrw-10.5")
 ;; (setq j0ni/fixed-font (font-spec :family "TerminessTTF Nerd Font Mono" :size 16.5 :antialias t))
 ;; (setq j0ni/fixed-font (font-spec :family "Latin Modern Mono" :size 15.0 :antialias t))
 ;; (setq j0ni/fixed-font (font-spec :family "BlexMono Nerd Font Mono" :size 12.5 :antialias t))
@@ -26,8 +29,10 @@
 ;; (setq j0ni/fixed-font "PragmataPro-12.0")
 ;; (setq j0ni/fixed-font (font-spec :family "Inconsolata Nerd Font" :size 13.5 :spacing 'm))
 ;; (setq j0ni/fixed-font "Inconsolata Nerd Font-13.0")
+(setq j0ni/fixed-font "Recursive Monospace-10.5")
+(setq j0ni/fixed-font-serif "Recursive Monospace Casual-10.5")
 ;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono" :size 11.0 :antialias t))
-(setq j0ni/variable-font "Lucida Grande-11.0")
+(setq j0ni/variable-font "Recursive Casual-10.5")
 
 (set-frame-font j0ni/fixed-font nil t)
 
@@ -35,12 +40,20 @@
   (interactive)
   (unless frame (setq frame (selected-frame)))
 
-  (set-face-attribute 'default nil :font j0ni/fixed-font)
-  (set-face-attribute 'mode-line nil :font j0ni/fixed-font)
+  ;; All of these? Really?
   (set-frame-font j0ni/fixed-font nil (list frame))
+
+  (set-face-attribute 'default frame :font j0ni/fixed-font)
+  (set-face-attribute 'mode-line frame :font j0ni/fixed-font)
+  (set-face-attribute 'fixed-pitch frame :font j0ni/fixed-font)
+  (set-face-attribute 'variable-pitch frame :font j0ni/variable-font)
+  (set-face-attribute 'fixed-pitch-serif frame :font j0ni/fixed-font-serif)
+
   (set-face-font 'variable-pitch j0ni/variable-font frame)
   (set-face-font 'fixed-pitch j0ni/fixed-font frame)
-  (set-face-font 'fixed-pitch-serif j0ni/fixed-font frame)
+  (set-face-font 'fixed-pitch-serif j0ni/fixed-font-serif frame)
+  (set-face-font 'mode-line j0ni/fixed-font frame)
+
   (set-fontset-font t 'unicode "Symbola" frame 'prepend)
   ;; if the font is paying attention ¯\_(ツ)_/¯
   ;; (set-face-attribute
