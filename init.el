@@ -314,7 +314,7 @@ frames with exactly two windows."
 (file-name-shadow-mode 1)
 
 ;; set up time display but don't turn it on
-(setq display-time-format nil)
+(setq display-time-format "%Y-%m-%d %H:%M")
 (setq display-time-24hr-format t)
 (setq display-time-day-and-date nil)
 (setq display-time-interval 15)
@@ -327,6 +327,8 @@ frames with exactly two windows."
         ("Asia/Hong_Kong" "Hong Kong")
         ("Asia/Tokyo" "Tokyo")))
 
+(display-time-mode 1)
+(display-battery-mode 1)
 ;;; Set up xref
 
 (setq xref-marker-ring-length 64)
@@ -341,12 +343,16 @@ frames with exactly two windows."
 (consult-customize
  consult-ripgrep consult-git-grep consult-grep consult-theme consult-buffer
  consult-bookmark consult-recent-file consult-xref consult-locate
- consult--source-recent-file consult--source-project-recent-file consult--source-bookmark
+ consult--source-recent-file consult--source-project-recent-file
+ consult--source-bookmark
  :preview-key (kbd "M-.")
  :group nil)
 
 ;; default value
 (setq consult-async-min-input 3)
+
+(straight-use-package 'consult-flycheck)
+(require 'consult-flycheck)
 
 ;; search map
 (dolist (binding '(;; search map
@@ -447,7 +453,7 @@ frames with exactly two windows."
 (setq ibuffer-use-header-line t)
 (setq ibuffer-default-shrink-to-minimum-size nil)
 (setq ibuffer-saved-filter-groups nil)
-(setq ibuffer-old-time 48)
+(setq ibuffer-old-time 72)
 
 (keymap-global-set "C-x C-b" #'ibuffer)
 
@@ -539,26 +545,26 @@ frames with exactly two windows."
    :password j0ni/srht-sasl-pass))
 
 ;; undo-fu, ripped from doom
-;; (straight-use-package 'undo-fu)
-;; (setq undo-fu-allow-undo-in-region t)
-;; (dolist (binding
-;;          `(("C-_"    . ,#'undo-fu-only-undo)
-;;            ("C-/"    . ,#'undo-fu-only-undo)
-;;            ("C-z"    . ,#'undo-fu-only-undo)
-;;            ("<undo>" . ,#'undo-fu-only-undo)
-;;            ("C-x u"  . ,#'undo-fu-only-undo)
-;;            ("M-_"    . ,#'undo-fu-only-redo)
-;;            ("C-M-z"  . ,#'undo-fu-only-redo)))
-;;   (j0ni/global-set-key (car binding) (cdr binding)))
+(straight-use-package 'undo-fu)
+(setq undo-fu-allow-undo-in-region t)
+(dolist (binding
+         `(("C-_"    . ,#'undo-fu-only-undo)
+           ("C-/"    . ,#'undo-fu-only-undo)
+           ("C-z"    . ,#'undo-fu-only-undo)
+           ("<undo>" . ,#'undo-fu-only-undo)
+           ("C-x u"  . ,#'undo-fu-only-undo)
+           ("M-_"    . ,#'undo-fu-only-redo)
+           ("C-M-z"  . ,#'undo-fu-only-redo)))
+  (keymap-global-set (car binding) (cdr binding)))
 
-;; (straight-use-package 'undo-fu-session)
-;; (global-undo-fu-session-mode 1)
+(straight-use-package 'undo-fu-session)
+(global-undo-fu-session-mode 1)
 
 ;; This is a bit clumsy, but it works
 (straight-use-package 'exec-path-from-shell)
 (defvar j0ni/exec-path-from-shell-completed nil "Stop this happening repeatedly")
 (when (and (not j0ni/exec-path-from-shell-completed)
-           (memq window-system '(mac ns x)))
+           (memq window-system '(mac ns x pgtk)))
   (exec-path-from-shell-initialize)
   (exec-path-from-shell-copy-env "SSH_AUTH_SOCK")
   (setq j0ni/exec-path-from-shell-completed t))
@@ -585,8 +591,15 @@ frames with exactly two windows."
 
 (modus-themes-load-themes)
 
+(straight-use-package 'mini-modeline)
+
 ;; (load-theme 'modus-operandi t)
-(load-theme 'modus-vivendi t)
+;; (load-theme 'modus-vivendi t)
+
+;; (straight-use-package 'matrix-theme)
+(add-to-list 'load-path "~/Scratch/emacs/matrix-emacs-theme")
+(require 'the-matrix-theme)
+(load-theme 'the-matrix t)
 
 (straight-use-package 'rainbow-mode)
 (keymap-global-set "C-c r" #'rainbow-mode)
@@ -620,32 +633,30 @@ frames with exactly two windows."
 
 ;;; Completion
 
-(straight-use-package 'vertico)
-(require 'vertico)
-(setq vertico-cycle t)
+;; (straight-use-package 'mct)
+;; (require 'mct)
+;; (setq mct-remove-shadowed-file-names t)
+;; (setq mct-live-completion t)
+;; (setq mct-minimum-input 3)
+;; (setq mct-live-update-delay 0.1)
+;; (setq mct-completion-passlist '(projectile-switch-project
+;;                                 projectile-find-file
+;;                                 projectile-find-file-dwim
+;;                                 projectile-switch-to-buffer
+;;                                 find-file
+;;                                 consult-buffer
+;;                                 consult-line
+;;                                 consult-xref
+;;                                 consult-imenu
+;;                                 consult-flymake
+;;                                 consult-flycheck
+;;                                 consult-org-heading
+;;                                 consult-ripgrep))
+
+(require 'icomplete)
 
 (straight-use-package 'yasnippet)
 (setq yas-snippet-dirs (concat user-emacs-directory "snippets"))
-
-(straight-use-package 'corfu)
-(require 'corfu)
-
-(setq corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-;; (setq corfu-auto t)              ;; Enable auto completion
-(setq corfu-commit-predicate nil)   ;; Do not commit selected candidates on next input
-(setq corfu-quit-at-boundary nil)   ;; Automatically quit at word boundary
-(setq corfu-quit-no-match t)        ;; Automatically quit if there is no match
-(setq corfu-echo-documentation t)   ;; Do not show documentation in the echo area
-(setq corfu-scroll-margin 2)        ;; Use scroll margin
-(setq corfu-min-width 40)
-(setq corfu-preview-current t)      ;; Preview current candidate
-
-(add-hook 'emacs-startup-hook #'corfu-global-mode)
-
-;; Optionally use TAB for cycling, default is `corfu-complete'.
-(with-eval-after-load 'corfu
-  (keymap-set corfu-map "<tab>" #'corfu-next)
-  (keymap-set corfu-map "<backtab>" #'corfu-previous))
 
 (straight-use-package
  '(cape :type git :host github :repo "minad/cape"))
@@ -685,12 +696,14 @@ frames with exactly two windows."
 
 (straight-use-package 'marginalia)
 (setq marginalia-margin-min 10)
-(setq marginalia-align-offset 3)
+(setq marginalia-align-offset 0)
 (marginalia-mode 1)
 
 (straight-use-package 'orderless)
 (require 'orderless)
-(setq orderless-matching-styles '(orderless-literal orderless-regexp))
+(setq orderless-matching-styles
+      '(orderless-literal
+        orderless-regexp))
 
 ;; see completion-styles-alist for the defaults, if this turns out to
 ;; not be quite right.
@@ -711,94 +724,31 @@ frames with exactly two windows."
         (info-menu (styles orderless+initialism))
         (file (styles orderless+initialism))))
 
-(straight-use-package 'embark)
-(straight-use-package 'embark-consult)
-(require 'embark-consult)
-(setq prefix-help-command #'embark-prefix-help-command)
-(keymap-global-set "C-." #'embark-act)
-(keymap-global-set "C-," #'embark-dwim)
-(keymap-global-set "C-h B" #'embark-bindings)
+(setf icomplete-in-buffer t)
 
-(defun with-minibuffer-keymap (keymap)
-  (lambda (fn &rest args)
-    (minibuffer-with-setup-hook
-        (lambda ()
-          (use-local-map
-           (make-composed-keymap keymap (current-local-map))))
-      (apply fn args))))
-
-(defvar embark-completing-read-prompter-map nil)
-(setq embark-completing-read-prompter-map
-      (let ((map (make-sparse-keymap)))
-        (keymap-set map "TAB" #'abort-recursive-edit)
-        map))
-
-(advice-add 'embark-completing-read-prompter :around
-            (with-minibuffer-keymap embark-completing-read-prompter-map))
-
-(defun embark-act-with-completing-read (&optional arg)
-  (interactive "P")
-  (let* ((embark-prompter 'embark-completing-read-prompter)
-         (act (propertize "Act" 'face 'highlight))
-         (embark-indicator (lambda (_keymap targets) nil)))
-    (embark-act arg)))
-
-(keymap-set vertico-map "TAB" #'embark-act-with-completing-read)
-
-;; just in case I guess
-(with-eval-after-load 'icomplete
+(defun j0ni/icomplete-minibuffer-setup ()
   (let ((map icomplete-minibuffer-map))
     (keymap-set map "SPC" nil)
     (keymap-set map "?" nil)
     (keymap-set map "TAB" #'icomplete-force-complete)
-    (keymap-set map "C-l" #'embark-collect-live)
-    (keymap-set map "M-l" #'embark-collect-snapshot)
-    (keymap-set map "M-s" #'embark-collect-snapshot)
-    (keymap-set map "C-." #'embark-act)
-    (keymap-set map "C-," #'embark-dwim)))
+    (keymap-set map "RET" #'icomplete-force-complete-and-exit))
+  (setq-local icomplete-tidy-shadowed-file-names t)
+  (setq-local icomplete-show-matches-on-no-input t)
+  (setq-local icomplete-scroll t))
 
-;; This is taken from the embark wiki, I like it better than
-(defun embark-which-key-indicator ()
-  "An embark indicator that displays keymaps using which-key.
-The which-key help message will show the type and value of the
-current target followed by an ellipsis if there are further
-targets."
-  (lambda (&optional keymap targets prefix)
-    (if (null keymap)
-        (which-key--hide-popup-ignore-command)
-      (which-key--show-keymap
-       (if (eq (plist-get (car targets) :type) 'embark-become)
-           "Become"
-         (format "Act on %s '%s'%s"
-                 (plist-get (car targets) :type)
-                 (embark--truncate-target (plist-get (car targets) :target))
-                 (if (cdr targets) "…" "")))
-       (if prefix
-           (pcase (lookup-key keymap prefix 'accept-default)
-             ((and (pred keymapp) km) km)
-             (_ (key-binding prefix 'accept-default)))
-         keymap)
-       nil nil t (lambda (binding)
-                   (not (string-suffix-p "-argument" (cdr binding))))))))
+(add-hook 'icomplete-minibuffer-setup-hook #'j0ni/icomplete-minibuffer-setup)
 
-(setq embark-indicators
-      '(embark-which-key-indicator
-        embark-highlight-indicator
-        embark-isearch-highlight-indicator))
+;;; MCT
 
-(defun embark-hide-which-key-indicator (fn &rest args)
-  "Hide the which-key indicator immediately when using the completing-read prompter."
-  (which-key--hide-popup-ignore-command)
-  (let ((embark-indicators
-         (remq #'embark-which-key-indicator embark-indicators)))
-    (apply fn args)))
+;; (keymap-set mct-minibuffer-completion-list-map "C-j" #'mct-complete-and-exit)
+;; (keymap-set mct-minibuffer-local-completion-map "C-j" #'mct-complete-and-exit)
 
-(advice-add #'embark-completing-read-prompter
-            :around #'embark-hide-which-key-indicator)
+;; (mct-minibuffer-mode 1)
+;; (mct-region-global-mode 1)
 
-;;; Vertico
+(icomplete-vertical-mode 1)
 
-(vertico-mode 1)
+;; (vertico-mode 1)
 
 ;;; Kill ring
 
@@ -955,6 +905,28 @@ targets."
 
 (global-rbenv-mode 1)
 (add-hook 'ruby-mode-hook #'rbenv-use-corresponding)
+
+;;; C/C++ etc
+
+(straight-use-package 'ggtags)
+(require 'ggtags)
+(add-hook 'c-mode-common-hook
+          (lambda ()
+            (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+              (setq-local imenu-create-index-function #'ggtags-build-imenu-index)
+              (setq-local hippie-expand-try-functions-list
+                          (cons 'ggtags-try-complete-tag hippie-expand-try-functions-list))
+              (ggtags-mode 1))))
+
+
+(keymap-set ggtags-mode-map "C-c g s" 'ggtags-find-other-symbol)
+(keymap-set ggtags-mode-map "C-c g h" 'ggtags-view-tag-history)
+(keymap-set ggtags-mode-map "C-c g r" 'ggtags-find-reference)
+(keymap-set ggtags-mode-map "C-c g f" 'ggtags-find-file)
+(keymap-set ggtags-mode-map "C-c g c" 'ggtags-create-tags)
+(keymap-set ggtags-mode-map "C-c g u" 'ggtags-update-tags)
+
+(keymap-set ggtags-mode-map "M-," 'pop-tag-mark)
 
 ;;; Misc
 
@@ -1130,15 +1102,17 @@ targets."
                      "https://www.democracynow.org/democracynow.rss"
                      "https://www.anarchistnews.org/rss.xml"
                      "https://www.anarchistfederation.net/feed/"
-                     "https://www.no-gods-no-masters.com/blog/rss"))
+                     "https://www.no-gods-no-masters.com/blog/rss"
+                     "https://taz.de/!p4608;rss/"
+                     "https://taz.de/Schwerpunkt-Klimawandel/!t5008262;rss/"))
 
 ;;; Telegram
 
-;; (straight-use-package 'telega)
-;; (require 'telega)
-;; (add-hook 'telega-chat-mode-hook #'visual-line-mode)
-;; (add-hook 'telega-chat-mode-hook #'telega-mode-line-mode)
-;; (add-hook 'telega-chat-mode-hook #'telega-notifications-mode)
+(straight-use-package 'telega)
+(require 'telega)
+(add-hook 'telega-chat-mode-hook #'visual-line-mode)
+(add-hook 'telega-chat-mode-hook #'telega-mode-line-mode)
+(add-hook 'telega-chat-mode-hook #'telega-notifications-mode)
 
 ;; (with-eval-after-load 'telega
 ;;   (when (featurep 'modus-themes)
