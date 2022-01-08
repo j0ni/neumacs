@@ -86,3 +86,6 @@
 (setq initial-frame-alist `((font . ,j0ni/fixed-font) (fullscreen . maximized)))
 (setq default-frame-alist `((font . ,j0ni/fixed-font) (height . 100) (width . 120)))
 (add-hook 'emacs-startup-hook #'j0ni/init-frame)
+
+(provide 'early-init)
+;;; early-init.el ends here
