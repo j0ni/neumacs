@@ -11,7 +11,7 @@
 
 ;; (debug-watch 'indent-tabs-mode)
 
-;; (desktop-save-mode)
+;; (desktop-save-mode 1) ;; eek
 
 (j0ni/init-frame)
 
@@ -59,13 +59,14 @@
 (setq custom-safe-themes t)
 (setq mouse-wheel-progressive-speed t)              ; accelerate scrolling
 (setq shr-color-visible-luminance-min 90)
+;; gotta find the berlin coords
 ;; 43.67066, -79.30211 - location
 ;; (setq calendar-longitude 43.67066)
 ;; (setq calendar-latitude -79.30211)
 ;; (setq calendar-location-name "Toronto")
 
 ;; OS dependent modifier setup
-(when j0ni/is-mac
+(when j0ni/is-mac ;; but it really isn't very often
   ;; The left and right Option or Alt keys.
   (setq ns-alternate-modifier 'meta)
   (setq ns-right-alternate-modifier 'left)
@@ -237,17 +238,18 @@ frames with exactly two windows."
                 ;; global-hl-line-mode
                 column-number-mode
                 winner-mode
-                global-auto-revert-mode
-                recentf-mode))
+                global-auto-revert-mode))
   (funcall mode 1))
 
 (blink-cursor-mode -1)
 (remove-hook 'minibuffer-setup-hook 'winner-save-unconditionally)
 (advice-add #'shr-colorize-region :around (defun shr-no-colorise-region (&rest ignore)))
 
+(recentf-mode 1)
+(keymap-global-set "C-x M-f" #'recentf-open-files)
+
 ;;; Dired
 
-;; dired - reuse current buffer by pressing 'a'
 (put 'dired-find-alternate-file 'disabled nil)
 
 ;; always delete and copy recursively
@@ -356,60 +358,51 @@ frames with exactly two windows."
 
 ;; search map
 (dolist (binding '(;; search map
-                   ("M-s f" . consult-find)
-                   ("M-s F" . consult-locate)
-                   ("M-s g" . consult-grep)
-                   ("M-s G" . consult-git-grep)
+                   ;; ("M-s f" . consult-find)
+                   ;; ("M-s F" . consult-locate)
+                   ;; ("M-s g" . consult-grep)
+                   ;; ("M-s G" . consult-git-grep)
                    ("M-s r" . consult-ripgrep)
                    ("M-s l" . consult-line)
                    ("M-s L" . consult-line-multi)
-                   ("M-s m" . consult-multi-occur)
-                   ("M-s k" . consult-keep-lines)
-                   ("M-s u" . consult-focus-lines)
+                   ;; ("M-s m" . consult-multi-occur)
+                   ;; ("M-s k" . consult-keep-lines)
+                   ;; ("M-s u" . consult-focus-lines)
                    ;; goto map
-                   ("M-g e" . consult-compile-error)
-                   ("M-g f" . consult-flycheck)
-                   ("M-g g" . consult-goto-line)
-                   ("M-g M-g" . consult-goto-line)
+                   ;; ("M-g e" . consult-compile-error)
+                   ;; ("M-g f" . consult-flycheck)
+                   ;; ("M-g g" . consult-goto-line)
+                   ;; ("M-g M-g" . consult-goto-line)
                    ("M-g o" . consult-org-heading)
-                   ("M-g m" . consult-mark)
-                   ("M-g k" . consult-global-mark)
+                   ;; ("M-g m" . consult-mark)
+                   ;; ("M-g k" . consult-global-mark)
                    ("M-g i" . consult-imenu)
                    ("M-g I" . consult-imenu-multi)
-                   ("M-s e" . consult-isearch-history)
+                   ;; ("M-s e" . consult-isearch-history)
                    ;; extras, which stomp on command commands
-                   ("C-c h" . consult-history)
-                   ("C-c m" . consult-mode-command)
-                   ("C-c b" . consult-bookmark)
-                   ("C-c k" . consult-kmacro)
+                   ;; ("C-c h" . consult-history)
+                   ;; ("C-c m" . consult-mode-command)
+                   ;; ("C-c b" . consult-bookmark)
+                   ;; ("C-c k" . consult-kmacro)
                    ;; C-x bindings (ctl-x-map)
-                   ("C-x M-:" . consult-complex-command)
-                   ("C-x b" . consult-buffer)
-                   ("C-x 4 b" . consult-buffer-other-window)
-                   ("C-x 5 b" . consult-buffer-other-frame)
+                   ;; ("C-x M-:" . consult-complex-command)
+                   ;; ("C-x B" . consult-buffer)
+                   ;; ("C-x 4 b" . consult-buffer-other-window)
+                   ;; ("C-x 5 b" . consult-buffer-other-frame)
                    ;; no idea what registers are for, I will read about it :P
-                   ("M-#" . consult-register-load)
-                   ("M-'" . consult-register-store) ;; orig. abbrev-prefix-mark (unrelated)
-                   ("C-M-#" . consult-register)))
+                   ;; ("M-#" . consult-register-load)
+                   ;; ("M-'" . consult-register-store) ;; orig. abbrev-prefix-mark (unrelated)
+                   ;; ("C-M-#" . consult-register)
+                   ))
   (keymap-global-set (car binding) (cdr binding)))
 
-;; isearch related commands
-(dolist (binding '(("M-e" . consult-isearch-history)
-                   ("M-s e" . consult-isearch-history)
-                   ("M-s l" . consult-line)
-                   ("M-s L" . consult-line-multi)))
-  (keymap-set isearch-mode-map (car binding) (cdr binding)))
-
+;; this is better than isearch
 (keymap-global-set "C-s" #'consult-line)
 
 (add-hook 'completion-list-mode-hook #'consult-preview-at-point-mode)
 
 ;; This adds thin lines, sorting and hides the mode line of the window.
 (advice-add #'register-preview :override #'consult-register-window)
-;; (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
-;; Use Consult to select xref locations with preview
-(setq xref-show-xrefs-function #'consult-xref)
-(setq xref-show-definitions-function #'consult-xref)
 ;; find the project root
 (with-eval-after-load 'projectile
   (setq consult-project-root-function #'projectile-project-root))
@@ -430,16 +423,17 @@ frames with exactly two windows."
 ;; turn off idle highlight, let lsp do it...maybe
 (add-hook 'lsp-managed-mode-hook
           (lambda ()
-            (setq-local idle-highlight-timer nil)))
-
-;; default is t
-(setq lsp-enable-folding nil)
-;; default is t
-(setq lsp-eldoc-enable-hover t)
-;; default is t
-(setq lsp-enable-on-type-formatting t)
-;; default is t
-(setq lsp-before-save-edits t)
+            (setq-local idle-highlight-timer nil)
+            ;; default is t
+            (setq-local lsp-enable-folding nil)
+            ;; default is t
+            (setq-local lsp-eldoc-enable-hover t)
+            ;; default is t
+            (setq-local lsp-enable-on-type-formatting t)
+            ;; default is t
+            (setq-local lsp-before-save-edits t)
+            ;; default is t
+            (setq-local lsp-enable-symbol-highlighting t)))
 
 ;; ibuffer looks much nicer than the default view
 (require 'ibuffer)
@@ -507,7 +501,7 @@ frames with exactly two windows."
 
 (defun rcirc-handler-AUTHENTICATE (process _cmd _args _text)
   "Respond to authentication request.
- PROCESS is the process object for the current connection."
+PROCESS is the process object for the current connection."
   (rcirc-send-string
    process
    "AUTHENTICATE"
@@ -562,7 +556,7 @@ frames with exactly two windows."
 
 ;; This is a bit clumsy, but it works
 (straight-use-package 'exec-path-from-shell)
-(defvar j0ni/exec-path-from-shell-completed nil "Stop this happening repeatedly")
+(defvar j0ni/exec-path-from-shell-completed nil "Stop this happening repeatedly.")
 (when (and (not j0ni/exec-path-from-shell-completed)
            (memq window-system '(mac ns x pgtk)))
   (exec-path-from-shell-initialize)
@@ -590,8 +584,6 @@ frames with exactly two windows."
 (setq modus-themes-paren-match '(intense bold underline))
 
 (modus-themes-load-themes)
-
-(straight-use-package 'mini-modeline)
 
 ;; (load-theme 'modus-operandi t)
 ;; (load-theme 'modus-vivendi t)
@@ -658,20 +650,6 @@ frames with exactly two windows."
 (straight-use-package 'yasnippet)
 (setq yas-snippet-dirs (concat user-emacs-directory "snippets"))
 
-(straight-use-package
- '(cape :type git :host github :repo "minad/cape"))
-
-;; Add `completion-at-point-functions', used by `completion-at-point'.
-;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
-;;(add-to-list 'completion-at-point-functions #'cape-ispell)
-;;(add-to-list 'completion-at-point-functions #'cape-dict)
-
-(add-to-list 'completion-at-point-functions #'cape-file)
-(add-to-list 'completion-at-point-functions #'cape-dabbrev)
-(add-to-list 'completion-at-point-functions #'cape-keyword)
-(add-to-list 'completion-at-point-functions #'cape-symbol)
-;; (add-to-list 'completion-at-point-functions #'cape-line)
-
 (require 'hippie-exp)
 (setq hippie-expand-try-functions-list
       '(try-expand-dabbrev
@@ -694,41 +672,13 @@ frames with exactly two windows."
 (setq save-abbrevs 'silently)
 (setq-default abbrev-mode t)
 
-(straight-use-package 'marginalia)
-(setq marginalia-margin-min 10)
-(setq marginalia-align-offset 0)
-(marginalia-mode 1)
-
-(straight-use-package 'orderless)
-(require 'orderless)
-(setq orderless-matching-styles
-      '(orderless-literal
-        orderless-regexp))
-
 ;; see completion-styles-alist for the defaults, if this turns out to
 ;; not be quite right.
-(setq completion-styles '(orderless))
-
-(orderless-define-completion-style orderless+initialism
-  (orderless-matching-styles '(orderless-initialism
-                               orderless-literal
-                               orderless-regexp)))
-(setq completion-category-overrides
-      '((command (styles orderless+initialism))
-        (symbol (styles orderless+initialism))
-        (variable (styles orderless+initialism))
-        (buffer (styles orderless+initialism))
-        (project-file (styles orderless+initialism))
-        (xref-location (styles orderless))
-        (symbol-help (styles orderless+initialism))
-        (info-menu (styles orderless+initialism))
-        (file (styles orderless+initialism))))
-
-(setf icomplete-in-buffer t)
+(setq completion-styles '(basic substring initials partial-completion))
 
 (defun j0ni/icomplete-minibuffer-setup ()
   (let ((map icomplete-minibuffer-map))
-    (keymap-set map "SPC" nil)
+    ;; (keymap-set map "SPC" nil)
     (keymap-set map "?" nil)
     (keymap-set map "TAB" #'icomplete-force-complete)
     (keymap-set map "RET" #'icomplete-force-complete-and-exit))
@@ -746,9 +696,9 @@ frames with exactly two windows."
 ;; (mct-minibuffer-mode 1)
 ;; (mct-region-global-mode 1)
 
-(icomplete-vertical-mode 1)
+;; (icomplete-vertical-mode 1)
 
-;; (vertico-mode 1)
+(fido-vertical-mode 1)
 
 ;;; Kill ring
 
