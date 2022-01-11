@@ -626,7 +626,8 @@ PROCESS is the process object for the current connection."
     (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)))
 
 (straight-use-package 'git-timemachine)
-(keymap-global-set "C-x C-g" #'git-timemachine)
+(require 'git-timemachine)
+;; (keymap-global-set "C-x C-g" #'git-timemachine)
 
 (straight-use-package 'expand-region)
 (keymap-global-set "C-x C-x" #'er/expand-region)
@@ -982,8 +983,10 @@ PROCESS is the process object for the current connection."
                              (expand-file-name "journal.org" org-directory)))
 (setq org-agenda-span 14)
 
-;; prevent org-mode hijacking arrow keys
-(setq org-replace-disputed-keys t)
+;; Since the very beginning I've had this, to address a problem I no longer
+;; have: prevent org-mode hijacking arrow keys so I can navigate the buffer
+;; using arrow keys. So lets not, and see how it goes.
+;; (setq org-replace-disputed-keys t)
 
 ;; set our own todo keywords
 (setq org-todo-keywords
