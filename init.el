@@ -15,6 +15,12 @@
 
 (j0ni/init-frame)
 
+;; like, why be unbound, when this is what I probably meant
+;; OTOH, how to make this future proof... check if it's bound?
+(when (not (keymap-global-lookup "C-x C-g"))
+  (message "Fixing C-x C-g")
+  (keymap-global-set "C-x C-g" #'keyboard-quit))
+
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
 
 (require 'wm)
@@ -406,8 +412,8 @@ frames with exactly two windows."
 ;; This adds thin lines, sorting and hides the mode line of the window.
 (advice-add #'register-preview :override #'consult-register-window)
 ;; find the project root
-(with-eval-after-load 'projectile
-  (setq consult-project-root-function #'projectile-project-root))
+(with-eval-after-load 'project
+  (setq consult-project-root-function (lambda () (cdr (project-current)))))
 ;; when multiple result types are collected in one completion set, hit this key
 ;; to subset to only those of the type at point.
 (setq consult-narrow-key "<")
@@ -424,9 +430,9 @@ frames with exactly two windows."
 
 (setq lsp-ui-sideline-delay 2.0)
 
-;; turn off idle highlight, let lsp do it...maybe
 (add-hook 'lsp-managed-mode-hook
           (lambda ()
+            ;; turn off idle highlight, let lsp do it...maybe
             (setq-local idle-highlight-timer nil)
             ;; default is t
             (setq-local lsp-enable-folding nil)
@@ -450,31 +456,35 @@ frames with exactly two windows."
 (setq ibuffer-default-sorting-mode 'filename/process)
 (setq ibuffer-use-header-line t)
 (setq ibuffer-default-shrink-to-minimum-size nil)
-(setq ibuffer-saved-filter-groups nil)
+;; (setq ibuffer-saved-filter-groups nil)
 (setq ibuffer-old-time 72)
 
 (keymap-global-set "C-x C-b" #'ibuffer)
 
+(require 'vc)
 (straight-use-package 'ibuffer-vc)
 (require 'ibuffer-vc)
 
 (setq ibuffer-formats
-      '((mark modified read-only vc-status-mini " "
-              (name 18 18 :left :elide)
-              " "
-              (size 9 -1 :right)
-              " "
-              (mode 16 16 :left :elide)
-              " "
-              (vc-status 16 16 :left)
-              " "
-              vc-relative-file)))
+      '((mark modified read-only vc-status-mini
+              " " (name 18 18 :left :elide)
+              " " (size 9 -1 :right)
+              " " (mode 16 16 :left :elide)
+              " " (vc-status 16 16 :left)
+              " " filename-and-process)
+        (mark modified read-only vc-status-mini
+              " " (name 18 18 :left :elide)
+              " " (size 9 -1 :right)
+              " " (mode 16 16 :left :elide)
+              " " (vc-status 16 16 :left)
+              " " vc-relative-file)))
+
 
 (defun j0ni/ibuffer-vc-hook ()
   (ibuffer-auto-mode 1)
   (ibuffer-vc-set-filter-groups-by-vc-root)
-  (unless (eq ibuffer-sorting-mode 'alphabetic)
-    (ibuffer-do-sort-by-alphabetic)))
+  (unless (eq ibuffer-sorting-mode 'recency)
+    (ibuffer-do-sort-by-recency)))
 
 ;; (remove-hook 'ibuffer-hook #'j0ni/ibuffer-vc-hook)
 (add-hook 'ibuffer-hook #'j0ni/ibuffer-vc-hook)
@@ -645,10 +655,17 @@ PROCESS is the process object for the current connection."
 (setq mct-live-completion t)
 (setq mct-minimum-input 3)
 (setq mct-live-update-delay 0.1)
-(setq mct-completion-passlist '(projectile-switch-project
-                                projectile-find-file
-                                projectile-find-file-dwim
-                                projectile-switch-to-buffer
+(setq mct-completion-passlist '(
+                                ;; projectile-switch-project
+                                ;; projectile-find-file
+                                ;; projectile-find-file-dwim
+                                ;; projectile-switch-to-buffer
+                                project-find-file
+                                project-switch-to-buffer
+                                project-switch-project
+                                project-prompt-project-dir
+                                project-or-external-find-file
+                                project-find-file-in
                                 find-file
                                 consult-buffer
                                 consult-line
@@ -689,7 +706,15 @@ PROCESS is the process object for the current connection."
 (setq completion-styles '(basic substring initials partial-completion flex))
 
 (setq completion-category-overrides
-      '((file (initials partial-completion flex))))
+      '((buffer (styles . (basic substring partial-completion)))
+        (file (styles (initials partial-completion flex)))
+        (unicode-name (styles . (basic substring)))
+        ;; A new style that combines substring and pcm might be better,
+        ;; e.g. one that does not anchor to bos.
+        (project-file (styles . (substring partial-completion)))
+        (xref-location (styles . (substring)))
+        (info-menu (styles . (basic substring)))
+        (symbol-help (styles . (basic shorthand substring)))))
 
 ;;; MCT
 
@@ -700,22 +725,21 @@ PROCESS is the process object for the current connection."
 (mct-minibuffer-mode 1)
 (mct-region-global-mode 1)
 
-(require 'icomplete)
+;; (require 'icomplete)
 
-(defun j0ni/icomplete-minibuffer-setup ()
-  (let ((map icomplete-minibuffer-map))
-    ;; (keymap-set map "SPC" nil)
-    (keymap-set map "?" nil)
-    (keymap-set map "TAB" #'icomplete-force-complete)
-    (keymap-set map "RET" #'icomplete-force-complete-and-exit))
-  (setq-local icomplete-tidy-shadowed-file-names t)
-  (setq-local icomplete-show-matches-on-no-input t)
-  (setq-local icomplete-scroll t))
+;; (defun j0ni/icomplete-minibuffer-setup ()
+;;   (let ((map icomplete-minibuffer-map))
+;;     ;; (keymap-set map "SPC" nil)
+;;     (keymap-set map "?" nil)
+;;     (keymap-set map "TAB" #'icomplete-force-complete)
+;;     (keymap-set map "RET" #'icomplete-force-complete-and-exit))
+;;   (setq-local icomplete-tidy-shadowed-file-names t)
+;;   (setq-local icomplete-show-matches-on-no-input t)
+;;   (setq-local icomplete-scroll t))
 
-(add-hook 'icomplete-minibuffer-setup-hook #'j0ni/icomplete-minibuffer-setup)
+;; (add-hook 'icomplete-minibuffer-setup-hook #'j0ni/icomplete-minibuffer-setup)
 
 ;; (icomplete-vertical-mode 1)
-
 ;; (fido-vertical-mode 1)
 
 (straight-use-package 'company)
@@ -742,17 +766,6 @@ PROCESS is the process object for the current connection."
 (add-hook 'prog-mode-hook #'idle-highlight)
 
 ;;; Projectile - various git project narrowed functions
-
-(straight-use-package 'projectile)
-(projectile-mode 1)
-(keymap-global-set "C-c p" #'projectile-command-map)
-(keymap-global-set "C-c C-p" #'projectile-command-map)
-(keymap-set projectile-command-map "C-p" #'projectile-switch-project)
-
-(straight-use-package 'projectile-ripgrep)
-(grep-apply-setting
- 'grep-find-command
- '("rg -n -H --no-heading -e '' $(git rev-parse --show-toplevel || pwd)" . 27))
 
 ;;; Useful knowledge, might deserve some extra binds
 
