@@ -927,6 +927,7 @@ PROCESS is the process object for the current connection."
 (straight-use-package 'flycheck-eldev)
 (setq flycheck-indication-mode 'right-fringe)
 (setq flycheck-checker-error-threshold nil)
+(setq flycheck-idle-change-delay 10.0)
 (add-hook 'prog-mode-hook #'flycheck-mode)
 
 ;;; Flymake
