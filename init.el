@@ -299,6 +299,8 @@ frames with exactly two windows."
 ;; I think this is bad for my impulsive fingers
 (setq enable-recursive-minibuffers t)
 (minibuffer-depth-indicate-mode t)
+;; it shouldn't be disallowed
+(setq minibuffer-scroll-window t)
 
 ;; some completion configuration
 (setq completion-ignore-case t)
@@ -419,6 +421,8 @@ frames with exactly two windows."
 (straight-use-package 'consult-lsp)
 (require 'lsp-ui)
 (require 'consult-lsp)
+
+(setq lsp-ui-sideline-delay 2.0)
 
 ;; turn off idle highlight, let lsp do it...maybe
 (add-hook 'lsp-managed-mode-hook
