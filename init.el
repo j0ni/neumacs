@@ -529,8 +529,17 @@ PROCESS is the process object for the current connection."
 (straight-use-package 'erc)
 (require 'erc)
 (require 'erc-sasl)
+(require 'erc-imenu)
 (require 'bandali-erc)
 
+(setq erc-format-query-as-channel-p t)
+(setq erc-current-nick-highlight-type 'nick)
+(setq erc-keywords '())
+(setq erc-track-exclude-types '("JOIN" "PART" "QUIT" "NICK" "MODE"))
+(setq erc-track-use-faces t)
+(setq erc-track-faces-priority-list
+      '(erc-current-nick-face erc-keyword-face))
+(setq erc-track-priority-faces-only 'all)
 (setq erc-email-userid "j0ni@tynan-erc/irc.libera.chat")
 
 (defun j0ni/connect-srht-bouncer ()
