@@ -345,10 +345,31 @@ frames with exactly two windows."
 (setq xref-show-xrefs-function 'xref--show-xref-buffer) ; default
 (setq xref-show-definitions-function 'xref-show-definitions-completing-read)
 
+;;; Flymake
+
+;; (require 'flymake)
+;; (setq flymake-fringe-indicator-position 'right-fringe)
+;; (setq flymake-no-changes-timeout nil)
+;; (setq flymake-start-on-flymake-mode nil)
+;; (setq flymake-start-on-save-buffer nil)
+;; (add-hook 'prog-mode-hook #'flymake-mode-on)
+
+;;; Flycheck - I tried to use flymake, but it is limited
+(straight-use-package 'flycheck)
+(straight-use-package 'flycheck-eldev)
+(setq flycheck-indication-mode 'right-fringe)
+(setq flycheck-checker-error-threshold nil)
+(setq flycheck-idle-change-delay 10.0)
+(setq flycheck-display-errors-delay 10.0)
+(setq flycheck-idle-buffer-switch-delay 10.0)
+(add-hook 'prog-mode-hook #'flycheck-mode)
+
 ;;; Consult - handy featureful commands, sometimes too noisy
 
+(straight-use-package 'consult-flycheck)
 (straight-use-package 'consult)
 (require 'consult)
+(require 'consult-flycheck)
 
 (consult-customize
  consult-ripgrep consult-git-grep consult-grep consult-theme consult-buffer
@@ -360,9 +381,6 @@ frames with exactly two windows."
 
 ;; default value
 (setq consult-async-min-input 3)
-
-(straight-use-package 'consult-flycheck)
-(require 'consult-flycheck)
 
 ;; search map
 (dolist (binding '(;; search map
@@ -421,6 +439,7 @@ frames with exactly two windows."
 ;;; LSP
 
 (straight-use-package 'lsp-mode)
+(setq lsp-keymap-prefix "C-c l")
 (require 'lsp-mode)
 
 (straight-use-package 'lsp-ui)
@@ -432,6 +451,10 @@ frames with exactly two windows."
 
 (add-hook 'lsp-managed-mode-hook
           (lambda ()
+            (setq-local flycheck-checker-error-threshold nil)
+            (setq-local flycheck-idle-change-delay 10.0)
+            (setq-local flycheck-display-errors-delay 10.0)
+            (setq-local flycheck-idle-buffer-switch-delay 10.0)
             ;; turn off idle highlight, let lsp do it...maybe
             (setq-local idle-highlight-timer nil)
             ;; default is t
@@ -442,6 +465,8 @@ frames with exactly two windows."
             (setq-local lsp-enable-on-type-formatting t)
             ;; default is t
             (setq-local lsp-before-save-edits t)
+            ;; default is t
+            (setq-local lsp-completion-enable t)
             ;; default is t
             (setq-local lsp-enable-symbol-highlighting t)))
 
@@ -682,8 +707,6 @@ PROCESS is the process object for the current connection."
       '((buffer (styles . (basic substring partial-completion)))
         (file (styles (initials partial-completion flex)))
         (unicode-name (styles . (basic substring)))
-        ;; A new style that combines substring and pcm might be better,
-        ;; e.g. one that does not anchor to bos.
         (project-file (styles . (substring partial-completion)))
         (xref-location (styles . (substring)))
         (info-menu (styles . (basic substring)))
@@ -934,24 +957,6 @@ PROCESS is the process object for the current connection."
 
 (straight-use-package 'eros)
 (eros-mode 1)
-
-;;; Flycheck - I tried to use flymake, but it is limited
-
-(straight-use-package 'flycheck)
-(straight-use-package 'flycheck-eldev)
-(setq flycheck-indication-mode 'right-fringe)
-(setq flycheck-checker-error-threshold nil)
-(setq flycheck-idle-change-delay 10.0)
-(add-hook 'prog-mode-hook #'flycheck-mode)
-
-;;; Flymake
-
-;; (require 'flymake)
-;; (setq flymake-fringe-indicator-position 'right-fringe)
-;; (setq flymake-no-changes-timeout nil)
-;; (setq flymake-start-on-flymake-mode nil)
-;; (setq flymake-start-on-save-buffer nil)
-;; (add-hook 'prog-mode-hook #'flymake-mode-on)
 
 ;;; Rust
 
