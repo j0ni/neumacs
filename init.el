@@ -649,33 +649,6 @@ PROCESS is the process object for the current connection."
 
 ;;; Completion
 
-(straight-use-package 'mct)
-(require 'mct)
-(setq mct-remove-shadowed-file-names t)
-(setq mct-live-completion t)
-(setq mct-minimum-input 3)
-(setq mct-live-update-delay 0.1)
-(setq mct-completion-passlist '(
-                                ;; projectile-switch-project
-                                ;; projectile-find-file
-                                ;; projectile-find-file-dwim
-                                ;; projectile-switch-to-buffer
-                                project-find-file
-                                project-switch-to-buffer
-                                project-switch-project
-                                project-prompt-project-dir
-                                project-or-external-find-file
-                                project-find-file-in
-                                find-file
-                                consult-buffer
-                                consult-line
-                                consult-xref
-                                consult-imenu
-                                consult-flymake
-                                consult-flycheck
-                                consult-org-heading
-                                consult-ripgrep))
-
 (straight-use-package 'yasnippet)
 (setq yas-snippet-dirs (concat user-emacs-directory "snippets"))
 
@@ -718,12 +691,39 @@ PROCESS is the process object for the current connection."
 
 ;;; MCT
 
+(straight-use-package 'mct)
+(require 'mct)
+(setq mct-remove-shadowed-file-names t)
+(setq mct-live-completion t)
+(setq mct-minimum-input 3)
+(setq mct-live-update-delay 0.1)
+(setq mct-completion-passlist '(
+                                ;; projectile-switch-project
+                                ;; projectile-find-file
+                                ;; projectile-find-file-dwim
+                                ;; projectile-switch-to-buffer
+                                project-find-file
+                                project-switch-to-buffer
+                                project-switch-project
+                                project-prompt-project-dir
+                                project-or-external-find-file
+                                project-find-file-in
+                                find-file
+                                consult-buffer
+                                consult-line
+                                consult-xref
+                                consult-imenu
+                                consult-flymake
+                                consult-flycheck
+                                consult-org-heading
+                                consult-ripgrep))
+
 (keymap-set mct-minibuffer-local-completion-map "C-j" #'mct-complete-and-exit)
 (keymap-set mct-minibuffer-completion-list-map "C-j" #'mct-complete-and-exit)
 (keymap-set mct-minibuffer-local-filename-completion-map "C-j" #'mct-complete-and-exit)
 
 (mct-minibuffer-mode 1)
-(mct-region-global-mode 1)
+(mct-region-mode 1)
 
 ;; (require 'icomplete)
 
