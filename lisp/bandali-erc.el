@@ -53,7 +53,7 @@
   (when (display-graphic-p)
     (add-to-list 'erc-modules 'notifications)
     (add-to-list 'erc-modules 'smiley))
-  (add-to-list 'erc-modules 'spelling)
+  ;; (add-to-list 'erc-modules 'spelling)
   (declare-function erc-update-modules "erc")
   (erc-update-modules)
 
@@ -104,7 +104,7 @@
   (with-eval-after-load 'erc-match
     (set-face-attribute
      'erc-timestamp-face nil
-     :foreground "#aaaaaa"
+     :foreground "#aaeeaa"
      :weight 'unspecified
      :background 'unspecified))
 

@@ -705,7 +705,7 @@ PROCESS is the process object for the current connection."
 
 (setq completion-category-overrides
       '((buffer (styles . (basic substring partial-completion)))
-        (file (styles (initials partial-completion flex)))
+        (file (styles . (initials partial-completion flex)))
         (unicode-name (styles . (basic substring)))
         (project-file (styles . (substring partial-completion)))
         (xref-location (styles . (substring)))
@@ -818,13 +818,13 @@ PROCESS is the process object for the current connection."
 
 (straight-use-package 'geiser-chicken)
 (straight-use-package 'geiser-guile)
-(straight-use-package 'geiser-racket)
+;; (straight-use-package 'geiser-racket)
 (straight-use-package 'geiser-chez)
 
 ;;; The other Scheme
 (straight-use-package 'racket-mode)
 (add-hook 'racket-mode-hook #'paredit-mode)
-(add-hook 'racket-mode-hook #'geiser-mode)
+;; (add-hook 'racket-mode-hook #'geiser-mode)
 
 ;;; Some guidance please
 (straight-use-package 'which-key)

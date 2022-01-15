@@ -34,6 +34,6 @@
 (fset 'j0ni/unicode-shortcut-map j0ni/unicode-shortcut-map)
 
 ;; This isn't available in Org-mode - find a better one
-(global-set-key (kbd "C-'") 'j0ni/unicode-shortcut-map)
+(keymap-global-set "C-'" 'j0ni/unicode-shortcut-map)
 
 (provide 'keys)
