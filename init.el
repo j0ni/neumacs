@@ -396,7 +396,7 @@ frames with exactly two windows."
                    ;; ("M-s u" . consult-focus-lines)
                    ;; goto map
                    ;; ("M-g e" . consult-compile-error)
-                   ;; ("M-g f" . consult-flycheck)
+                   ("M-g f" . consult-flycheck)
                    ;; ("M-g g" . consult-goto-line)
                    ;; ("M-g M-g" . consult-goto-line)
                    ("M-g o" . consult-org-heading)
@@ -412,7 +412,7 @@ frames with exactly two windows."
                    ;; ("C-c k" . consult-kmacro)
                    ;; C-x bindings (ctl-x-map)
                    ;; ("C-x M-:" . consult-complex-command)
-                   ;; ("C-x B" . consult-buffer)
+                   ("C-x b" . consult-buffer)
                    ;; ("C-x 4 b" . consult-buffer-other-window)
                    ;; ("C-x 5 b" . consult-buffer-other-frame)
                    ;; no idea what registers are for, I will read about it :P
@@ -712,62 +712,15 @@ PROCESS is the process object for the current connection."
         (info-menu (styles . (basic substring)))
         (symbol-help (styles . (basic shorthand substring)))))
 
-;;; MCT
+(straight-use-package 'vertico)
+(vertico-mode 1)
 
-(straight-use-package 'mct)
-(require 'mct)
-(setq mct-remove-shadowed-file-names t)
-(setq mct-live-completion t)
-(setq mct-minimum-input 3)
-(setq mct-live-update-delay 0.1)
-(setq mct-completion-passlist '(
-                                ;; projectile-switch-project
-                                ;; projectile-find-file
-                                ;; projectile-find-file-dwim
-                                ;; projectile-switch-to-buffer
-                                project-find-file
-                                project-switch-to-buffer
-                                project-switch-project
-                                project-prompt-project-dir
-                                project-or-external-find-file
-                                project-find-file-in
-                                find-file
-                                consult-buffer
-                                consult-line
-                                consult-xref
-                                consult-imenu
-                                consult-flymake
-                                consult-flycheck
-                                consult-org-heading
-                                consult-ripgrep))
-
-(keymap-set mct-minibuffer-local-completion-map "C-j" #'mct-complete-and-exit)
-(keymap-set mct-minibuffer-completion-list-map "C-j" #'mct-complete-and-exit)
-(keymap-set mct-minibuffer-local-filename-completion-map "C-j" #'mct-complete-and-exit)
-
-(mct-minibuffer-mode 1)
-(mct-region-mode 1)
-
-;; (require 'icomplete)
-
-;; (defun j0ni/icomplete-minibuffer-setup ()
-;;   (let ((map icomplete-minibuffer-map))
-;;     ;; (keymap-set map "SPC" nil)
-;;     (keymap-set map "?" nil)
-;;     (keymap-set map "TAB" #'icomplete-force-complete)
-;;     (keymap-set map "RET" #'icomplete-force-complete-and-exit))
-;;   (setq-local icomplete-tidy-shadowed-file-names t)
-;;   (setq-local icomplete-show-matches-on-no-input t)
-;;   (setq-local icomplete-scroll t))
-
-;; (add-hook 'icomplete-minibuffer-setup-hook #'j0ni/icomplete-minibuffer-setup)
-
-;; (icomplete-vertical-mode 1)
-;; (fido-vertical-mode 1)
+(straight-use-package 'marginalia)
+(marginalia-mode 1)
 
 (straight-use-package 'company)
 (require 'company)
-;; (global-company-mode 1)
+(global-company-mode 1)
 
 ;;; Kill ring
 
