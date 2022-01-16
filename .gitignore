@@ -30,3 +30,4 @@
 /session.*
 /smex-items
 /.org-id-locations
+/racket-mode
