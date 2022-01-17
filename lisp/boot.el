@@ -13,6 +13,7 @@
 (setq straight-use-package-by-default t)
 (setq straight-fix-flycheck t)
 (setq straight-fix-org t)
+(setq straight-recipe-overrides nil)
 
 (defvar bootstrap-version)
 (let ((bootstrap-file

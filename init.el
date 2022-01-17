@@ -362,6 +362,8 @@ frames with exactly two windows."
 (setq flycheck-idle-change-delay 10.0)
 (setq flycheck-display-errors-delay 10.0)
 (setq flycheck-idle-buffer-switch-delay 10.0)
+(setq-default flycheck-emacs-lisp-load-path 'inherit)
+(setq flycheck-disabled-checkers '(emacs-lisp-checkdoc))
 (add-hook 'prog-mode-hook #'flycheck-mode)
 
 ;;; Consult - handy featureful commands, sometimes too noisy
@@ -712,15 +714,34 @@ PROCESS is the process object for the current connection."
         (info-menu (styles . (basic substring)))
         (symbol-help (styles . (basic shorthand substring)))))
 
+;; (setq straight-recipe-overrides nil)
+(straight-override-recipe '(vertico :inherit t :files (:defaults "extensions/*.el")))
 (straight-use-package 'vertico)
 (vertico-mode 1)
+;; this
+;; (vertico-unobtrusive-mode 1)
+;; or this
+(vertico-buffer-mode 1)
+;; but not both
+
+(keymap-set vertico-map "RET" #'vertico-directory-enter)
+(keymap-set vertico-map "DEL" #'vertico-directory-delete-char)
+(keymap-set vertico-map "M-DEL" #'vertico-directory-delete-word)
+(add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+
+(setq completion-in-region-function
+      (lambda (&rest args)
+        (apply (if vertico-mode
+                   #'consult-completion-in-region
+                 #'completion--in-region)
+               args)))
 
 (straight-use-package 'marginalia)
 (marginalia-mode 1)
 
 (straight-use-package 'company)
 (require 'company)
-(global-company-mode 1)
+;; (global-company-mode 1)
 
 ;;; Kill ring
 
