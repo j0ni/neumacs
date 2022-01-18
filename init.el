@@ -28,5 +28,7 @@
   (straight-use-package 'org-contrib)
   (require 'org)
   ;; tangle the rest of the configuration
-  (org-babel-load-file (expand-file-name "notwithstanding.org" user-emacs-directory))
-  (garbage-collect))
+  (let ((init-source-file (expand-file-name "notwithstanding.org" user-emacs-directory)))
+    (org-babel-load-file init-source-file)
+    (org-publish "notwithstanding")
+    (garbage-collect)))

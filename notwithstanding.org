@@ -1458,6 +1458,16 @@ Org was installed and required before tangling this file, but I believe we can s
 (require 'org-habit)
 #+end_src
 
+**** Org publish configuration
+
+#+begin_src emacs-lisp
+(setq org-publish-project-alist
+      `(("notwithstanding"
+         :base-directory ,user-emacs-directory
+         :publishing-directory ,user-emacs-directory
+         :publishing-function org-md-publish-to-md)))
+#+end_src
+
 **** Super Agenda \o/
 
 #+begin_src emacs-lisp

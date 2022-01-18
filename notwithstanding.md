@@ -1,78 +1,78 @@
 
 # Table of Contents
 
-1.  [Notwithstanding](#org82127e3)
-    1.  [Pre-amble](#org79041cd)
-    2.  [Initiate basic prep](#orgac3ada8)
-    3.  [Install packages](#orge7d7c62)
-    4.  [Baseline Emacs Configuration](#org6d2da6b)
-    5.  [Completion](#orgfc46ad9)
-        1.  [Minibuffer setup](#org70321d8)
-        2.  [Builtin completion configuration](#org14966b7)
-        3.  [Extra builtins](#org234fe3d)
-        4.  [yas-snippets](#orgbb09629)
-        5.  [Vertico](#org2b0d6bb)
-        6.  [Marginalia](#org0937f87)
-    6.  [Package Configuration](#org025357f)
-        1.  [ibuffer](#orgeea44ee)
-        2.  [Key chords](#org3148a88)
-        3.  [Flymake](#org6a45575)
-        4.  [Flycheck](#orgcaad722)
-        5.  [Consult](#org67c0e55)
-        6.  [LSP](#orgbbc9470)
-        7.  [Find File in Project](#org5abc968)
-        8.  [IRC - ERC and RCIRC](#org2ffccf6)
-        9.  [Undo-fu](#org56492bf)
-        10. [exec-path-from-shell](#orge7ab352)
-        11. [Highlight TODO Mode](#orge5f05e9)
-        12. [Volatile Highlights](#org3b3c764)
-        13. [Themes!](#orgfb3ff55)
-        14. [Rainbow Mode](#org9e15d92)
-        15. [Rainbow Delimiters Mode](#org1c5173a)
-        16. [Diff Highlight Mode](#orgaa07e22)
-        17. [Git Time Machine](#orgfd4dc12)
-        18. [Expand Region](#orgaf2fc24)
-        19. [Anzu](#org0f2f327)
-        20. [Browse Kill Ring](#org03ecfa3)
-        21. [Magit](#org3375f57)
-        22. [Idle highlight mode](#orgab29c17)
-        23. [Paredit](#org769a200)
-        24. [Scheme](#orgc327c0e)
-        25. [Which Key](#org383eb48)
-        26. [Window Switcher](#org2244cdc)
-        27. [Web mode and webbish stuff](#orgb134875)
-        28. [Common Lisp - Sly](#org30c4f09)
-        29. [Clojure](#orgb3cb83d)
-        30. [Lua and Fennel](#org39e8f06)
-        31. [Ruby](#org558c8b7)
-        32. [C/C++](#orgfd8a518)
-        33. [Markdown](#org79cab8d)
-        34. [Purescript](#org96390d5)
-        35. [Typescript](#org95dcf12)
-        36. [Evaluation overlays](#org2f7330e)
-        37. [Rust](#orgbcbf850)
-        38. [Org Mode](#orgb2b989f)
-        39. [ELFeed - RSS Reader](#org877e30d)
-        40. [Telega](#orga901831)
-        41. [Minions](#org4000f12)
-        42. [Icons](#org52a114d)
-        43. [Haskell](#org1a9edc1)
-        44. [Olivetti Mode](#orga08194b)
-        45. [Move Text](#orgd479f05)
-        46. [Set all the fonts one last time](#orgd598ef5)
-        47. [Mu 4 Emacs](#org5595e13)
-        48. [Crypto setup](#orgfbc5bbd)
-        49. [Custom file configuration](#org373398d)
+1.  [Notwithstanding](#orgcf5bdc2)
+    1.  [Pre-amble](#orgc283eec)
+    2.  [Initiate basic prep](#org8a725c5)
+    3.  [Install packages](#org6528bc7)
+    4.  [Baseline Emacs Configuration](#org581e40e)
+    5.  [Completion](#org788e575)
+        1.  [Minibuffer setup](#orgdb7250b)
+        2.  [Builtin completion configuration](#org42546b4)
+        3.  [Extra builtins](#org61d5d39)
+        4.  [yas-snippets](#org3740ed3)
+        5.  [Vertico](#orgff849f2)
+        6.  [Marginalia](#org79279a5)
+    6.  [Package Configuration](#org691a681)
+        1.  [ibuffer](#org57fdc3f)
+        2.  [Key chords](#org7e838f9)
+        3.  [Flymake](#orgeaeffb0)
+        4.  [Flycheck](#org67e6a88)
+        5.  [Consult](#org651a463)
+        6.  [LSP](#orgecd2bad)
+        7.  [Find File in Project](#orgc4e324f)
+        8.  [IRC - ERC and RCIRC](#orga0aefc3)
+        9.  [Undo-fu](#org08fede6)
+        10. [exec-path-from-shell](#org4417fbe)
+        11. [Highlight TODO Mode](#org65d2890)
+        12. [Volatile Highlights](#org0be92ef)
+        13. [Themes!](#orgff044aa)
+        14. [Rainbow Mode](#orgcd40cdf)
+        15. [Rainbow Delimiters Mode](#org7af2676)
+        16. [Diff Highlight Mode](#org563ab4f)
+        17. [Git Time Machine](#org27f469e)
+        18. [Expand Region](#orgb181a98)
+        19. [Anzu](#orgc9c9e56)
+        20. [Browse Kill Ring](#orgd36d6f8)
+        21. [Magit](#orge2464d0)
+        22. [Idle highlight mode](#orgd956636)
+        23. [Paredit](#orga9e9753)
+        24. [Scheme](#org9727a5d)
+        25. [Which Key](#org911dc70)
+        26. [Window Switcher](#org30fc608)
+        27. [Web mode and webbish stuff](#orgd5dbd7c)
+        28. [Common Lisp - Sly](#orgdfe11d9)
+        29. [Clojure](#org9dc2752)
+        30. [Lua and Fennel](#org6d413d0)
+        31. [Ruby](#org128ae96)
+        32. [C/C++](#org9a67f01)
+        33. [Markdown](#org287bec0)
+        34. [Purescript](#orgf73efcc)
+        35. [Typescript](#org1207ece)
+        36. [Evaluation overlays](#org8f04766)
+        37. [Rust](#org438a553)
+        38. [Org Mode](#orgc41f1fe)
+        39. [ELFeed - RSS Reader](#org070b716)
+        40. [Telega](#orgf3ad7fe)
+        41. [Minions](#org1ed1c36)
+        42. [Icons](#org585b542)
+        43. [Haskell](#orge23d95a)
+        44. [Olivetti Mode](#orge57d0a7)
+        45. [Move Text](#orgd40b02f)
+        46. [Set all the fonts one last time](#org9071105)
+        47. [Mu 4 Emacs](#orge0f3941)
+        48. [Crypto setup](#org3b6a0c5)
+        49. [Custom file configuration](#orgd9d6e1f)
 
 
-<a id="org82127e3"></a>
+<a id="orgcf5bdc2"></a>
 
 # Notwithstanding
 
 my intent to write a literate configuration for my emacs, in all likelihood this will end up being a half-baked solution to a non-problem I don't have. Anyway, let's get to it. I believe there should be a pre-amble.
 
 
-<a id="org79041cd"></a>
+<a id="orgc283eec"></a>
 
 ## Pre-amble
 
@@ -85,7 +85,7 @@ my intent to write a literate configuration for my emacs, in all likelihood this
     ;;; Code:
 
 
-<a id="orgac3ada8"></a>
+<a id="org8a725c5"></a>
 
 ## Initiate basic prep
 
@@ -147,7 +147,7 @@ This is a useful gate for setting up bindings and other Mac OS bits and pieces.
       "This is a useful gate for setting up specific keybindings")
 
 
-<a id="orge7d7c62"></a>
+<a id="org6528bc7"></a>
 
 ## Install packages
 
@@ -241,7 +241,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
     (straight-use-package 'yasnippet)
 
 
-<a id="org6d2da6b"></a>
+<a id="org581e40e"></a>
 
 ## Baseline Emacs Configuration
 
@@ -563,14 +563,14 @@ This, like pixel scrolling, is something I didn't know I was missing.
 Thats the end of the baseline emacs configuration.
 
 
-<a id="orgfc46ad9"></a>
+<a id="org788e575"></a>
 
 ## Completion
 
 This gets a special section for having so much to configure.
 
 
-<a id="org70321d8"></a>
+<a id="orgdb7250b"></a>
 
 ### Minibuffer setup
 
@@ -594,7 +594,7 @@ This gets a special section for having so much to configure.
     (file-name-shadow-mode 1)
 
 
-<a id="org14966b7"></a>
+<a id="org42546b4"></a>
 
 ### Builtin completion configuration
 
@@ -625,7 +625,7 @@ Of course, fido-mode completely ignores these settings.
             (symbol-help (styles . (basic shorthand substring)))))
 
 
-<a id="org234fe3d"></a>
+<a id="org61d5d39"></a>
 
 ### Extra builtins
 
@@ -656,14 +656,14 @@ Of course, fido-mode completely ignores these settings.
         (setq-default abbrev-mode t)
 
 
-<a id="orgbb09629"></a>
+<a id="org3740ed3"></a>
 
 ### yas-snippets
 
     (setq yas-snippet-dirs (concat user-emacs-directory "snippets"))
 
 
-<a id="org2b0d6bb"></a>
+<a id="orgff849f2"></a>
 
 ### Vertico
 
@@ -697,7 +697,7 @@ instead of this:
     ;; (global-company-mode 1)
 
 
-<a id="org0937f87"></a>
+<a id="org79279a5"></a>
 
 ### Marginalia
 
@@ -706,12 +706,12 @@ Marginalia adds a bunch of metadata annotations to completions, which are portab
     (marginalia-mode 1)
 
 
-<a id="org025357f"></a>
+<a id="org691a681"></a>
 
 ## Package Configuration
 
 
-<a id="orgeea44ee"></a>
+<a id="org57fdc3f"></a>
 
 ### ibuffer
 
@@ -761,7 +761,7 @@ OK I lied a bit. ibuffer is built-in, but ibuffer-vc is not, and I wanted to kee
     (add-hook 'ibuffer-hook #'j0ni/ibuffer-vc-hook)
 
 
-<a id="org3148a88"></a>
+<a id="org7e838f9"></a>
 
 ### Key chords
 
@@ -774,7 +774,7 @@ OK I lied a bit. ibuffer is built-in, but ibuffer-vc is not, and I wanted to kee
       (key-chord-define prog-mode-map "[]" #'display-line-numbers-mode))
 
 
-<a id="org6a45575"></a>
+<a id="orgeaeffb0"></a>
 
 ### Flymake
 
@@ -788,7 +788,7 @@ OK I lied a bit. ibuffer is built-in, but ibuffer-vc is not, and I wanted to kee
     ;; (add-hook 'prog-mode-hook #'flymake-mode-on)
 
 
-<a id="orgcaad722"></a>
+<a id="org67e6a88"></a>
 
 ### Flycheck
 
@@ -804,7 +804,7 @@ OK I lied a bit. ibuffer is built-in, but ibuffer-vc is not, and I wanted to kee
     (require 'consult-flycheck)
 
 
-<a id="org67c0e55"></a>
+<a id="org651a463"></a>
 
 ### Consult
 
@@ -878,7 +878,7 @@ Consult - handy featureful commands, sometimes too noisy
     (setq consult-narrow-key "<")
 
 
-<a id="orgbbc9470"></a>
+<a id="orgecd2bad"></a>
 
 ### LSP
 
@@ -915,7 +915,7 @@ Language Server Protocol, a Microsoft invention, is providing a common interface
                 (setq-local lsp-enable-symbol-highlighting t)))
 
 
-<a id="org5abc968"></a>
+<a id="orgc4e324f"></a>
 
 ### Find File in Project
 
@@ -926,7 +926,7 @@ ffip setup
     (keymap-global-set "C-c f" #'find-file-in-project-by-selected)
 
 
-<a id="org2ffccf6"></a>
+<a id="orga0aefc3"></a>
 
 ### IRC - ERC and RCIRC
 
@@ -1002,7 +1002,7 @@ ffip setup
            :password j0ni/srht-sasl-pass))
 
 
-<a id="org56492bf"></a>
+<a id="org08fede6"></a>
 
 ### Undo-fu
 
@@ -1022,7 +1022,7 @@ undo-fu, ripped from doom
     (global-undo-fu-session-mode 1)
 
 
-<a id="orge7ab352"></a>
+<a id="org4417fbe"></a>
 
 ### exec-path-from-shell
 
@@ -1036,21 +1036,21 @@ This is a bit clumsy, but it works
       (setq j0ni/exec-path-from-shell-completed t))
 
 
-<a id="orge5f05e9"></a>
+<a id="org65d2890"></a>
 
 ### Highlight TODO Mode
 
     (global-hl-todo-mode 1)
 
 
-<a id="org3b3c764"></a>
+<a id="org0be92ef"></a>
 
 ### Volatile Highlights
 
     (volatile-highlights-mode 1)
 
 
-<a id="orgfb3ff55"></a>
+<a id="orgff044aa"></a>
 
 ### Themes!
 
@@ -1084,7 +1084,7 @@ This is a bit clumsy, but it works
         (load-theme 'the-matrix t)
 
 
-<a id="org9e15d92"></a>
+<a id="orgcd40cdf"></a>
 
 ### Rainbow Mode
 
@@ -1093,7 +1093,7 @@ This is for turning the background of all the color strings (e.g. "#ff3700") int
     (keymap-global-set "C-c r" #'rainbow-mode)
 
 
-<a id="org1c5173a"></a>
+<a id="org7af2676"></a>
 
 ### Rainbow Delimiters Mode
 
@@ -1102,7 +1102,7 @@ This on the other hand is super useful inside of any lisp code - most of the tim
     (add-hook 'paredit-mode-hook #'rainbow-delimiters-mode)
 
 
-<a id="orgaa07e22"></a>
+<a id="org563ab4f"></a>
 
 ### Diff Highlight Mode
 
@@ -1111,7 +1111,7 @@ This provides better functionality than the various git gutters, and also makes 
     (global-diff-hl-mode 1)
 
 
-<a id="orgfd4dc12"></a>
+<a id="org27f469e"></a>
 
 ### Git Time Machine
 
@@ -1120,7 +1120,7 @@ This can be useful, but not often enough to have a binding.
     (require 'git-timemachine)
 
 
-<a id="orgaf2fc24"></a>
+<a id="orgb181a98"></a>
 
 ### Expand Region
 
@@ -1129,7 +1129,7 @@ Super simple alternative to text objects, that vim users go on about.
     (keymap-global-set "C-x C-x" #'er/expand-region)
 
 
-<a id="org0f2f327"></a>
+<a id="orgc9c9e56"></a>
 
 ### Anzu
 
@@ -1138,14 +1138,14 @@ For counting isearch results - mode-line highlighter.
     (global-anzu-mode 1)
 
 
-<a id="org03ecfa3"></a>
+<a id="orgd36d6f8"></a>
 
 ### Browse Kill Ring
 
     (browse-kill-ring-default-keybindings)
 
 
-<a id="org3375f57"></a>
+<a id="orge2464d0"></a>
 
 ### Magit
 
@@ -1163,14 +1163,14 @@ Diff Highlight Mode loaded when the global mode is enabled above. Magit hopefull
         (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)))
 
 
-<a id="orgab29c17"></a>
+<a id="orgd956636"></a>
 
 ### Idle highlight mode
 
     (add-hook 'prog-mode-hook #'idle-highlight)
 
 
-<a id="org769a200"></a>
+<a id="orga9e9753"></a>
 
 ### Paredit
 
@@ -1198,7 +1198,7 @@ Because it may be ass code but it is the best at what it does.
 Other modes are hooked in their own configurations.
 
 
-<a id="orgc327c0e"></a>
+<a id="org9727a5d"></a>
 
 ### Scheme
 
@@ -1219,7 +1219,7 @@ Other modes are hooked in their own configurations.
         (add-hook 'racket-mode-hook #'paredit-mode)
 
 
-<a id="org383eb48"></a>
+<a id="org911dc70"></a>
 
 ### Which Key
 
@@ -1228,7 +1228,7 @@ Pop up a minibuffer help window thingy with key binds in it after pausing for a 
     (which-key-mode 1)
 
 
-<a id="org2244cdc"></a>
+<a id="org30fc608"></a>
 
 ### Window Switcher
 
@@ -1244,7 +1244,7 @@ Like avy, but a bit smaller? Or something.
     (keymap-global-set "C-x o" #'switch-window)
 
 
-<a id="orgb134875"></a>
+<a id="orgd5dbd7c"></a>
 
 ### Web mode and webbish stuff
 
@@ -1269,7 +1269,7 @@ Some of the shit we just have to have, unsightly though it may be.
     (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
 
 
-<a id="org30c4f09"></a>
+<a id="orgdfe11d9"></a>
 
 ### Common Lisp - Sly
 
@@ -1279,7 +1279,7 @@ For common lisp, this is most likely the successor to slime.
     (setq inferior-lisp-program "sbcl")
 
 
-<a id="orgb3cb83d"></a>
+<a id="org9dc2752"></a>
 
 ### Clojure
 
@@ -1328,7 +1328,7 @@ Start off with cider for now.
       (add-hook hook #'lsp))
 
 
-<a id="org39e8f06"></a>
+<a id="org6d413d0"></a>
 
 ### Lua and Fennel
 
@@ -1338,7 +1338,7 @@ Start off with cider for now.
     (add-hook 'fennel-mode-hook #'paredit-mode)
 
 
-<a id="org558c8b7"></a>
+<a id="org128ae96"></a>
 
 ### Ruby
 
@@ -1348,7 +1348,7 @@ Start off with cider for now.
     (add-hook 'ruby-mode-hook #'rbenv-use-corresponding)
 
 
-<a id="orgfd8a518"></a>
+<a id="org9a67f01"></a>
 
 ### C/C++
 
@@ -1373,14 +1373,14 @@ I spent a lot more time on this than I ever spent writing C or C++.
     (keymap-set ggtags-mode-map "M-," 'pop-tag-mark)
 
 
-<a id="org79cab8d"></a>
+<a id="org287bec0"></a>
 
 ### Markdown
 
     (add-hook 'markdown-mode-hook #'visual-line-mode)
 
 
-<a id="org96390d5"></a>
+<a id="orgf73efcc"></a>
 
 ### Purescript
 
@@ -1388,14 +1388,14 @@ I spent a lot more time on this than I ever spent writing C or C++.
     (add-hook 'purescript-mode-hook #'psc-ide-mode)
 
 
-<a id="org95dcf12"></a>
+<a id="org1207ece"></a>
 
 ### Typescript
 
     (add-hook 'typescript-mode-hook #'lsp)
 
 
-<a id="org2f7330e"></a>
+<a id="org8f04766"></a>
 
 ### Evaluation overlays
 
@@ -1404,7 +1404,7 @@ This renders eval results in-buffer at the end of the eval'd expression. Honestl
     (eros-mode 1)
 
 
-<a id="orgbcbf850"></a>
+<a id="org438a553"></a>
 
 ### Rust
 
@@ -1422,7 +1422,7 @@ I am loving this language more and more.
     (rustic-flycheck-setup)
 
 
-<a id="orgb2b989f"></a>
+<a id="orgc41f1fe"></a>
 
 ### Org Mode
 
@@ -1523,12 +1523,20 @@ Org was installed and required before tangling this file, but I believe we can s
 
     (require 'org-habit)
 
-1.  Super Agenda \o/
+1.  Org publish configuration
+
+        (setq org-publish-project-alist
+              `(("notwithstanding"
+                 :base-directory ,user-emacs-directory
+                 :publishing-directory ,user-emacs-directory
+                 :publishing-function org-md-publish-to-md)))
+
+2.  Super Agenda \o/
 
         (setq org-super-agenda-groups '((:auto-dir-name t)))
         (add-hook 'org-agenda-mode-hook #'org-super-agenda-mode)
 
-2.  Org Roam
+3.  Org Roam
 
         ;; (setq org-roam-v2-ack t)
         (setq org-roam-directory (expand-file-name "org-roam" org-directory))
@@ -1536,7 +1544,7 @@ Org was installed and required before tangling this file, but I believe we can s
         (org-roam-db-autosync-mode 1)
 
 
-<a id="org877e30d"></a>
+<a id="org070b716"></a>
 
 ### ELFeed - RSS Reader
 
@@ -1556,7 +1564,7 @@ Org was installed and required before tangling this file, but I believe we can s
                          "https://taz.de/Schwerpunkt-Klimawandel/!t5008262;rss/"))
 
 
-<a id="orga901831"></a>
+<a id="orgf3ad7fe"></a>
 
 ### Telega
 
@@ -1568,7 +1576,7 @@ Because of course Telegram in Emacs, in Russian.
     (add-hook 'telega-chat-mode-hook #'telega-notifications-mode)
 
 
-<a id="org4000f12"></a>
+<a id="org1ed1c36"></a>
 
 ### Minions
 
@@ -1578,7 +1586,7 @@ Remove the annoying mode list
     (keymap-global-set "C-x C-m" #'minions-minor-modes-menu)
 
 
-<a id="org52a114d"></a>
+<a id="org585b542"></a>
 
 ### Icons
 
@@ -1588,7 +1596,7 @@ Icons for noisy modes, milk for the morning cake.
       '(all-the-icons-install-fonts))
 
 
-<a id="org1a9edc1"></a>
+<a id="orge23d95a"></a>
 
 ### Haskell
 
@@ -1598,7 +1606,7 @@ Icons for noisy modes, milk for the morning cake.
     (add-hook 'haskell-mode-hook #'haskell-doc-mode)
 
 
-<a id="orga08194b"></a>
+<a id="orge57d0a7"></a>
 
 ### Olivetti Mode
 
@@ -1607,7 +1615,7 @@ Declutter the screen - good for big screens, laptop doesn't care.
     (setq olivetti-body-width 120)
 
 
-<a id="orgd479f05"></a>
+<a id="orgd40b02f"></a>
 
 ### Move Text
 
@@ -1617,14 +1625,14 @@ I remember this from Netbeans!
     (keymap-global-set "M-S-<down>" #'move-text-down)
 
 
-<a id="orgd598ef5"></a>
+<a id="org9071105"></a>
 
 ### Set all the fonts one last time
 
     (j0ni/init-frame)
 
 
-<a id="org5595e13"></a>
+<a id="orge0f3941"></a>
 
 ### Mu 4 Emacs
 
@@ -1747,7 +1755,7 @@ Either way, this is flaky as hell and almost always needs tweaking for a new OS.
     (add-hook 'message-mode-hook #'mml-secure-message-sign-pgpmime)
 
 
-<a id="orgfbc5bbd"></a>
+<a id="org3b6a0c5"></a>
 
 ### Crypto setup
 
@@ -1762,7 +1770,7 @@ Either way, this is flaky as hell and almost always needs tweaking for a new OS.
     (pinentry-start t) ;; don't complain if its already running
 
 
-<a id="org373398d"></a>
+<a id="orgd9d6e1f"></a>
 
 ### Custom file configuration
 
