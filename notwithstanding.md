@@ -148,7 +148,9 @@ my intent to write a literate configuration for my emacs, in all likelihood this
 
     (defun j0ni/reload-config ()
       (interactive)
-      (load-file (expand-file-name "init.el" user-emacs-directory)))
+      (load-file (expand-file-name "early-init.el" user-emacs-directory))
+      (load-file (expand-file-name "init.el" user-emacs-directory))
+      (j0ni/init-frame))
 
     ;; Don't know where I found this, but it I didn't write it
     (defun j0ni/toggle-window-split ()

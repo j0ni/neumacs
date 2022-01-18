@@ -67,7 +67,9 @@ If BACKWARD-ONLY is non-nil, only delete them before point."
 
 (defun j0ni/reload-config ()
   (interactive)
-  (load-file (expand-file-name "init.el" user-emacs-directory)))
+  (load-file (expand-file-name "early-init.el" user-emacs-directory))
+  (load-file (expand-file-name "init.el" user-emacs-directory))
+  (j0ni/init-frame))
 
 ;; Don't know where I found this, but it I didn't write it
 (defun j0ni/toggle-window-split ()
