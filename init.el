@@ -13,8 +13,6 @@
 
 ;; (desktop-save-mode 1) ;; eek
 
-(j0ni/init-frame)
-
 ;; like, why be unbound, when this is what I probably meant
 ;; OTOH, how to make this future proof... check if it's bound?
 (when (not (keymap-global-lookup "C-x C-g"))
@@ -22,9 +20,6 @@
   (keymap-global-set "C-x C-g" #'keyboard-quit))
 
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
-
-(require 'wm)
-;; (j0ni/exwm-enable)
 
 (require 'boot)
 (require 'keys)
@@ -636,12 +631,12 @@ PROCESS is the process object for the current connection."
 (modus-themes-load-themes)
 
 ;; (load-theme 'modus-operandi t)
-;; (load-theme 'modus-vivendi t)
+(load-theme 'modus-vivendi t)
 
 ;; (straight-use-package 'matrix-theme)
 (add-to-list 'load-path "~/Scratch/emacs/matrix-emacs-theme")
 (require 'the-matrix-theme)
-(load-theme 'the-matrix t)
+;; (load-theme 'the-matrix t)
 
 (straight-use-package 'rainbow-mode)
 (keymap-global-set "C-c r" #'rainbow-mode)
@@ -1116,6 +1111,9 @@ PROCESS is the process object for the current connection."
 (straight-use-package 'move-text)
 (keymap-global-set "M-S-<up>" #'move-text-up)
 (keymap-global-set "M-S-<down>" #'move-text-down)
+
+;; looks
+(j0ni/init-frame)
 
 ;; mu4e isn't packaged in the usual way, it gets installed as part of the `mu` system package.
 
