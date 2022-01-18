@@ -849,14 +849,42 @@ PROCESS is the process object for the current connection."
 (add-hook 'inf-clojure-mode-hook #'turn-on-eldoc-mode)
 (add-hook 'inf-clojure-mode-hook #'paredit-mode)
 
+;; but lets not load it
+(straight-use-package 'cider)
+
+(defun j0ni/unhook-cider ()
+  "Use this to unfuck clojure buffers when switching live from
+CIDER to inf-clojure."
+  (interactive)
+  (remove-hook 'clojure-mode-hook #'cider-mode)
+  (add-hook 'clojure-mode-hook #'inf-clojure-minor-mode)
+  (seq-doseq (buffer (buffer-list))
+    (with-current-buffer buffer
+      (when (bound-and-true-p cider-mode)
+        (cider-mode -1)
+        (inf-clojure-minor-mode 1)))))
+
+(defun j0ni/unhook-inf-clojure ()
+  "Use this to unfuck clojure buffers when switching live from
+inf-clojure to CIDER."
+  (interactive)
+  (remove-hook 'clojure-mode-hook #'inf-clojure-minor-mode)
+  (add-hook 'clojure-mode-hook #'cider-mode)
+  (seq-doseq (buffer (buffer-list))
+    (with-current-buffer buffer
+      (when (bound-and-true-p inf-clojure-minor-mode)
+        (inf-clojure-minor-mode -1)
+        (cider-mode 1)))))
+
 (straight-use-package 'clojure-mode)
+
 (dolist (hook '(clojure-mode-hook
                 clojurec-mode-hook
                 clojurescript-mode-hook
                 clojurex-mode-hook))
+  (add-hook hook #'inf-clojure-minor-mode)
   (add-hook hook (lambda ()
                    (paredit-mode 1)
-                   (inf-clojure-minor-mode 1)
                    (subword-mode 1)
                    (lsp))))
 
@@ -894,7 +922,6 @@ PROCESS is the process object for the current connection."
               (setq-local hippie-expand-try-functions-list
                           (cons 'ggtags-try-complete-tag hippie-expand-try-functions-list))
               (ggtags-mode 1))))
-
 
 (keymap-set ggtags-mode-map "C-c g s" 'ggtags-find-other-symbol)
 (keymap-set ggtags-mode-map "C-c g h" 'ggtags-view-tag-history)
