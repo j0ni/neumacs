@@ -3,7 +3,12 @@
 
 1.  [Notwithstanding](#orgcf5bdc2)
     1.  [Pre-amble](#orgc283eec)
-    2.  [Initiate basic prep](#org8a725c5)
+    2.  [Some building blocks](#org3c4e4bd)
+        1.  [Useful functions](#org27373cc)
+        2.  [Undo a gotcha](#orge55959c)
+        3.  [A little about the package manager](#orgef22e7a)
+        4.  [Global Keymap Hacks](#org90d0b71)
+        5.  [Global Switches](#org5c29699)
     3.  [Install packages](#org6528bc7)
     4.  [Baseline Emacs Configuration](#org581e40e)
     5.  [Completion](#org788e575)
@@ -85,9 +90,112 @@ my intent to write a literate configuration for my emacs, in all likelihood this
     ;;; Code:
 
 
-<a id="org8a725c5"></a>
+<a id="org3c4e4bd"></a>
 
-## Initiate basic prep
+## Some building blocks
+
+
+<a id="org27373cc"></a>
+
+### Useful functions
+
+    ;; handy fns
+    (defun j0ni/disable-truncate-lines ()
+      (interactive)
+      (setq-local truncate-lines nil))
+    (defun j0ni/enable-truncate-lines ()
+      (interactive)
+      (setq-local truncate-lines t))
+    (defun j0ni/disable-word-wrap ()
+      (interactive)
+      (setq-local word-wrap nil))
+    (defun j0ni/enable-word-wrap ()
+      (interactive)
+      (setq-local word-wrap t))
+
+    ;; Shamelessly lifted from @zarkone's config, and refactored
+    (defun j0ni/delete-whitespace (&optional backward-only)
+      "Replaces all spaces, tabs and newlinesaround point with a single space.
+    If BACKWARD-ONLY is non-nil, only delete them before point."
+      (interactive "*P")
+      (unless backward-only
+        (j0ni/backward-delete-whitespace))
+      (j0ni/forward-delete-whitespace)
+      (unless backward-only (insert " ")))
+
+    (defun j0ni/forward-delete-whitespace ()
+      (interactive)
+      (let ((orig-pos (point)))
+        (delete-region
+         (progn
+           (skip-chars-forward " \t\n")
+           (constrain-to-field nil orig-pos t))
+         orig-pos)))
+
+    (defun j0ni/backward-delete-whitespace ()
+      (interactive)
+      (let ((orig-pos (point)))
+        (delete-region
+         orig-pos
+         (progn
+           (skip-chars-backward " \t\n")
+           (constrain-to-field nil orig-pos)))))
+
+    ;; Been missing yooooou
+    (defun j0ni/insert-shrug ()
+      (interactive)
+      (insert "¯\\_(ツ)_/¯"))
+
+    (defun j0ni/reload-config ()
+      (interactive)
+      (load-file (expand-file-name "init.el" user-emacs-directory)))
+
+    ;; Don't know where I found this, but it I didn't write it
+    (defun j0ni/toggle-window-split ()
+      "Vertical split shows more of each line, horizontal split shows
+    more lines. This code toggles between them. It only works for
+    frames with exactly two windows."
+      (interactive)
+      (if (= (count-windows) 2)
+          (let* ((this-win-buffer (window-buffer))
+                 (next-win-buffer (window-buffer (next-window)))
+                 (this-win-edges (window-edges (selected-window)))
+                 (next-win-edges (window-edges (next-window)))
+                 (this-win-2nd (not (and (<= (car this-win-edges)
+                                             (car next-win-edges))
+                                         (<= (cadr this-win-edges)
+                                             (cadr next-win-edges)))))
+                 (splitter
+                  (if (= (car this-win-edges)
+                         (car (window-edges (next-window))))
+                      'split-window-horizontally
+                    'split-window-vertically)))
+            (delete-other-windows)
+            (let ((first-win (selected-window)))
+              (funcall splitter)
+              (if this-win-2nd (other-window 1))
+              (set-window-buffer (selected-window) this-win-buffer)
+              (set-window-buffer (next-window) next-win-buffer)
+              (select-window first-win)
+              (if this-win-2nd (other-window 1))))))
+
+    (defun zarkone/vertical-three-windows-layout ()
+      "Vertical, three window layout"
+      (interactive)
+      (delete-other-windows)
+      (split-window-horizontally)
+      (split-window-horizontally)
+      (balance-windows))
+
+    (defun j0ni/read-string-from-file (file-path)
+      (with-temp-buffer
+        (insert-file-contents file-path)
+        (buffer-string)))
+
+
+<a id="orge55959c"></a>
+
+### Undo a gotcha
 
 Sometimes I accidentally find myself in the C-x map, and hit C-g to get the hell out, in a panic. But it's unbound, which is effectively the same thing, but annoying. Why be unbound, when this is what I probably meant?
 
@@ -97,11 +205,21 @@ OTOH, how to make this future proof&#x2026; check if it's bound?
       (message "Fixing C-x C-g")
       (keymap-global-set "C-x C-g" #'keyboard-quit))
 
+
+<a id="orgef22e7a"></a>
+
+### A little about the package manager
+
 So we started (top of the init.el, before tangling) by installing the packaging system, which is straight.el, found at <https://github.com/raxod502/straight.el>.
 
 Straight is pretty cool, but also has become quite complex and fiddly, with a lot of documentation not much of which is easy to follow. For now I'm good, but I might resort either to my own git submodules with some use-package load magic, or head back toward package.el.
 
 Perhaps next time I'm as frustrated as I was trying to figure out how to override vertico's recipe. But for now&#x2026;
+
+
+<a id="org90d0b71"></a>
+
+### Global Keymap Hacks
 
 The next thing is a set of key mappings for getting special characters, like umlauts and lambdas, which has nothing at all to do with input methods and other dark magic.
 
@@ -141,10 +259,17 @@ The next thing is a set of key mappings for getting special characters, like uml
     ;; This isn't available in Org-mode - find a better one
     (keymap-global-set "C-'" 'j0ni/unicode-shortcut-map)
 
+
+<a id="org5c29699"></a>
+
+### Global Switches
+
 This is a useful gate for setting up bindings and other Mac OS bits and pieces.
 
     (defvar j0ni/is-mac (memq window-system '(mac ns))
       "This is a useful gate for setting up specific keybindings")
+
+Honestly, there are more of these, but I moved them to early-init.el for reasons that may have become lost in the mists of time. Mostly fonts.
 
 
 <a id="org6528bc7"></a>
@@ -289,6 +414,9 @@ These are mostly settings that emacs considers to be "customizations".
     (setq custom-safe-themes t)
     (setq mouse-wheel-progressive-speed t)              ; accelerate scrolling
     (setq shr-color-visible-luminance-min 90)
+    (advice-add #'shr-colorize-region
+                :around (defun shr-no-colorise-region (&rest ignore)))
+
     ;; gotta find the berlin coords
     ;; 43.67066, -79.30211 - location
     ;; (setq calendar-longitude 43.67066)
@@ -376,6 +504,8 @@ This, like pixel scrolling, is something I didn't know I was missing.
 
     (delete-selection-mode 1)
 
+More cosmetic tweaks, more agreeable defaults, and some things I don't understand.
+
     (setq load-prefer-newer t)
     (setq highlight-nonselected-windows nil)
     (setq kill-buffer-query-functions nil)
@@ -388,121 +518,33 @@ This, like pixel scrolling, is something I didn't know I was missing.
     (setq resize-mini-windows t)
     (setq completion-show-help nil)
 
-    ;; handy fns
-    (defun j0ni/disable-truncate-lines ()
-      (interactive)
-      (setq-local truncate-lines nil))
-    (defun j0ni/enable-truncate-lines ()
-      (interactive)
-      (setq-local truncate-lines t))
-    (defun j0ni/disable-word-wrap ()
-      (interactive)
-      (setq-local word-wrap nil))
-    (defun j0ni/enable-word-wrap ()
-      (interactive)
-      (setq-local word-wrap t))
+Because I honestly don't care about anyone else. That's what ?w=1 is for.
 
-    ;; Shamelessly lifted from @zarkone's config, and refactored
-    (defun j0ni/delete-whitespace (&optional backward-only)
-      "Replaces all spaces, tabs and newlinesaround point with a single space.
-    If BACKWARD-ONLY is non-nil, only delete them before point."
-      (interactive "*P")
-      (unless backward-only
-        (j0ni/backward-delete-whitespace))
-      (j0ni/forward-delete-whitespace)
-      (unless backward-only (insert " ")))
-
-    (defun j0ni/forward-delete-whitespace ()
-      (interactive)
-      (let ((orig-pos (point)))
-        (delete-region
-         (progn
-           (skip-chars-forward " \t\n")
-           (constrain-to-field nil orig-pos t))
-         orig-pos)))
-
-    (defun j0ni/backward-delete-whitespace ()
-      (interactive)
-      (let ((orig-pos (point)))
-        (delete-region
-         orig-pos
-         (progn
-           (skip-chars-backward " \t\n")
-           (constrain-to-field nil orig-pos)))))
-
-    ;; Been missing yooooou
-    (defun j0ni/insert-shrug ()
-      (interactive)
-      (insert "¯\\_(ツ)_/¯"))
-
-    (defun j0ni/reload-config ()
-      (interactive)
-      (load-file (expand-file-name "init.el" user-emacs-directory)))
-
-    ;; Don't know where I found this, but it I didn't write it
-    (defun j0ni/toggle-window-split ()
-      "Vertical split shows more of each line, horizontal split shows
-    more lines. This code toggles between them. It only works for
-    frames with exactly two windows."
-      (interactive)
-      (if (= (count-windows) 2)
-          (let* ((this-win-buffer (window-buffer))
-                 (next-win-buffer (window-buffer (next-window)))
-                 (this-win-edges (window-edges (selected-window)))
-                 (next-win-edges (window-edges (next-window)))
-                 (this-win-2nd (not (and (<= (car this-win-edges)
-                                             (car next-win-edges))
-                                         (<= (cadr this-win-edges)
-                                             (cadr next-win-edges)))))
-                 (splitter
-                  (if (= (car this-win-edges)
-                         (car (window-edges (next-window))))
-                      'split-window-horizontally
-                    'split-window-vertically)))
-            (delete-other-windows)
-            (let ((first-win (selected-window)))
-              (funcall splitter)
-              (if this-win-2nd (other-window 1))
-              (set-window-buffer (selected-window) this-win-buffer)
-              (set-window-buffer (next-window) next-win-buffer)
-              (select-window first-win)
-              (if this-win-2nd (other-window 1))))))
-
-    (defun zarkone/vertical-three-windows-layout ()
-      "Vertical, three window layout"
-      (interactive)
-      (delete-other-windows)
-      (split-window-horizontally)
-      (split-window-horizontally)
-      (balance-windows))
-
-    (defun j0ni/read-string-from-file (file-path)
-      (with-temp-buffer
-        (insert-file-contents file-path)
-        (buffer-string)))
-
-    ;; because I honestly don't care about anyone else
     (add-hook 'before-save-hook #'delete-trailing-whitespace)
 
-    ;; start a bunch of global modes
+Start a few global essentials.
+
     (dolist (mode '(electric-indent-mode
                     show-paren-mode
                     save-place-mode
                     size-indication-mode
-                    ;; global-hl-line-mode
+                    global-hl-line-mode
                     column-number-mode
                     winner-mode
                     global-auto-revert-mode))
       (funcall mode 1))
 
+Kill a couple of less essential globals.
+
     (blink-cursor-mode -1)
     (remove-hook 'minibuffer-setup-hook 'winner-save-unconditionally)
-    (advice-add #'shr-colorize-region :around (defun shr-no-colorise-region (&rest ignore)))
+
+Because sometimes I want to live without consult:
 
     (recentf-mode 1)
     (keymap-global-set "C-x M-f" #'recentf-open-files)
 
-    ;;; Dired
+Dired. I am not really sure that I get it.
 
     (put 'dired-find-alternate-file 'disabled nil)
 
@@ -517,8 +559,11 @@ This, like pixel scrolling, is something I didn't know I was missing.
     ;; enable some really cool extensions like C-x C-j (dired-jump)
     (require 'dired-x)
 
-    ;; a nice process editor - who knew (everyone but me no doubt)
+Proced, which I recently discovered in bbatsov's dotfiles. It's a nice enough process table and editor.
+
     (keymap-global-set "C-x P" #'proced)
+
+Some bindings I've come to depend on. I'm genuinely trying to scale down these kinds of customisations where I have probably been stomping on binds I have never ever experienced before.
 
     (keymap-set lisp-mode-shared-map "C-c C-k" #'eval-buffer)
 
@@ -531,14 +576,16 @@ This, like pixel scrolling, is something I didn't know I was missing.
                ("C--" . text-scale-decrease)))
       (keymap-global-set (car binding) (cdr binding)))
 
-    ;; history
+Command history for the minibuffer. Invaluable intell.
+
     (setq savehist-save-minibuffer-history t)
     (setq history-length 10000)
     (setq history-delete-duplicates t)
 
     (savehist-mode 1)
 
-    ;; set up time display but don't turn it on
+Time and date, and battery, for the modeline.
+
     (setq display-time-format "%Y-%m-%d %H:%M")
     (setq display-time-24hr-format t)
     (setq display-time-day-and-date nil)
@@ -554,7 +601,8 @@ This, like pixel scrolling, is something I didn't know I was missing.
 
     (display-time-mode 1)
     (display-battery-mode 1)
-    ;;; Set up xref
+
+A little configuration for xref, which is honesly mostly totally fine.
 
     (setq xref-marker-ring-length 64)
     (setq xref-show-xrefs-function 'xref--show-xref-buffer) ; default
