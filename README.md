@@ -12,7 +12,7 @@ So here I am, on my holiday break, making a new config for my emacs. Because tha
 
 Because Anatolii did it, and it was cool, so I did it. All of my stories start like that. I have no original thoughts at all.
 
-Check out the full thing in so-called "literate" form, [notwithstanding dot org](https://github.com/j0ni/neumacs/blob/master/notwithstanding.org).
+Check out the full thing in so-called "literate" form, [notwithstanding dot org](https://github.com/j0ni/neumacs/blob/main/notwithstanding.org).
 
 ## Acknowledgements
 
