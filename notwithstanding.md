@@ -520,6 +520,10 @@ More cosmetic tweaks, more agreeable defaults, and some things I don't understan
     (setq resize-mini-windows t)
     (setq completion-show-help nil)
 
+I've used projectile for a long time, but it seems like project.el is actually entirely capable of supporting my use cases. So I'm using that now mostly without extra configuration. However the questionnaire I have to peruse and fill out when I pick a project is annoying, and I would like to just go ahead and choose a file.
+
+    (setq project-switch-commands 'project-find-file)
+
 Because I honestly don't care about anyone else. That's what ?w=1 is for.
 
     (add-hook 'before-save-hook #'delete-trailing-whitespace)
