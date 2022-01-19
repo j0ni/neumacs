@@ -15,9 +15,8 @@
         1.  [Minibuffer setup](#orgdb7250b)
         2.  [Builtin completion configuration](#org42546b4)
         3.  [Extra builtins](#org61d5d39)
-        4.  [yas-snippets](#org3740ed3)
-        5.  [Vertico](#orgff849f2)
-        6.  [Marginalia](#org79279a5)
+        4.  [Vertico](#orgff849f2)
+        5.  [Marginalia](#org79279a5)
     6.  [Package Configuration](#org691a681)
         1.  [ibuffer](#org57fdc3f)
         2.  [Key chords](#org7e838f9)
@@ -365,7 +364,6 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
     (straight-use-package 'web-mode)
     (straight-use-package 'which-key)
     (straight-use-package 'yaml-mode)
-    (straight-use-package 'yasnippet)
 
 
 <a id="org581e40e"></a>
@@ -708,13 +706,6 @@ Of course, fido-mode completely ignores these settings.
         (require 'abbrev)
         (setq save-abbrevs 'silently)
         (setq-default abbrev-mode t)
-
-
-<a id="org3740ed3"></a>
-
-### yas-snippets
-
-    (setq yas-snippet-dirs (concat user-emacs-directory "snippets"))
 
 
 <a id="orgff849f2"></a>
@@ -1615,7 +1606,8 @@ Org was installed and required before tangling this file, but I believe we can s
                          "https://www.anarchistfederation.net/feed/"
                          "https://www.no-gods-no-masters.com/blog/rss"
                          "https://taz.de/!p4608;rss/"
-                         "https://taz.de/Schwerpunkt-Klimawandel/!t5008262;rss/"))
+                         "https://taz.de/Schwerpunkt-Klimawandel/!t5008262;rss/"
+                         "https://berline.rs/feed.xml"))
 
 
 <a id="orgf3ad7fe"></a>
