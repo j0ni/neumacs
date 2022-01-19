@@ -29,6 +29,7 @@
   (require 'org)
   ;; tangle the rest of the configuration
   (let ((init-source-file (expand-file-name "notwithstanding.org" user-emacs-directory)))
-    (org-babel-load-file init-source-file)
-    (org-publish "notwithstanding")
+    (with-temp-buffer
+      (org-babel-load-file init-source-file)
+      (org-publish "notwithstanding"))
     (garbage-collect)))
