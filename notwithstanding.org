@@ -279,7 +279,6 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'web-mode)
 (straight-use-package 'which-key)
 (straight-use-package 'yaml-mode)
-(straight-use-package 'yasnippet)
 #+end_src
 
 ** Baseline Emacs Configuration
@@ -640,7 +639,6 @@ Of course, fido-mode completely ignores these settings.
 #+end_src
 
 *** Extra builtins
-
 **** Hippie Expand
 
 #+begin_src emacs-lisp
@@ -669,12 +667,6 @@ Of course, fido-mode completely ignores these settings.
 (require 'abbrev)
 (setq save-abbrevs 'silently)
 (setq-default abbrev-mode t)
-#+end_src
-
-*** yas-snippets
-
-#+begin_src emacs-lisp
-(setq yas-snippet-dirs (concat user-emacs-directory "snippets"))
 #+end_src
 
 *** Vertico
@@ -1557,7 +1549,8 @@ Org was installed and required before tangling this file, but I believe we can s
                      "https://www.anarchistfederation.net/feed/"
                      "https://www.no-gods-no-masters.com/blog/rss"
                      "https://taz.de/!p4608;rss/"
-                     "https://taz.de/Schwerpunkt-Klimawandel/!t5008262;rss/"))
+                     "https://taz.de/Schwerpunkt-Klimawandel/!t5008262;rss/"
+                     "https://berline.rs/feed.xml"))
 #+end_src
 
 *** Telega
