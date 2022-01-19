@@ -8,6 +8,12 @@ For a while now, I've been using Doom, which has been great, but despite `evil` 
 
 So here I am, on my holiday break, making a new config for my emacs. Because that's who I am. I'm not proud. Or tired.
 
+## But wherefore dot org?
+
+Because Anatolii did it, and it was cool, so I did it. All of my stories start like that. I have no original thoughts at all.
+
+Check out the full thing in so-called "literate" form, [notwithstanding dot org](https://github.com/j0ni/neumacs/blob/master/notwithstanding.org).
+
 ## Acknowledgements
 
 I've borrowed liberally from others here, as well as from my own Doom customizations and my prior home-grown config. Particularly useful have been:
