@@ -890,14 +890,14 @@ Language Server Protocol, a Microsoft invention, is providing a common interface
 (require 'lsp-ui)
 (require 'consult-lsp)
 
-(setq lsp-ui-sideline-delay 2.0)
+(setq lsp-ui-sideline-delay 1.0)
 
 (add-hook 'lsp-managed-mode-hook
           (lambda ()
             (setq-local flycheck-checker-error-threshold nil)
-            (setq-local flycheck-idle-change-delay 10.0)
-            (setq-local flycheck-display-errors-delay 10.0)
-            (setq-local flycheck-idle-buffer-switch-delay 10.0)
+            (setq-local flycheck-idle-change-delay 1.0)
+            (setq-local flycheck-display-errors-delay 1.0)
+            (setq-local flycheck-idle-buffer-switch-delay 1.0)
             ;; turn off idle highlight, let lsp do it...maybe
             (setq-local idle-highlight-timer nil)
             ;; default is t
