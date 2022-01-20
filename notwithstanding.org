@@ -635,12 +635,13 @@ Of course, fido-mode completely ignores these settings.
 
 (setq completion-category-overrides
       '((buffer (styles . (basic substring partial-completion)))
-        (file (styles . (initials partial-completion flex)))
+        (file (styles . (initials basic partial-completion)))
         (unicode-name (styles . (basic substring)))
         (project-file (styles . (substring partial-completion)))
         (xref-location (styles . (substring)))
         (info-menu (styles . (basic substring)))
-        (symbol-help (styles . (basic shorthand substring)))))
+        (symbol-help (styles . (basic shorthand substring)))
+        (consult-line (styles . (basic substring)))))
 #+end_src
 
 *** Extra builtins

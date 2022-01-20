@@ -56,9 +56,9 @@
 
   (set-fontset-font t 'unicode "Symbola" frame 'prepend)
   ;; if the font is paying attention ¯\_(ツ)_/¯
-  ;; (set-face-attribute
-  ;;  'default frame
-  ;;  :weight 'semi-light)
+  (set-face-attribute
+   'default frame
+   :weight 'semi-light)
   (set-face-attribute
    'bold frame
    :weight 'semi-bold)
@@ -70,11 +70,11 @@
   (tool-bar-mode -1)
   (tooltip-mode -1)
 
-  (setq x-underline-at-descent-line t)
-  (setq x-use-underline-position-properties nil)
+  (setq mouse-autoselect-window nil)
+  (setq focus-follows-mouse nil)
 
-  (setq mouse-autoselect-window t)
-  (setq focus-follows-mouse t))
+  (setq x-underline-at-descent-line t)
+  (setq x-use-underline-position-properties nil))
 
 ;; This is an attempt to prevent the emacsclient frame from ignoring all this
 ;; stuff. Unfortunately it does not appear to work. ¯\_(ツ)_/¯
