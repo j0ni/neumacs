@@ -1414,6 +1414,9 @@ I am loving this language more and more.
 (add-hook 'rustic-mode-hook #'electric-pair-local-mode)
 (add-hook 'rustic-mode-hook #'lsp)
 (add-hook 'rustic-mode-hook #'rustic-doc-mode)
+(add-hook 'rustic-mode-hook
+          (lambda ()
+            (setq-local completion-in-region-function #'completion--in-region)))
 
 (setq rust-indent-method-chain nil)
 

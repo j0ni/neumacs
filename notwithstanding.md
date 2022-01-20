@@ -147,6 +147,10 @@ my intent to write a literate configuration for my emacs, in all likelihood this
       (insert "¯\\_(ツ)_/¯"))
 
     (defun j0ni/reload-config ()
+      "This is weirdly not recursive, unless you consider installing a
+    file containing this definition is part of what it does, and the
+    next time you use it, it will have been redefined by the
+    `load-file` you see in the 3rd line. Yeah. Food for thought."
       (interactive)
       (load-file (expand-file-name "early-init.el" user-emacs-directory))
       (load-file (expand-file-name "init.el" user-emacs-directory))
@@ -671,12 +675,13 @@ Of course, fido-mode completely ignores these settings.
 
     (setq completion-category-overrides
           '((buffer (styles . (basic substring partial-completion)))
-            (file (styles . (initials partial-completion flex)))
+            (file (styles . (initials basic partial-completion)))
             (unicode-name (styles . (basic substring)))
             (project-file (styles . (substring partial-completion)))
             (xref-location (styles . (substring)))
             (info-menu (styles . (basic substring)))
-            (symbol-help (styles . (basic shorthand substring)))))
+            (symbol-help (styles . (basic shorthand substring)))
+            (consult-line (styles . (basic substring)))))
 
 
 <a id="org61d5d39"></a>
@@ -1472,6 +1477,9 @@ I am loving this language more and more.
     (add-hook 'rustic-mode-hook #'electric-pair-local-mode)
     (add-hook 'rustic-mode-hook #'lsp)
     (add-hook 'rustic-mode-hook #'rustic-doc-mode)
+    (add-hook 'rustic-mode-hook
+              (lambda ()
+                (setq-local completion-in-region-function #'completion--in-region)))
 
     (setq rust-indent-method-chain nil)
 
