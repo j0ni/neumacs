@@ -66,6 +66,10 @@ If BACKWARD-ONLY is non-nil, only delete them before point."
   (insert "¯\\_(ツ)_/¯"))
 
 (defun j0ni/reload-config ()
+  "This is weirdly not recursive, unless you consider installing a
+file containing this definition is part of what it does, and the
+next time you use it, it will have been redefined by the
+`load-file` you see in the 3rd line. Yeah. Food for thought."
   (interactive)
   (load-file (expand-file-name "early-init.el" user-emacs-directory))
   (load-file (expand-file-name "init.el" user-emacs-directory))
@@ -1072,7 +1076,7 @@ By Prot the Spectacular.
 (setq modus-themes-bold-constructs t)
 (setq modus-themes-italic-constructs nil)
 ;; (setq modus-themes-syntax '(yellow-comments))
-(setq modus-themes-syntax '(faint yellow-comments))
+(setq modus-themes-syntax '())
 (setq modus-themes-fringes nil)
 (setq modus-themes-hl-line '(underline neutral))
 (setq modus-themes-completions 'opinionated)

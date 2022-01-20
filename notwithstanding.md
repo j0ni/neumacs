@@ -1122,7 +1122,7 @@ This is a bit clumsy, but it works
         (setq modus-themes-bold-constructs t)
         (setq modus-themes-italic-constructs nil)
         ;; (setq modus-themes-syntax '(yellow-comments))
-        (setq modus-themes-syntax '(faint yellow-comments))
+        (setq modus-themes-syntax '())
         (setq modus-themes-fringes nil)
         (setq modus-themes-hl-line '(underline neutral))
         (setq modus-themes-completions 'opinionated)
@@ -1480,6 +1480,8 @@ I am loving this language more and more.
     (setq rustic-lsp-server 'rust-analyzer)
     (setq rustic-lsp-format t)
     (setq rustic-lsp-client 'lsp-mode)
+
+    (setq rustic-test-arguments "-- --nocapture")
 
     (rustic-flycheck-setup)
     (rustic-doc-setup)
