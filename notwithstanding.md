@@ -66,7 +66,8 @@
         46. [Set all the fonts one last time](#org9071105)
         47. [Mu 4 Emacs](#orge0f3941)
         48. [Crypto setup](#org3b6a0c5)
-        49. [Custom file configuration](#orgd9d6e1f)
+        49. [Edtiroconfig](#orge2f6128)
+        50. [Custom file configuration](#orgd9d6e1f)
 
 
 <a id="orgcf5bdc2"></a>
@@ -300,6 +301,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
     (straight-use-package 'consult-lsp)
     (straight-use-package 'diff-hl)
     (straight-use-package 'dockerfile-mode)
+    (straight-use-package 'editorconfig)
     (straight-use-package 'elfeed)
     (straight-use-package 'erc)
     (straight-use-package 'eros)
@@ -1108,7 +1110,7 @@ This is a bit clumsy, but it works
         (setq modus-themes-bold-constructs t)
         (setq modus-themes-italic-constructs nil)
         ;; (setq modus-themes-syntax '(yellow-comments))
-        (setq modus-themes-syntax '(faint))
+        (setq modus-themes-syntax '(faint yellow-comments))
         (setq modus-themes-fringes nil)
         (setq modus-themes-hl-line '(underline neutral))
         (setq modus-themes-completions 'opinionated)
@@ -1119,14 +1121,14 @@ This is a bit clumsy, but it works
         (modus-themes-load-themes)
 
         ;; (load-theme 'modus-operandi t)
-        ;; (load-theme 'modus-vivendi t)
+        (load-theme 'modus-vivendi t)
 
 2.  The Matrix
 
     Weirdly, this is speaking to me at the moment.
 
-        (require 'the-matrix-theme)
-        (load-theme 'the-matrix t)
+        ;; (require 'the-matrix-theme)
+        ;; (load-theme 'the-matrix t)
 
 
 <a id="orgcd40cdf"></a>
@@ -1456,15 +1458,19 @@ This renders eval results in-buffer at the end of the eval'd expression. Honestl
 I am loving this language more and more.
 
     (add-hook 'rustic-mode-hook #'electric-pair-local-mode)
+    (add-hook 'rustic-mode-hook #'lsp)
+    (add-hook 'rustic-mode-hook #'rustic-doc-mode)
 
     (setq rust-indent-method-chain nil)
 
+    (setq rustic-spinner-type 'moon)
     (setq rustic-format-trigger nil)
     (setq rustic-lsp-server 'rust-analyzer)
-    (setq rustic-lsp-format nil)
+    (setq rustic-lsp-format t)
     (setq rustic-lsp-client 'lsp-mode)
 
     (rustic-flycheck-setup)
+    (rustic-doc-setup)
 
 
 <a id="orgc41f1fe"></a>
@@ -1814,6 +1820,15 @@ Either way, this is flaky as hell and almost always needs tweaking for a new OS.
     (setq epg-pinentry-mode 'loopback)
 
     (pinentry-start t) ;; don't complain if its already running
+
+
+<a id="orge2f6128"></a>
+
+### Edtiroconfig
+
+Because I guess it's nice to play well with others. Dang that hurts to write.
+
+    (editorconfig-mode 1)
 
 
 <a id="orgd9d6e1f"></a>
