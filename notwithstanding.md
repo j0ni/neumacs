@@ -935,6 +935,10 @@ Language Server Protocol, a Microsoft invention, is providing a common interface
 
     (require 'lsp-mode)
 
+    (setq lsp-rust-analyzer-cargo-watch-command "clippy")
+    (setq lsp-rust-analyzer-server-display-inlay-hints t)
+    (setq lsp-rust-clippy-preference "on")
+
     (require 'lsp-ui)
     (require 'consult-lsp)
 
@@ -1047,6 +1051,14 @@ ffip setup
            :nick "j0ni"
            :full-name "Joni"
            :password j0ni/srht-sasl-pass))
+
+        (defun j0ni/reset-erc-track-mode ()
+          "Stole this whole from John Wiegley's dotemacs."
+          (interactive)
+          (setq erc-modified-channels-alist nil)
+          (erc-modified-channels-update)
+          (erc-modified-channels-display)
+          (force-mode-line-update))
 
 
 <a id="org08fede6"></a>
