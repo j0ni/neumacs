@@ -1828,7 +1828,9 @@ Either way, this is flaky as hell and almost always needs tweaking for a new OS.
 
 Because I guess it's nice to play well with others. Dang that hurts to write.
 
-    (editorconfig-mode 1)
+But unless you do a thorough job configuring this, it seems to prevent other setup from occurring, which is unacceptable. So not for now.
+
+    ;; (editorconfig-mode 1)
 
 
 <a id="orgd9d6e1f"></a>

@@ -1757,8 +1757,10 @@ Either way, this is flaky as hell and almost always needs tweaking for a new OS.
 *** Edtiroconfig
 Because I guess it's nice to play well with others. Dang that hurts to write.
 
+But unless you do a thorough job configuring this, it seems to prevent other setup from occurring, which is unacceptable. So not for now.
+
 #+begin_src emacs-lisp
-(editorconfig-mode 1)
+;; (editorconfig-mode 1)
 #+end_src
 
 *** Custom file configuration
