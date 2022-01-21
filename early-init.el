@@ -56,9 +56,9 @@
 
   (set-fontset-font t 'unicode "Symbola" frame 'prepend)
   ;; if the font is paying attention ¯\_(ツ)_/¯
-  (set-face-attribute
-   'default frame
-   :weight 'semi-light)
+  ;; (set-face-attribute
+  ;;  'default frame
+  ;;  :weight 'light)
   (set-face-attribute
    'bold frame
    :weight 'semi-bold)

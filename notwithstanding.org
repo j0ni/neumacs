@@ -213,10 +213,11 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'browse-kill-ring)
 (straight-use-package 'cider)
 (straight-use-package 'clojure-mode)
-(straight-use-package 'company)
+;; (straight-use-package 'company)
 (straight-use-package 'consult)
 (straight-use-package 'consult-flycheck)
 (straight-use-package 'consult-lsp)
+(straight-use-package 'corfu)
 (straight-use-package 'diff-hl)
 (straight-use-package 'dockerfile-mode)
 (straight-use-package 'editorconfig)
@@ -440,7 +441,7 @@ We should absolutely not use tabs for indentation though, so make sure we never 
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 8)
 (setq indent-tabs-mode nil)
-(setq tab-always-indent 'complete)
+(setq tab-always-indent t)
 (setq require-final-newline t)
 #+end_src
 
@@ -686,9 +687,13 @@ A fast vertical minibuffer manager which mostly plays nice with builtin stuff. M
 ;; (vertico-unobtrusive-mode 1)
 ;; or this
 (vertico-buffer-mode 1)
+(setq vertico-buffer-display-action
+      '(display-buffer-below-selected
+        display-buffer-at-bottom))
 ;; but not both
 
 (keymap-set vertico-map "RET" #'vertico-directory-enter)
+(keymap-set vertico-map "C-j" #'vertico-directory-enter)
 (keymap-set vertico-map "DEL" #'vertico-directory-delete-char)
 (keymap-set vertico-map "M-DEL" #'vertico-directory-delete-word)
 (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
@@ -697,19 +702,36 @@ A fast vertical minibuffer manager which mostly plays nice with builtin stuff. M
 This is a bit previous - I should generalize it and move it up into the consult configuration. But the principle is one I'd like to get used to. Out-of-buffer completion, with the regular completion system, whatever that may be. So we do this:
 
 #+begin_src emacs-lisp
-(setq completion-in-region-function
-      (lambda (&rest args)
-        (apply (if vertico-mode
-                   #'consult-completion-in-region
-                 #'completion--in-region)
-               args)))
+;; (setq completion-in-region-function
+;;       (lambda (&rest args)
+;;         (apply (if vertico-mode
+;;                    #'consult-completion-in-region
+;;                  #'completion--in-region)
+;;                args)))
 #+end_src
 
-instead of this:
+Except when it collides with rustic, which I haven't managed to fix up. So try something else.
+
+#+begin_src
+;; (require 'company)
+;; (global-company-mode -1)
+#+end_src
+
+Corfu. Why this and not company? Better integration, no special independent invocation (completion-at-point does not invoke company, so there are frequent collisions.
 
 #+begin_src emacs-lisp
-;; (require 'company)
-;; (global-company-mode 1)
+(require 'corfu)
+(corfu-global-mode 1)
+
+(setq corfu-cycle t)                   ;; Enable cycling for `corfu-next/previous'
+(setq corfu-auto nil)                  ;; Auto completion
+(setq corfu-commit-predicate nil)      ;; Do not commit selected candidates on next input
+;; (setq corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
+;; (setq corfu-quit-no-match t)        ;; Automatically quit if there is no match
+;; (setq corfu-preview-current nil)    ;; Disable current candidate preview
+;; (setq corfu-preselect-first nil)    ;; Disable candidate preselection
+;; (setq corfu-echo-documentation nil) ;; Disable documentation in the echo area
+;; (setq corfu-scroll-margin 5)        ;; Use scroll margin
 #+end_src
 
 *** Marginalia
@@ -1088,7 +1110,7 @@ By Prot the Spectacular.
 (modus-themes-load-themes)
 
 ;; (load-theme 'modus-operandi t)
-(load-theme 'modus-vivendi t)
+;; (load-theme 'modus-vivendi t)
 #+end_src
 
 **** The Matrix
@@ -1096,8 +1118,8 @@ By Prot the Spectacular.
 Weirdly, this is speaking to me at the moment.
 
 #+begin_src emacs-lisp
-;; (require 'the-matrix-theme)
-;; (load-theme 'the-matrix t)
+(require 'the-matrix-theme)
+(load-theme 'the-matrix t)
 #+end_src
 
 *** Rainbow Mode
