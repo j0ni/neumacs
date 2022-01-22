@@ -16,7 +16,8 @@
         2.  [Builtin completion configuration](#org42546b4)
         3.  [Extra builtins](#org61d5d39)
         4.  [Vertico](#orgff849f2)
-        5.  [Marginalia](#org79279a5)
+        5.  [Completion in Region](#org2da4624)
+        6.  [Marginalia](#org79279a5)
     6.  [Package Configuration](#org691a681)
         1.  [ibuffer](#org57fdc3f)
         2.  [Key chords](#org7e838f9)
@@ -275,6 +276,10 @@ This is a useful gate for setting up bindings and other Mac OS bits and pieces.
     (defvar j0ni/is-mac (memq window-system '(mac ns))
       "This is a useful gate for setting up specific keybindings")
 
+This idea I acquired from John Wiegley's dotfiles.
+
+    (defvar j0ni/use-eglot t "Switch this off to enable LSP instead.")
+
 Honestly, there are more of these, but I moved them to early-init.el for reasons that may have become lost in the mists of time. Mostly fonts.
 
 
@@ -299,7 +304,6 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
     (straight-use-package 'browse-kill-ring)
     (straight-use-package 'cider)
     (straight-use-package 'clojure-mode)
-    ;; (straight-use-package 'company)
     (straight-use-package 'consult)
     (straight-use-package 'consult-flycheck)
     (straight-use-package 'consult-lsp)
@@ -307,6 +311,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
     (straight-use-package 'diff-hl)
     (straight-use-package 'dockerfile-mode)
     (straight-use-package 'editorconfig)
+    (straight-use-package 'eglot)
     (straight-use-package 'elfeed)
     (straight-use-package 'erc)
     (straight-use-package 'eros)
@@ -343,6 +348,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
     (straight-use-package 'monroe)
     (straight-use-package 'move-text)
     (straight-use-package 'olivetti)
+    (straight-use-package 'orderless)
     (straight-use-package 'org-roam)
     (straight-use-package 'org-super-agenda)
     (straight-use-package 'paredit)
@@ -432,11 +438,11 @@ These are mostly settings that emacs considers to be "customizations".
 
 Configure keyboard for MacOS. This repurposes:
 
-; - alt             -> meta
-; - right alt       -> same as left (meta)
-; - left command    -> meta
-; - right command   -> super
-; - function key    -> ignore
+    ; - alt             -> meta
+    ; - right alt       -> same as left (meta)
+    ; - left command    -> meta
+    ; - right command   -> super
+    ; - function key    -> ignore
 
     (when j0ni/is-mac
       (setq ns-alternate-modifier 'meta)
@@ -619,6 +625,11 @@ A little configuration for xref, which is honesly mostly totally fine.
     (setq xref-show-xrefs-function 'xref--show-xref-buffer) ; default
     (setq xref-show-definitions-function 'xref-show-definitions-completing-read)
 
+Finally, switch on flymake when necessary if we're using flymake.
+
+    (add-hook 'prog-mode-hook #'flymake-mode)
+    (setq flymake-fringe-indicator-position 'right-fringe)
+
 Thats the end of the baseline emacs configuration.
 
 
@@ -739,6 +750,11 @@ A fast vertical minibuffer manager which mostly plays nice with builtin stuff. M
     (keymap-set vertico-map "M-DEL" #'vertico-directory-delete-word)
     (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 
+
+<a id="org2da4624"></a>
+
+### Completion in Region
+
 This is a bit previous - I should generalize it and move it up into the consult configuration. But the principle is one I'd like to get used to. Out-of-buffer completion, with the regular completion system, whatever that may be. So we do this:
 
     ;; (setq completion-in-region-function
@@ -749,9 +765,6 @@ This is a bit previous - I should generalize it and move it up into the consult 
     ;;                args)))
 
 Except when it collides with rustic, which I haven't managed to fix up. So try something else.
-
-    ;; (require 'company)
-    ;; (global-company-mode -1)
 
 Corfu. Why this and not company? Better integration, no special independent invocation (completion-at-point does not invoke company, so there are frequent collisions.
 
@@ -767,6 +780,23 @@ Corfu. Why this and not company? Better integration, no special independent invo
     ;; (setq corfu-preselect-first nil)    ;; Disable candidate preselection
     ;; (setq corfu-echo-documentation nil) ;; Disable documentation in the echo area
     ;; (setq corfu-scroll-margin 5)        ;; Use scroll margin
+
+This is cool, straight from the corfu wiki, it seems to do what I have always expected but never happens.
+
+    (defun corfu-beginning-of-prompt ()
+      "Move to beginning of completion input."
+      (interactive)
+      (corfu--goto -1)
+      (goto-char (car completion-in-region--data)))
+
+    (defun corfu-end-of-prompt ()
+      "Move to end of completion input."
+      (interactive)
+      (corfu--goto -1)
+      (goto-char (cadr completion-in-region--data)))
+
+    (define-key corfu-map [remap move-beginning-of-line] #'corfu-beginning-of-prompt)
+    (define-key corfu-map [remap move-end-of-line] #'corfu-end-of-prompt)
 
 
 <a id="org79279a5"></a>
@@ -871,9 +901,11 @@ OK I lied a bit. ibuffer is built-in, but ibuffer-vc is not, and I wanted to kee
     (setq flycheck-idle-buffer-switch-delay 10.0)
     (setq-default flycheck-emacs-lisp-load-path 'inherit)
     (setq flycheck-disabled-checkers '(emacs-lisp-checkdoc))
-    (add-hook 'prog-mode-hook #'flycheck-mode)
 
-    (require 'consult-flycheck)
+Switch it on, or don't - flymake is sometimes worth checking out.
+
+    ;; (add-hook 'prog-mode-hook #'flycheck-mode)
+    ;; (require 'consult-flycheck)
 
 
 <a id="org651a463"></a>
@@ -956,13 +988,26 @@ Consult - handy featureful commands, sometimes too noisy
 
 Language Server Protocol, a Microsoft invention, is providing a common interface for a bunch of languages that are otherwise not so well supported. It's also proving useful in some other well supported modes like clojure and rust.
 
+    (require 'lsp-mode)
     (setq lsp-keymap-prefix "C-c l")
 
-    (require 'lsp-mode)
+LSP tries to switch on company-mode, and it's fiddly to prevent. This apparently is how you do it (from the corfu github wiki).
+
+    (setq lsp-completion-provider :none)
+
+    (defun j0ni/setup-lsp-completion ()
+      (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+            '(orderless)))
+
+    (add-hook 'lsp-completion-mode-hook #'j0ni/setup-lsp-completion)
+
+Rust setup for lsp, which is honestly the main use case.
 
     (setq lsp-rust-analyzer-cargo-watch-command "clippy")
     (setq lsp-rust-analyzer-server-display-inlay-hints t)
     (setq lsp-rust-clippy-preference "on")
+
+Extras, UI stuff that I mostly don't use, and some per-buffer local overrides.
 
     (require 'lsp-ui)
     (require 'consult-lsp)
@@ -988,7 +1033,10 @@ Language Server Protocol, a Microsoft invention, is providing a common interface
                 ;; default is t
                 (setq-local lsp-completion-enable t)
                 ;; default is t
-                (setq-local lsp-enable-symbol-highlighting t)))
+                (setq-local lsp-enable-symbol-highlighting t)
+                ;; this should substitute orderless for lsp's capf
+                (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+                      '(orderless))))
 
 
 <a id="orgc4e324f"></a>
@@ -1409,7 +1457,7 @@ Start off with cider for now.
       (add-hook hook #'cider-mode)
       (add-hook hook #'paredit-mode)
       (add-hook hook #'subword-mode)
-      (add-hook hook #'lsp))
+      (add-hook hook (if j0ni/use-eglot #'eglot-ensure #'lsp)))
 
 
 <a id="org6d413d0"></a>
@@ -1476,7 +1524,7 @@ I spent a lot more time on this than I ever spent writing C or C++.
 
 ### Typescript
 
-    (add-hook 'typescript-mode-hook #'lsp)
+    (add-hook 'typescript-mode-hook (if j0ni/use-eglot #'eglot-ensure #'lsp))
 
 
 <a id="org8f04766"></a>
@@ -1494,8 +1542,16 @@ This renders eval results in-buffer at the end of the eval'd expression. Honestl
 
 I am loving this language more and more.
 
+    (if j0ni/use-eglot
+        (progn
+          (add-hook 'rustic-mode-hook #'eglot-ensure)
+          (setq rustic-lsp-client 'eglot))
+      (add-hook 'rustic-mode-hook #'lsp)
+      (setq rustic-lsp-client 'lsp-mode)
+      (when (bound-and-true-p flycheck-mode)
+        (rustic-flycheck-setup)))
+
     (add-hook 'rustic-mode-hook #'electric-pair-local-mode)
-    (add-hook 'rustic-mode-hook #'lsp)
     (add-hook 'rustic-mode-hook #'rustic-doc-mode)
     (add-hook 'rustic-mode-hook
               (lambda ()
@@ -1505,13 +1561,11 @@ I am loving this language more and more.
 
     (setq rustic-spinner-type 'moon)
     (setq rustic-format-trigger nil)
+
     (setq rustic-lsp-server 'rust-analyzer)
     (setq rustic-lsp-format t)
-    (setq rustic-lsp-client 'lsp-mode)
-
     (setq rustic-test-arguments "-- --nocapture")
 
-    (rustic-flycheck-setup)
     (rustic-doc-setup)
 
 

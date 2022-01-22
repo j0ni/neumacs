@@ -189,6 +189,12 @@ This is a useful gate for setting up bindings and other Mac OS bits and pieces.
   "This is a useful gate for setting up specific keybindings")
 #+end_src
 
+This idea I acquired from John Wiegley's dotfiles.
+
+#+begin_src emacs-lisp
+(defvar j0ni/use-eglot t "Switch this off to enable LSP instead.")
+#+end_src
+
 Honestly, there are more of these, but I moved them to early-init.el for reasons that may have become lost in the mists of time. Mostly fonts.
 
 ** Install packages
@@ -213,7 +219,6 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'browse-kill-ring)
 (straight-use-package 'cider)
 (straight-use-package 'clojure-mode)
-;; (straight-use-package 'company)
 (straight-use-package 'consult)
 (straight-use-package 'consult-flycheck)
 (straight-use-package 'consult-lsp)
@@ -221,6 +226,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'diff-hl)
 (straight-use-package 'dockerfile-mode)
 (straight-use-package 'editorconfig)
+(straight-use-package 'eglot)
 (straight-use-package 'elfeed)
 (straight-use-package 'erc)
 (straight-use-package 'eros)
@@ -257,6 +263,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'monroe)
 (straight-use-package 'move-text)
 (straight-use-package 'olivetti)
+(straight-use-package 'orderless)
 (straight-use-package 'org-roam)
 (straight-use-package 'org-super-agenda)
 (straight-use-package 'paredit)
@@ -352,11 +359,11 @@ These are mostly settings that emacs considers to be "customizations".
 
 Configure keyboard for MacOS. This repurposes:
 
-; - alt             -> meta
-; - right alt       -> same as left (meta)
-; - left command    -> meta
-; - right command   -> super
-; - function key    -> ignore
+: ; - alt             -> meta
+: ; - right alt       -> same as left (meta)
+: ; - left command    -> meta
+: ; - right command   -> super
+: ; - function key    -> ignore
 
 #+begin_src emacs-lisp
 (when j0ni/is-mac
@@ -583,12 +590,17 @@ A little configuration for xref, which is honesly mostly totally fine.
 (setq xref-show-definitions-function 'xref-show-definitions-completing-read)
 #+end_src
 
+Finally, switch on flymake when necessary if we're using flymake.
+
+#+begin_src emacs-lisp
+(add-hook 'prog-mode-hook #'flymake-mode)
+(setq flymake-fringe-indicator-position 'right-fringe)
+#+end_src
+
 Thats the end of the baseline emacs configuration.
 
 ** Completion
-
 This gets a special section for having so much to configure.
-
 *** Minibuffer setup
 
 #+begin_src emacs-lisp
@@ -677,7 +689,6 @@ Of course, fido-mode completely ignores these settings.
 #+end_src
 
 *** Vertico
-
 A fast vertical minibuffer manager which mostly plays nice with builtin stuff. Moreso than many - all but MCT, I dare say.
 
 #+begin_src emacs-lisp
@@ -699,6 +710,8 @@ A fast vertical minibuffer manager which mostly plays nice with builtin stuff. M
 (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 #+end_src
 
+*** Completion in Region
+
 This is a bit previous - I should generalize it and move it up into the consult configuration. But the principle is one I'd like to get used to. Out-of-buffer completion, with the regular completion system, whatever that may be. So we do this:
 
 #+begin_src emacs-lisp
@@ -711,11 +724,6 @@ This is a bit previous - I should generalize it and move it up into the consult 
 #+end_src
 
 Except when it collides with rustic, which I haven't managed to fix up. So try something else.
-
-#+begin_src
-;; (require 'company)
-;; (global-company-mode -1)
-#+end_src
 
 Corfu. Why this and not company? Better integration, no special independent invocation (completion-at-point does not invoke company, so there are frequent collisions.
 
@@ -732,6 +740,25 @@ Corfu. Why this and not company? Better integration, no special independent invo
 ;; (setq corfu-preselect-first nil)    ;; Disable candidate preselection
 ;; (setq corfu-echo-documentation nil) ;; Disable documentation in the echo area
 ;; (setq corfu-scroll-margin 5)        ;; Use scroll margin
+#+end_src
+
+This is cool, straight from the corfu wiki, it seems to do what I have always expected but never happens.
+
+#+begin_src emacs-lisp
+(defun corfu-beginning-of-prompt ()
+  "Move to beginning of completion input."
+  (interactive)
+  (corfu--goto -1)
+  (goto-char (car completion-in-region--data)))
+
+(defun corfu-end-of-prompt ()
+  "Move to end of completion input."
+  (interactive)
+  (corfu--goto -1)
+  (goto-char (cadr completion-in-region--data)))
+
+(define-key corfu-map [remap move-beginning-of-line] #'corfu-beginning-of-prompt)
+(define-key corfu-map [remap move-end-of-line] #'corfu-end-of-prompt)
 #+end_src
 
 *** Marginalia
@@ -828,9 +855,13 @@ OK I lied a bit. ibuffer is built-in, but ibuffer-vc is not, and I wanted to kee
 (setq flycheck-idle-buffer-switch-delay 10.0)
 (setq-default flycheck-emacs-lisp-load-path 'inherit)
 (setq flycheck-disabled-checkers '(emacs-lisp-checkdoc))
-(add-hook 'prog-mode-hook #'flycheck-mode)
+#+end_src
 
-(require 'consult-flycheck)
+Switch it on, or don't - flymake is sometimes worth checking out.
+
+#+begin_src emacs-lisp
+;; (add-hook 'prog-mode-hook #'flycheck-mode)
+;; (require 'consult-flycheck)
 #+end_src
 
 *** Consult
@@ -911,14 +942,33 @@ Consult - handy featureful commands, sometimes too noisy
 Language Server Protocol, a Microsoft invention, is providing a common interface for a bunch of languages that are otherwise not so well supported. It's also proving useful in some other well supported modes like clojure and rust.
 
 #+begin_src emacs-lisp
-(setq lsp-keymap-prefix "C-c l")
-
 (require 'lsp-mode)
+(setq lsp-keymap-prefix "C-c l")
+#+end_src
 
+LSP tries to switch on company-mode, and it's fiddly to prevent. This apparently is how you do it (from the corfu github wiki).
+
+#+begin_src emacs-lisp
+(setq lsp-completion-provider :none)
+
+(defun j0ni/setup-lsp-completion ()
+  (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+        '(orderless)))
+
+(add-hook 'lsp-completion-mode-hook #'j0ni/setup-lsp-completion)
+#+end_src
+
+Rust setup for lsp, which is honestly the main use case.
+
+#+begin_src emacs-lisp
 (setq lsp-rust-analyzer-cargo-watch-command "clippy")
 (setq lsp-rust-analyzer-server-display-inlay-hints t)
 (setq lsp-rust-clippy-preference "on")
+#+end_src
 
+Extras, UI stuff that I mostly don't use, and some per-buffer local overrides.
+
+#+begin_src emacs-lisp
 (require 'lsp-ui)
 (require 'consult-lsp)
 
@@ -943,8 +993,10 @@ Language Server Protocol, a Microsoft invention, is providing a common interface
             ;; default is t
             (setq-local lsp-completion-enable t)
             ;; default is t
-            (setq-local lsp-enable-symbol-highlighting t)))
-
+            (setq-local lsp-enable-symbol-highlighting t)
+            ;; this should substitute orderless for lsp's capf
+            (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+                  '(orderless))))
 #+end_src
 
 *** Find File in Project
@@ -1258,7 +1310,6 @@ Pop up a minibuffer help window thingy with key binds in it after pausing for a 
 (which-key-mode 1)
 #+end_src
 
-
 *** Window Switcher
 
 Like avy, but a bit smaller? Or something.
@@ -1356,7 +1407,7 @@ Start off with cider for now.
   (add-hook hook #'cider-mode)
   (add-hook hook #'paredit-mode)
   (add-hook hook #'subword-mode)
-  (add-hook hook #'lsp))
+  (add-hook hook (if j0ni/use-eglot #'eglot-ensure #'lsp)))
 #+end_src
 
 *** Lua and Fennel
@@ -1417,7 +1468,7 @@ I spent a lot more time on this than I ever spent writing C or C++.
 *** Typescript
 
 #+begin_src emacs-lisp
-(add-hook 'typescript-mode-hook #'lsp)
+(add-hook 'typescript-mode-hook (if j0ni/use-eglot #'eglot-ensure #'lsp))
 #+end_src
 
 *** Evaluation overlays
@@ -1433,8 +1484,16 @@ This renders eval results in-buffer at the end of the eval'd expression. Honestl
 I am loving this language more and more.
 
 #+begin_src emacs-lisp
+(if j0ni/use-eglot
+    (progn
+      (add-hook 'rustic-mode-hook #'eglot-ensure)
+      (setq rustic-lsp-client 'eglot))
+  (add-hook 'rustic-mode-hook #'lsp)
+  (setq rustic-lsp-client 'lsp-mode)
+  (when (bound-and-true-p flycheck-mode)
+    (rustic-flycheck-setup)))
+
 (add-hook 'rustic-mode-hook #'electric-pair-local-mode)
-(add-hook 'rustic-mode-hook #'lsp)
 (add-hook 'rustic-mode-hook #'rustic-doc-mode)
 (add-hook 'rustic-mode-hook
           (lambda ()
@@ -1444,13 +1503,11 @@ I am loving this language more and more.
 
 (setq rustic-spinner-type 'moon)
 (setq rustic-format-trigger nil)
+
 (setq rustic-lsp-server 'rust-analyzer)
 (setq rustic-lsp-format t)
-(setq rustic-lsp-client 'lsp-mode)
-
 (setq rustic-test-arguments "-- --nocapture")
 
-(rustic-flycheck-setup)
 (rustic-doc-setup)
 #+end_src
 
