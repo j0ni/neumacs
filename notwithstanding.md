@@ -625,10 +625,10 @@ A little configuration for xref, which is honesly mostly totally fine.
     (setq xref-show-xrefs-function 'xref--show-xref-buffer) ; default
     (setq xref-show-definitions-function 'xref-show-definitions-completing-read)
 
-Finally, switch on flymake when necessary if we're using flymake.
+Eldoc tweaks to make it less intrusive.
 
-    (add-hook 'prog-mode-hook #'flymake-mode)
-    (setq flymake-fringe-indicator-position 'right-fringe)
+    (setq eldoc-echo-area-use-multiline-p nil)
+    (setq eldoc-echo-area-prefer-doc-buffer t)
 
 Thats the end of the baseline emacs configuration.
 
@@ -683,17 +683,31 @@ Note that the way this works is, the first of these to return anything is used. 
 
 Of course, fido-mode completely ignores these settings.
 
-    (setq completion-styles '(basic substring initials partial-completion flex))
+    ;; (setq completion-styles '(basic substring initials partial-completion flex))
+
+    ;; (setq completion-category-overrides
+    ;;       '((buffer (styles . (basic substring partial-completion)))
+    ;;         (file (styles . (initials basic partial-completion)))
+    ;;         (unicode-name (styles . (basic substring)))
+    ;;         (project-file (styles . (substring partial-completion)))
+    ;;         (xref-location (styles . (substring)))
+    ;;         (info-menu (styles . (basic substring)))
+    ;;         (symbol-help (styles . (basic shorthand substring)))
+    ;;         (consult-line (styles . (basic substring)))))
+
+Using orderless.
+
+    (setq completion-styles '(orderless))
 
     (setq completion-category-overrides
-          '((buffer (styles . (basic substring partial-completion)))
-            (file (styles . (initials basic partial-completion)))
-            (unicode-name (styles . (basic substring)))
-            (project-file (styles . (substring partial-completion)))
-            (xref-location (styles . (substring)))
-            (info-menu (styles . (basic substring)))
-            (symbol-help (styles . (basic shorthand substring)))
-            (consult-line (styles . (basic substring)))))
+          '((buffer (styles . (orderless)))
+            (file (styles . (orderless)))
+            (unicode-name (styles . (orderless)))
+            (project-file (styles . (orderless)))
+            (xref-location (styles . (orderless)))
+            (info-menu (styles . (orderless)))
+            (symbol-help (styles . (orderless)))
+            (consult-line (styles . (orderless)))))
 
 
 <a id="org61d5d39"></a>
@@ -880,14 +894,12 @@ OK I lied a bit. ibuffer is built-in, but ibuffer-vc is not, and I wanted to kee
 
 ### Flymake
 
-    ;;; Flymake
-
-    ;; (require 'flymake)
-    ;; (setq flymake-fringe-indicator-position 'right-fringe)
-    ;; (setq flymake-no-changes-timeout nil)
-    ;; (setq flymake-start-on-flymake-mode nil)
-    ;; (setq flymake-start-on-save-buffer nil)
-    ;; (add-hook 'prog-mode-hook #'flymake-mode-on)
+    (require 'flymake)
+    (setq flymake-fringe-indicator-position 'right-fringe)
+    (setq flymake-no-changes-timeout nil)
+    (setq flymake-start-on-flymake-mode t)
+    (setq flymake-start-on-save-buffer t)
+    (add-hook 'prog-mode-hook #'flymake-mode)
 
 
 <a id="org67e6a88"></a>
@@ -940,16 +952,17 @@ Consult - handy featureful commands, sometimes too noisy
                        ("M-s k" . consult-keep-lines)
                        ("M-s u" . consult-focus-lines)
                        ;; goto map
-                       ;; ("M-g e" . consult-compile-error)
-                       ("M-g f" . consult-flycheck)
-                       ;; ("M-g g" . consult-goto-line)
+                       ("M-g e" . consult-compile-error)
+                       ;; ("M-g f" . consult-flycheck)
+                       ("M-g f" . consult-flymake)
+                       ("M-g g" . consult-goto-line)
                        ;; ("M-g M-g" . consult-goto-line)
                        ("M-g o" . consult-org-heading)
-                       ;; ("M-g m" . consult-mark)
-                       ;; ("M-g k" . consult-global-mark)
+                       ("M-g m" . consult-mark)
+                       ("M-g k" . consult-global-mark)
                        ("M-g i" . consult-imenu)
                        ("M-g I" . consult-imenu-multi)
-                       ;; ("M-s e" . consult-isearch-history)
+                       ("M-s e" . consult-isearch-history)
                        ;; extras, which stomp on command commands
                        ("C-c h" . consult-history)
                        ("C-c m" . consult-mode-command)
@@ -963,8 +976,7 @@ Consult - handy featureful commands, sometimes too noisy
                        ;; no idea what registers are for, I will read about it :P
                        ("M-#" . consult-register-load)
                        ("M-'" . consult-register-store) ;; orig. abbrev-prefix-mark (unrelated)
-                       ("C-M-#" . consult-register)
-                       ))
+                       ("C-M-#" . consult-register)))
       (keymap-global-set (car binding) (cdr binding)))
 
     ;; this is better than isearch
@@ -1308,14 +1320,14 @@ Diff Highlight Mode loaded when the global mode is enabled above. Magit hopefull
 
 Because it may be ass code but it is the best at what it does.
 
-;;; Useful knowledge, might deserve some extra binds
+    ;;; Useful knowledge, might deserve some extra binds
 
-;; C-M-n forward-list Move forward over a parenthetical group
-;; C-M-p backward-list Move backward over a parenthetical group
-;; C-M-f forward-sexp Move forward over a balanced expression
-;; C-M-b backward-sexp Move backward over a balanced expression
-;; C-M-k kill-sexp Kill balanced expression forward
-;; C-M-SPC mark-sexp Put the mark at the end of the sexp.
+    ;; C-M-n forward-list Move forward over a parenthetical group
+    ;; C-M-p backward-list Move backward over a parenthetical group
+    ;; C-M-f forward-sexp Move forward over a balanced expression
+    ;; C-M-b backward-sexp Move backward over a balanced expression
+    ;; C-M-k kill-sexp Kill balanced expression forward
+    ;; C-M-SPC mark-sexp Put the mark at the end of the sexp.
 
     ;; yer basic lisps
     (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
