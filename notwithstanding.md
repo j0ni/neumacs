@@ -101,6 +101,13 @@ my intent to write a literate configuration for my emacs, in all likelihood this
 ### Useful functions
 
     ;; handy fns
+    (defun j0ni/eldoc-layout ()
+      (interactive)
+      (delete-other-windows)
+      (eldoc-doc-buffer)
+      (j0ni/toggle-window-split)
+      (maximize-window))
+
     (defun j0ni/disable-truncate-lines ()
       (interactive)
       (setq-local truncate-lines nil))
@@ -278,7 +285,7 @@ This is a useful gate for setting up bindings and other Mac OS bits and pieces.
 
 This idea I acquired from John Wiegley's dotfiles.
 
-    (defvar j0ni/use-eglot t "Switch this off to enable LSP instead.")
+    (defvar j0ni/use-eglot nil "Switch this off to enable LSP instead.")
 
 Honestly, there are more of these, but I moved them to early-init.el for reasons that may have become lost in the mists of time. Mostly fonts.
 
@@ -811,6 +818,15 @@ This is cool, straight from the corfu wiki, it seems to do what I have always ex
 
     (define-key corfu-map [remap move-beginning-of-line] #'corfu-beginning-of-prompt)
     (define-key corfu-map [remap move-end-of-line] #'corfu-end-of-prompt)
+
+Another potentially useful hack - move the completion into the minibuffer on demand.
+
+    (defun corfu-move-to-minibuffer ()
+      (interactive)
+      (let ((completion-extra-properties corfu--extra)
+            completion-cycle-threshold completion-cycling)
+        (apply #'consult-completion-in-region completion-in-region--data)))
+    (keymap-set corfu-map "M-m" #'corfu-move-to-minibuffer)
 
 
 <a id="org79279a5"></a>
@@ -1578,7 +1594,7 @@ I am loving this language more and more.
     (setq rustic-lsp-format t)
     (setq rustic-test-arguments "-- --nocapture")
 
-    (rustic-doc-setup)
+    ;; (rustic-doc-setup)
 
 
 <a id="orgc41f1fe"></a>

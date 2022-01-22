@@ -19,6 +19,13 @@ my intent to write a literate configuration for my emacs, in all likelihood this
 
 #+begin_src emacs-lisp
 ;; handy fns
+(defun j0ni/eldoc-layout ()
+  (interactive)
+  (delete-other-windows)
+  (eldoc-doc-buffer)
+  (j0ni/toggle-window-split)
+  (maximize-window))
+
 (defun j0ni/disable-truncate-lines ()
   (interactive)
   (setq-local truncate-lines nil))
@@ -192,7 +199,7 @@ This is a useful gate for setting up bindings and other Mac OS bits and pieces.
 This idea I acquired from John Wiegley's dotfiles.
 
 #+begin_src emacs-lisp
-(defvar j0ni/use-eglot t "Switch this off to enable LSP instead.")
+(defvar j0ni/use-eglot nil "Switch this off to enable LSP instead.")
 #+end_src
 
 Honestly, there are more of these, but I moved them to early-init.el for reasons that may have become lost in the mists of time. Mostly fonts.
@@ -1533,7 +1540,7 @@ I am loving this language more and more.
 (setq rustic-lsp-format t)
 (setq rustic-test-arguments "-- --nocapture")
 
-(rustic-doc-setup)
+;; (rustic-doc-setup)
 #+end_src
 
 *** Org Mode
