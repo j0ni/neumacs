@@ -660,7 +660,7 @@ Of course, fido-mode completely ignores these settings.
 ;;         (consult-line (styles . (basic substring)))))
 #+end_src
 
-Using orderless.
+Using orderless, this all means NOTHING.
 
 #+begin_src emacs-lisp
 (setq completion-styles '(orderless))
