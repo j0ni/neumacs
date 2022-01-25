@@ -67,7 +67,7 @@
         46. [Set all the fonts one last time](#org9071105)
         47. [Mu 4 Emacs](#orge0f3941)
         48. [Crypto setup](#org3b6a0c5)
-        49. [Edtiroconfig](#orge2f6128)
+        49. [Editorconfig](#orgaa1572b)
         50. [Custom file configuration](#orgd9d6e1f)
 
 
@@ -283,10 +283,6 @@ This is a useful gate for setting up bindings and other Mac OS bits and pieces.
     (defvar j0ni/is-mac (memq window-system '(mac ns))
       "This is a useful gate for setting up specific keybindings")
 
-This idea I acquired from John Wiegley's dotfiles.
-
-    (defvar j0ni/use-eglot nil "Switch this off to enable LSP instead.")
-
 Honestly, there are more of these, but I moved them to early-init.el for reasons that may have become lost in the mists of time. Mostly fonts.
 
 
@@ -318,7 +314,6 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
     (straight-use-package 'diff-hl)
     (straight-use-package 'dockerfile-mode)
     (straight-use-package 'editorconfig)
-    (straight-use-package 'eglot)
     (straight-use-package 'elfeed)
     (straight-use-package 'erc)
     (straight-use-package 'eros)
@@ -335,6 +330,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
     (straight-use-package 'ggtags)
     (straight-use-package 'git-timemachine)
     (straight-use-package 'graphql-mode)
+    (straight-use-package 'gruvbox-theme)
     (straight-use-package 'haskell-mode)
     (straight-use-package 'hl-todo)
     (straight-use-package 'ibuffer-vc)
@@ -632,9 +628,9 @@ A little configuration for xref, which is honesly mostly totally fine.
     (setq xref-show-xrefs-function 'xref--show-xref-buffer) ; default
     (setq xref-show-definitions-function 'xref-show-definitions-completing-read)
 
-Eldoc tweaks to make it less intrusive.
+Eldoc tweaks to make it less intrusive. The first is mostly for eglot which means well, but is kind of janky.
 
-    (setq eldoc-echo-area-use-multiline-p nil)
+    ;; (setq eldoc-echo-area-use-multiline-p nil)
     (setq eldoc-echo-area-prefer-doc-buffer t)
 
 Thats the end of the baseline emacs configuration.
@@ -759,10 +755,10 @@ A fast vertical minibuffer manager which mostly plays nice with builtin stuff. M
     ;; this
     ;; (vertico-unobtrusive-mode 1)
     ;; or this
-    (vertico-buffer-mode 1)
-    (setq vertico-buffer-display-action
-          '(display-buffer-below-selected
-            display-buffer-at-bottom))
+    ;; (vertico-buffer-mode 1)
+    ;; (setq vertico-buffer-display-action
+    ;;       '(display-buffer-below-selected
+    ;;         display-buffer-at-bottom))
     ;; but not both
 
     (keymap-set vertico-map "RET" #'vertico-directory-enter)
@@ -910,30 +906,38 @@ OK I lied a bit. ibuffer is built-in, but ibuffer-vc is not, and I wanted to kee
 
 ### Flymake
 
+Flymake holds the promise of being just enough. But then there's some tunable missing, or something else just rudely installs flycheck and switches it on without asking. So for now, configure it and leave it off.
+
     (require 'flymake)
     (setq flymake-fringe-indicator-position 'right-fringe)
     (setq flymake-no-changes-timeout nil)
     (setq flymake-start-on-flymake-mode t)
     (setq flymake-start-on-save-buffer t)
-    (add-hook 'prog-mode-hook #'flymake-mode)
+    ;; (add-hook 'prog-mode-hook #'flymake-mode)
 
 
 <a id="org67e6a88"></a>
 
 ### Flycheck
 
+This is another thing that should have been an improvement to existing emacs.
+
     (setq flycheck-indication-mode 'right-fringe)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+
     (setq flycheck-checker-error-threshold nil)
-    (setq flycheck-idle-change-delay 10.0)
-    (setq flycheck-display-errors-delay 10.0)
-    (setq flycheck-idle-buffer-switch-delay 10.0)
+    (setq flycheck-idle-change-delay nil)
+    (setq flycheck-display-errors-delay nil)
+    (setq flycheck-idle-buffer-switch-delay nil)
+
     (setq-default flycheck-emacs-lisp-load-path 'inherit)
+
     (setq flycheck-disabled-checkers '(emacs-lisp-checkdoc))
 
-Switch it on, or don't - flymake is sometimes worth checking out.
+Switch it on.
 
-    ;; (add-hook 'prog-mode-hook #'flycheck-mode)
-    ;; (require 'consult-flycheck)
+    (add-hook 'prog-mode-hook #'flycheck-mode)
+    (require 'consult-flycheck)
 
 
 <a id="org651a463"></a>
@@ -969,8 +973,8 @@ Consult - handy featureful commands, sometimes too noisy
                        ("M-s u" . consult-focus-lines)
                        ;; goto map
                        ("M-g e" . consult-compile-error)
-                       ;; ("M-g f" . consult-flycheck)
-                       ("M-g f" . consult-flymake)
+                       ("M-g f" . consult-flycheck)
+                       ;; ("M-g f" . consult-flymake)
                        ("M-g g" . consult-goto-line)
                        ;; ("M-g M-g" . consult-goto-line)
                        ("M-g o" . consult-org-heading)
@@ -1033,6 +1037,7 @@ Rust setup for lsp, which is honestly the main use case.
 
     (setq lsp-rust-analyzer-cargo-watch-command "clippy")
     (setq lsp-rust-analyzer-server-display-inlay-hints t)
+    (setq lsp-rust-analyzer-display-chaining-hints t)
     (setq lsp-rust-clippy-preference "on")
 
 Extras, UI stuff that I mostly don't use, and some per-buffer local overrides.
@@ -1040,31 +1045,24 @@ Extras, UI stuff that I mostly don't use, and some per-buffer local overrides.
     (require 'lsp-ui)
     (require 'consult-lsp)
 
-    (setq lsp-ui-sideline-delay 1.0)
+    ;; default is t
+    (setq lsp-enable-folding nil)
+    ;; default is t
+    (setq lsp-eldoc-enable-hover t)
+    ;; default is t
+    (setq lsp-enable-on-type-formatting t)
+    ;; default is t
+    (setq lsp-before-save-edits nil)
+    ;; default is t
+    (setq lsp-completion-enable t)
+    ;; default is t
+    (setq lsp-enable-symbol-highlighting t)
 
+    (add-hook 'lsp-mode-hook #'lsp-ui-mode)
     (add-hook 'lsp-managed-mode-hook
               (lambda ()
-                (setq-local flycheck-checker-error-threshold nil)
-                (setq-local flycheck-idle-change-delay 1.0)
-                (setq-local flycheck-display-errors-delay 1.0)
-                (setq-local flycheck-idle-buffer-switch-delay 1.0)
                 ;; turn off idle highlight, let lsp do it...maybe
-                (setq-local idle-highlight-timer nil)
-                ;; default is t
-                (setq-local lsp-enable-folding nil)
-                ;; default is t
-                (setq-local lsp-eldoc-enable-hover t)
-                ;; default is t
-                (setq-local lsp-enable-on-type-formatting t)
-                ;; default is t
-                (setq-local lsp-before-save-edits t)
-                ;; default is t
-                (setq-local lsp-completion-enable t)
-                ;; default is t
-                (setq-local lsp-enable-symbol-highlighting t)
-                ;; this should substitute orderless for lsp's capf
-                (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-                      '(orderless))))
+                (setq-local idle-highlight-timer nil)))
 
 
 <a id="orgc4e324f"></a>
@@ -1234,14 +1232,18 @@ This is a bit clumsy, but it works
         (modus-themes-load-themes)
 
         ;; (load-theme 'modus-operandi t)
-        ;; (load-theme 'modus-vivendi t)
+        (load-theme 'modus-vivendi t)
 
 2.  The Matrix
 
     Weirdly, this is speaking to me at the moment.
 
-        (require 'the-matrix-theme)
-        (load-theme 'the-matrix t)
+        ;; (require 'the-matrix-theme)
+        ;; (load-theme 'the-matrix t)
+
+3.  Gruvbox
+
+        ;; (load-theme 'gruvbox-dark-hard t)
 
 
 <a id="orgcd40cdf"></a>
@@ -1485,7 +1487,7 @@ Start off with cider for now.
       (add-hook hook #'cider-mode)
       (add-hook hook #'paredit-mode)
       (add-hook hook #'subword-mode)
-      (add-hook hook (if j0ni/use-eglot #'eglot-ensure #'lsp)))
+      (add-hook hook #'lsp))
 
 
 <a id="org6d413d0"></a>
@@ -1552,7 +1554,7 @@ I spent a lot more time on this than I ever spent writing C or C++.
 
 ### Typescript
 
-    (add-hook 'typescript-mode-hook (if j0ni/use-eglot #'eglot-ensure #'lsp))
+    (add-hook 'typescript-mode-hook #'lsp)
 
 
 <a id="org8f04766"></a>
@@ -1570,20 +1572,13 @@ This renders eval results in-buffer at the end of the eval'd expression. Honestl
 
 I am loving this language more and more.
 
-    (if j0ni/use-eglot
-        (progn
-          (add-hook 'rustic-mode-hook #'eglot-ensure)
-          (setq rustic-lsp-client 'eglot))
-      (add-hook 'rustic-mode-hook #'lsp)
-      (setq rustic-lsp-client 'lsp-mode)
-      (when (bound-and-true-p flycheck-mode)
-        (rustic-flycheck-setup)))
+    (add-hook 'rustic-mode-hook #'lsp)
+    (setq rustic-lsp-client 'lsp-mode)
+
+    (rustic-flycheck-setup)
 
     (add-hook 'rustic-mode-hook #'electric-pair-local-mode)
     (add-hook 'rustic-mode-hook #'rustic-doc-mode)
-    (add-hook 'rustic-mode-hook
-              (lambda ()
-                (setq-local completion-in-region-function #'completion--in-region)))
 
     (setq rust-indent-method-chain nil)
 
@@ -1946,9 +1941,9 @@ Either way, this is flaky as hell and almost always needs tweaking for a new OS.
     (pinentry-start t) ;; don't complain if its already running
 
 
-<a id="orge2f6128"></a>
+<a id="orgaa1572b"></a>
 
-### Edtiroconfig
+### Editorconfig
 
 Because I guess it's nice to play well with others. Dang that hurts to write.
 
