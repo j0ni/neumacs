@@ -277,6 +277,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'rbenv)
 (straight-use-package 'restclient)
 (straight-use-package 'ruby-mode)
+(straight-use-package 'rust-mode)
 (straight-use-package 'rustic)
 (straight-use-package 'simple-httpd)
 (straight-use-package 'sly)
@@ -293,6 +294,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'web-mode)
 (straight-use-package 'which-key)
 (straight-use-package 'yaml-mode)
+(straight-use-package 'yasnippet)
 #+end_src
 
 ** Baseline Emacs Configuration
@@ -977,7 +979,6 @@ Language Server Protocol, a Microsoft invention, is providing a common interface
 
 #+begin_src emacs-lisp
 (require 'lsp-mode)
-(setq lsp-keymap-prefix "C-c l")
 #+end_src
 
 LSP tries to switch on company-mode, and it's fiddly to prevent. This apparently is how you do it (from the corfu github wiki).
@@ -995,10 +996,19 @@ LSP tries to switch on company-mode, and it's fiddly to prevent. This apparently
 Rust setup for lsp, which is honestly the main use case.
 
 #+begin_src emacs-lisp
+(setq lsp-keymap-prefix "C-c l")
+
+(setq lsp-rust-server 'rust-analyzer)
+
 (setq lsp-rust-analyzer-cargo-watch-command "clippy")
+(setq lsp-rust-clippy-preference "on")
+
+(setq lsp-rust-analyzer-import-merge-behaviour "none")
 (setq lsp-rust-analyzer-server-display-inlay-hints t)
 (setq lsp-rust-analyzer-display-chaining-hints t)
-(setq lsp-rust-clippy-preference "on")
+(setq lsp-rust-analyzer-display-parameter-hints t)
+
+(setq lsp-rust-analyzer-import-granularity "item")
 #+end_src
 
 Extras, UI stuff that I mostly don't use, and some per-buffer local overrides.
@@ -1020,11 +1030,40 @@ Extras, UI stuff that I mostly don't use, and some per-buffer local overrides.
 ;; default is t
 (setq lsp-enable-symbol-highlighting t)
 
+(add-hook 'lsp-mode-hook #'yas-minor-mode)
 (add-hook 'lsp-mode-hook #'lsp-ui-mode)
 (add-hook 'lsp-managed-mode-hook
           (lambda ()
             ;; turn off idle highlight, let lsp do it...maybe
             (setq-local idle-highlight-timer nil)))
+#+end_src
+
+*** Rust
+I am loving this language more and more.
+
+Rust mode can do most of the things.
+
+#+begin_src emacs-lisp
+(add-hook 'rust-mode-hook #'lsp)
+(add-hook 'rust-mode-hook #'electric-pair-local-mode)
+#+end_src
+
+Rustic mode is layered on top, but I'm not sure what it brings.
+
+#+begin_src emacs-lisp
+(setq rustic-lsp-client 'lsp-mode)
+(rustic-flycheck-setup)
+
+(add-hook 'rustic-mode-hook #'rustic-doc-mode)
+
+(setq rustic-spinner-type 'moon)
+(setq rustic-format-trigger nil)
+
+(setq rustic-lsp-server 'rust-analyzer)
+(setq rustic-lsp-format t)
+(setq rustic-test-arguments "-- --nocapture")
+
+;; (rustic-doc-setup)
 #+end_src
 
 *** Find File in Project
@@ -1511,30 +1550,6 @@ This renders eval results in-buffer at the end of the eval'd expression. Honestl
 
 #+begin_src emacs-lisp
 (eros-mode 1)
-#+end_src
-
-*** Rust
-I am loving this language more and more.
-
-#+begin_src emacs-lisp
-(add-hook 'rustic-mode-hook #'lsp)
-(setq rustic-lsp-client 'lsp-mode)
-
-(rustic-flycheck-setup)
-
-(add-hook 'rustic-mode-hook #'electric-pair-local-mode)
-(add-hook 'rustic-mode-hook #'rustic-doc-mode)
-
-(setq rust-indent-method-chain nil)
-
-(setq rustic-spinner-type 'moon)
-(setq rustic-format-trigger nil)
-
-(setq rustic-lsp-server 'rust-analyzer)
-(setq rustic-lsp-format t)
-(setq rustic-test-arguments "-- --nocapture")
-
-;; (rustic-doc-setup)
 #+end_src
 
 *** Org Mode

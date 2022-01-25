@@ -25,37 +25,37 @@
         4.  [Flycheck](#org67e6a88)
         5.  [Consult](#org651a463)
         6.  [LSP](#orgecd2bad)
-        7.  [Find File in Project](#orgc4e324f)
-        8.  [IRC - ERC and RCIRC](#orga0aefc3)
-        9.  [Undo-fu](#org08fede6)
-        10. [exec-path-from-shell](#org4417fbe)
-        11. [Highlight TODO Mode](#org65d2890)
-        12. [Volatile Highlights](#org0be92ef)
-        13. [Themes!](#orgff044aa)
-        14. [Rainbow Mode](#orgcd40cdf)
-        15. [Rainbow Delimiters Mode](#org7af2676)
-        16. [Diff Highlight Mode](#org563ab4f)
-        17. [Git Time Machine](#org27f469e)
-        18. [Expand Region](#orgb181a98)
-        19. [Anzu](#orgc9c9e56)
-        20. [Browse Kill Ring](#orgd36d6f8)
-        21. [Magit](#orge2464d0)
-        22. [Idle highlight mode](#orgd956636)
-        23. [Paredit](#orga9e9753)
-        24. [Scheme](#org9727a5d)
-        25. [Which Key](#org911dc70)
-        26. [Window Switcher](#org30fc608)
-        27. [Web mode and webbish stuff](#orgd5dbd7c)
-        28. [Common Lisp - Sly](#orgdfe11d9)
-        29. [Clojure](#org9dc2752)
-        30. [Lua and Fennel](#org6d413d0)
-        31. [Ruby](#org128ae96)
-        32. [C/C++](#org9a67f01)
-        33. [Markdown](#org287bec0)
-        34. [Purescript](#orgf73efcc)
-        35. [Typescript](#org1207ece)
-        36. [Evaluation overlays](#org8f04766)
-        37. [Rust](#org438a553)
+        7.  [Rust](#org438a553)
+        8.  [Find File in Project](#orgc4e324f)
+        9.  [IRC - ERC and RCIRC](#orga0aefc3)
+        10. [Undo-fu](#org08fede6)
+        11. [exec-path-from-shell](#org4417fbe)
+        12. [Highlight TODO Mode](#org65d2890)
+        13. [Volatile Highlights](#org0be92ef)
+        14. [Themes!](#orgff044aa)
+        15. [Rainbow Mode](#orgcd40cdf)
+        16. [Rainbow Delimiters Mode](#org7af2676)
+        17. [Diff Highlight Mode](#org563ab4f)
+        18. [Git Time Machine](#org27f469e)
+        19. [Expand Region](#orgb181a98)
+        20. [Anzu](#orgc9c9e56)
+        21. [Browse Kill Ring](#orgd36d6f8)
+        22. [Magit](#orge2464d0)
+        23. [Idle highlight mode](#orgd956636)
+        24. [Paredit](#orga9e9753)
+        25. [Scheme](#org9727a5d)
+        26. [Which Key](#org911dc70)
+        27. [Window Switcher](#org30fc608)
+        28. [Web mode and webbish stuff](#orgd5dbd7c)
+        29. [Common Lisp - Sly](#orgdfe11d9)
+        30. [Clojure](#org9dc2752)
+        31. [Lua and Fennel](#org6d413d0)
+        32. [Ruby](#org128ae96)
+        33. [C/C++](#org9a67f01)
+        34. [Markdown](#org287bec0)
+        35. [Purescript](#orgf73efcc)
+        36. [Typescript](#org1207ece)
+        37. [Evaluation overlays](#org8f04766)
         38. [Org Mode](#orgc41f1fe)
         39. [ELFeed - RSS Reader](#org070b716)
         40. [Telega](#orgf3ad7fe)
@@ -364,6 +364,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
     (straight-use-package 'rbenv)
     (straight-use-package 'restclient)
     (straight-use-package 'ruby-mode)
+    (straight-use-package 'rust-mode)
     (straight-use-package 'rustic)
     (straight-use-package 'simple-httpd)
     (straight-use-package 'sly)
@@ -380,6 +381,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
     (straight-use-package 'web-mode)
     (straight-use-package 'which-key)
     (straight-use-package 'yaml-mode)
+    (straight-use-package 'yasnippet)
 
 
 <a id="org581e40e"></a>
@@ -1021,7 +1023,6 @@ Consult - handy featureful commands, sometimes too noisy
 Language Server Protocol, a Microsoft invention, is providing a common interface for a bunch of languages that are otherwise not so well supported. It's also proving useful in some other well supported modes like clojure and rust.
 
     (require 'lsp-mode)
-    (setq lsp-keymap-prefix "C-c l")
 
 LSP tries to switch on company-mode, and it's fiddly to prevent. This apparently is how you do it (from the corfu github wiki).
 
@@ -1035,10 +1036,19 @@ LSP tries to switch on company-mode, and it's fiddly to prevent. This apparently
 
 Rust setup for lsp, which is honestly the main use case.
 
+    (setq lsp-keymap-prefix "C-c l")
+
+    (setq lsp-rust-server 'rust-analyzer)
+
     (setq lsp-rust-analyzer-cargo-watch-command "clippy")
+    (setq lsp-rust-clippy-preference "on")
+
+    (setq lsp-rust-analyzer-import-merge-behaviour "none")
     (setq lsp-rust-analyzer-server-display-inlay-hints t)
     (setq lsp-rust-analyzer-display-chaining-hints t)
-    (setq lsp-rust-clippy-preference "on")
+    (setq lsp-rust-analyzer-display-parameter-hints t)
+
+    (setq lsp-rust-analyzer-import-granularity "item")
 
 Extras, UI stuff that I mostly don't use, and some per-buffer local overrides.
 
@@ -1058,11 +1068,40 @@ Extras, UI stuff that I mostly don't use, and some per-buffer local overrides.
     ;; default is t
     (setq lsp-enable-symbol-highlighting t)
 
+    (add-hook 'lsp-mode-hook #'yas-minor-mode)
     (add-hook 'lsp-mode-hook #'lsp-ui-mode)
     (add-hook 'lsp-managed-mode-hook
               (lambda ()
                 ;; turn off idle highlight, let lsp do it...maybe
                 (setq-local idle-highlight-timer nil)))
+
+
+<a id="org438a553"></a>
+
+### Rust
+
+I am loving this language more and more.
+
+Rust mode can do most of the things.
+
+    (add-hook 'rust-mode-hook #'lsp)
+    (add-hook 'rust-mode-hook #'electric-pair-local-mode)
+
+Rustic mode is layered on top, but I'm not sure what it brings.
+
+    (setq rustic-lsp-client 'lsp-mode)
+    (rustic-flycheck-setup)
+
+    (add-hook 'rustic-mode-hook #'rustic-doc-mode)
+
+    (setq rustic-spinner-type 'moon)
+    (setq rustic-format-trigger nil)
+
+    (setq rustic-lsp-server 'rust-analyzer)
+    (setq rustic-lsp-format t)
+    (setq rustic-test-arguments "-- --nocapture")
+
+    ;; (rustic-doc-setup)
 
 
 <a id="orgc4e324f"></a>
@@ -1564,32 +1603,6 @@ I spent a lot more time on this than I ever spent writing C or C++.
 This renders eval results in-buffer at the end of the eval'd expression. Honestly I've forgotten what life was like before this feature.
 
     (eros-mode 1)
-
-
-<a id="org438a553"></a>
-
-### Rust
-
-I am loving this language more and more.
-
-    (add-hook 'rustic-mode-hook #'lsp)
-    (setq rustic-lsp-client 'lsp-mode)
-
-    (rustic-flycheck-setup)
-
-    (add-hook 'rustic-mode-hook #'electric-pair-local-mode)
-    (add-hook 'rustic-mode-hook #'rustic-doc-mode)
-
-    (setq rust-indent-method-chain nil)
-
-    (setq rustic-spinner-type 'moon)
-    (setq rustic-format-trigger nil)
-
-    (setq rustic-lsp-server 'rust-analyzer)
-    (setq rustic-lsp-format t)
-    (setq rustic-test-arguments "-- --nocapture")
-
-    ;; (rustic-doc-setup)
 
 
 <a id="orgc41f1fe"></a>
