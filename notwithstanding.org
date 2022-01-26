@@ -1007,6 +1007,7 @@ Rust setup for lsp, which is honestly the main use case.
 (setq lsp-rust-analyzer-server-display-inlay-hints t)
 (setq lsp-rust-analyzer-display-chaining-hints t)
 (setq lsp-rust-analyzer-display-parameter-hints t)
+(setq lsp-rust-analyzer-proc-macro-enable t)
 
 (setq lsp-rust-analyzer-import-granularity "item")
 #+end_src
