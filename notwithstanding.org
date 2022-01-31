@@ -1551,8 +1551,9 @@ Start off with cider for now.
   (add-hook hook #'cider-mode)
   (add-hook hook #'paredit-mode)
   (add-hook hook #'subword-mode)
-  (add-hook hook (lambda () (setq-local lsp-eldoc-enable-hover nil)))
-  (add-hook hook #'lsp))
+  ;; (add-hook hook (lambda () (setq-local lsp-eldoc-enable-hover nil)))
+  ;; (add-hook hook #'lsp)
+  )
 #+end_src
 
 *** Lua and Fennel
