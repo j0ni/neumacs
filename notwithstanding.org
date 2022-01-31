@@ -214,6 +214,7 @@ Note that these commands do not `require` anything, but they do construct the au
 Future me may well ditch the autoloads completely in favour of git submodules, no build step, and explicit use-package configuration. That's because use-package itself will implicitly load functions when you declare them via :hooks or :binds, and explicitly via :commands. In the context of another package manager such as straight.el or package.el, that's just downright confusing, because it isn't clear what was required and what was autoloaded. In a git submodule world that might not be so confusing.
 
 #+begin_src emacs-lisp
+(straight-use-package 'adoc-mode)
 (straight-use-package 'all-the-icons)
 (straight-use-package 'anzu)
 (straight-use-package 'browse-at-remote)
@@ -258,7 +259,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'magit)
 (straight-use-package 'marginalia)
 (straight-use-package 'markdown-mode)
-(straight-use-package 'the-matrix-theme)
+(straight-use-package 'mct)
 (straight-use-package 'minions)
 (straight-use-package 'modus-themes)
 (straight-use-package 'monroe)
@@ -286,6 +287,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'sly-quicklisp)
 (straight-use-package 'switch-window)
 (straight-use-package 'telega)
+(straight-use-package 'the-matrix-theme)
 (straight-use-package 'typescript-mode)
 (straight-use-package 'undo-fu)
 (straight-use-package 'undo-fu-session)
@@ -451,7 +453,6 @@ We should absolutely not use tabs for indentation though, so make sure we never 
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 8)
 (setq indent-tabs-mode nil)
-(setq tab-always-indent t)
 (setq require-final-newline t)
 #+end_src
 
@@ -582,7 +583,7 @@ Time and date, and battery, for the modeline.
         ("Asia/Tokyo" "Tokyo")))
 
 (display-time-mode 1)
-(display-battery-mode 1)
+;; (display-battery-mode 1)
 #+end_src
 
 A little configuration for xref, which is honesly mostly totally fine.
@@ -614,14 +615,15 @@ This gets a special section for having so much to configure.
 (setq minibuffer-eldef-shorten-default t)
 ;; I think this is bad for my impulsive fingers
 (setq enable-recursive-minibuffers t)
-;; at least show us where we are
-(minibuffer-depth-indicate-mode t)
 ;; it shouldn't be disallowed
 (setq minibuffer-scroll-window t)
 
 ;; Do not allow the cursor in the minibuffer prompt
 (setq minibuffer-prompt-properties
       '(read-only t cursor-intangible t face minibuffer-prompt))
+
+;; at least show us where we are if we're recursed
+(minibuffer-depth-indicate-mode 1)
 
 (minibuffer-electric-default-mode 1)
 (file-name-shadow-mode 1)
@@ -638,6 +640,10 @@ Not all of this is respected by various different systems I try out and switch b
 (setq completion-cycle-threshold 3)
 (setq completions-detailed t)
 (setq completions-format 'one-column)
+(setq completion-show-inline-help nil)
+
+(setq-default tab-always-indent 'complete)
+(setq-default tab-first-completion 'word-or-paren-or-punct)
 #+end_src
 
 These define the completion algorithms used in general, and in each separate context. The list of overrides is non-exhaustive, and I cannot find any way of figuring out what all the keys should be.
@@ -663,17 +669,25 @@ Of course, fido-mode completely ignores these settings.
 Using orderless, this all means NOTHING.
 
 #+begin_src emacs-lisp
-(setq completion-styles '(orderless))
-
+(setq completion-styles '(basic substring initials flex partial-completion orderless))
+(setq completion-category-defaults nil)
 (setq completion-category-overrides
       '((buffer (styles . (orderless)))
-        (file (styles . (orderless)))
+        (file (styles . (initials partial-completion orderless)))
         (unicode-name (styles . (orderless)))
         (project-file (styles . (orderless)))
         (xref-location (styles . (orderless)))
         (info-menu (styles . (orderless)))
         (symbol-help (styles . (orderless)))
         (consult-line (styles . (orderless)))))
+#+end_src
+
+More orderless configuration. From MCT docs, I finally understand why putting orderless at the end of the list of completion-styles works. Basically, hit space and it's the only one that will continue to match.
+
+#+begin_src emacs-lisp
+(let ((map minibuffer-local-completion-map))
+  (define-key map (kbd "SPC") nil)
+  (define-key map (kbd "?") nil))
 #+end_src
 
 *** Extra builtins
@@ -712,7 +726,7 @@ A fast vertical minibuffer manager which mostly plays nice with builtin stuff. M
 
 #+begin_src emacs-lisp
 ;; (setq straight-recipe-overrides nil)
-(vertico-mode 1)
+;; (vertico-mode 1)
 ;; this
 ;; (vertico-unobtrusive-mode 1)
 ;; or this
@@ -722,11 +736,60 @@ A fast vertical minibuffer manager which mostly plays nice with builtin stuff. M
 ;;         display-buffer-at-bottom))
 ;; but not both
 
-(keymap-set vertico-map "RET" #'vertico-directory-enter)
-(keymap-set vertico-map "C-j" #'vertico-directory-enter)
-(keymap-set vertico-map "DEL" #'vertico-directory-delete-char)
-(keymap-set vertico-map "M-DEL" #'vertico-directory-delete-word)
-(add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+;; (keymap-set vertico-map "RET" #'vertico-directory-enter)
+;; (keymap-set vertico-map "C-j" #'vertico-directory-enter)
+;; (keymap-set vertico-map "DEL" #'vertico-directory-delete-char)
+;; (keymap-set vertico-map "M-DEL" #'vertico-directory-delete-word)
+;; (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+#+end_src
+
+*** MCT
+This is Prot's close-to-emacs-metal system. I like it, but it isn't quite polished enough. Every so often I give it another shot, and just now it got a release so why the hell not.
+
+#+begin_src emacs-lisp
+(require 'mct)
+
+(setq mct-completion-window-size '(15 . 15))
+(setq mct-remove-shadowed-file-name t)
+(setq mct-hide-completion-mode-line nil)
+(setq mct-show-completion-line-numbers nil)
+(setq mct-apply-completion-stripes nil)
+
+(setq mct-minimum-input 3)
+(setq mct-live-update-delay 0.3)
+(setq mct-completions-format 'one-column)
+
+(setq mct-completion-passlist
+      '(;; Some commands
+        imenu
+        Info-goto-node
+        Info-index
+        Info-menu
+        vc-retrieve-tag
+        ;; Some completion categories
+        project-file
+        xref-location
+        file
+        buffer
+        consult-location))
+
+;; Alternatively - specify the window placement in more detail
+;;
+;; (setq mct-display-buffer-action
+;;       (quote ((display-buffer-reuse-window
+;;                display-buffer-in-side-window)
+;;               (side . left)
+;;               (slot . 99)
+;;               (window-width . 0.3))))
+
+(add-hook 'completion-list-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
+
+(keymap-set mct-minibuffer-completion-list-map "C-j" #'mct-complete-and-exit)
+(keymap-set mct-minibuffer-local-completion-map "C-j" #'mct-complete-and-exit)
+(keymap-set mct-minibuffer-local-filename-completion-map "C-j" #'mct-complete-and-exit)
+
+(mct-minibuffer-mode 1)
+(mct-region-mode 1)
 #+end_src
 
 *** Completion in Region
@@ -748,7 +811,7 @@ Corfu. Why this and not company? Better integration, no special independent invo
 
 #+begin_src emacs-lisp
 (require 'corfu)
-(corfu-global-mode 1)
+;; (corfu-global-mode 1)
 
 (setq corfu-cycle t)                   ;; Enable cycling for `corfu-next/previous'
 (setq corfu-auto nil)                  ;; Auto completion
@@ -1423,6 +1486,11 @@ Some of the shit we just have to have, unsightly though it may be.
 (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
 #+end_src
 
+*** ASCII Doc
+#+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.adoc\\'" . adoc-mode))
+#+end_src
+
 *** Common Lisp - Sly
 
 For common lisp, this is most likely the successor to slime.
@@ -1474,6 +1542,8 @@ Some harmless inf-clojure setup
 Start off with cider for now.
 
 #+begin_src emacs-lisp
+(setq cider-repl-display-help-banner nil)
+(setq cider-use-fringe-indicators nil)
 (dolist (hook '(clojure-mode-hook
                 clojurec-mode-hook
                 clojurescript-mode-hook
@@ -1481,6 +1551,7 @@ Start off with cider for now.
   (add-hook hook #'cider-mode)
   (add-hook hook #'paredit-mode)
   (add-hook hook #'subword-mode)
+  (add-hook hook (lambda () (setq-local lsp-eldoc-enable-hover nil)))
   (add-hook hook #'lsp))
 #+end_src
 
@@ -1773,7 +1844,7 @@ Either way, this is flaky as hell and almost always needs tweaking for a new OS.
 (if j0ni/is-mac
     (setq j0ni/mu4e-path "/usr/local/share/emacs/site-lisp/mu/mu4e")
   (setq j0ni/mu4e-path "/usr/local/share/emacs/site-lisp/mu4e"))
-
+(setq j0ni/mu4e-path "/usr/share/emacs/site-lisp/mu4e")
 (add-to-list 'load-path j0ni/mu4e-path)
 
 (require 'mu4e)
