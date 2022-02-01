@@ -220,6 +220,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'browse-at-remote)
 (straight-use-package 'browse-kill-ring)
 (straight-use-package 'cider)
+(straight-use-package 'cider-eval-sexp-fu)
 (straight-use-package 'clojure-mode)
 (straight-use-package 'consult)
 (straight-use-package 'consult-flycheck)
@@ -227,10 +228,12 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'corfu)
 (straight-use-package 'diff-hl)
 (straight-use-package 'dockerfile-mode)
+(straight-use-package 'dracula-theme)
 (straight-use-package 'editorconfig)
 (straight-use-package 'elfeed)
 (straight-use-package 'erc)
 (straight-use-package 'eros)
+(straight-use-package 'eval-sexp-fu)
 (straight-use-package 'exec-path-from-shell)
 (straight-use-package 'expand-region)
 (straight-use-package 'fennel-mode)
@@ -771,6 +774,7 @@ This is Prot's close-to-emacs-metal system. I like it, but it isn't quite polish
         xref-location
         file
         buffer
+        consult-buffer
         consult-location))
 
 ;; Alternatively - specify the window placement in more detail
@@ -784,9 +788,11 @@ This is Prot's close-to-emacs-metal system. I like it, but it isn't quite polish
 
 (add-hook 'completion-list-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
 
-(keymap-set mct-minibuffer-completion-list-map "C-j" #'mct-complete-and-exit)
-(keymap-set mct-minibuffer-local-completion-map "C-j" #'mct-complete-and-exit)
-(keymap-set mct-minibuffer-local-filename-completion-map "C-j" #'mct-complete-and-exit)
+(dolist (k '("C-j" "RET"))
+  (keymap-set mct-minibuffer-completion-list-map k #'mct-complete-and-exit)
+  (keymap-set mct-minibuffer-local-completion-map k #'mct-complete-and-exit)
+  (keymap-set mct-minibuffer-local-filename-completion-map k #'mct-complete-and-exit))
+
 
 (mct-minibuffer-mode 1)
 (mct-region-mode 1)
@@ -1293,7 +1299,7 @@ By Prot the Spectacular.
 (modus-themes-load-themes)
 
 ;; (load-theme 'modus-operandi t)
-(load-theme 'modus-vivendi t)
+;; (load-theme 'modus-vivendi t)
 #+end_src
 
 **** The Matrix
@@ -1309,6 +1315,11 @@ Weirdly, this is speaking to me at the moment.
 
 #+begin_src emacs-lisp
 ;; (load-theme 'gruvbox-dark-hard t)
+#+end_src
+
+**** Dracula
+#+begin_src emacs-lisp
+(require 'dracula-theme)
 #+end_src
 
 *** Rainbow Mode
@@ -1501,6 +1512,18 @@ For common lisp, this is most likely the successor to slime.
 #+end_src
 
 *** Clojure
+#+begin_src emacs-lisp
+(require 'clojure-mode)
+
+(setq clojure-indent-style 'always-align)
+(setq clojure-docstring-fill-column fill-column)
+(setq clojure-docstring-fill-prefix-width 2)
+(setq clojure-align-forms-automatically t)
+(setq clojure-use-metadata-for-privacy t)
+
+;; this is new, and might cause problems - bear in mind
+(setq clojure-toplevel-inside-comment-form t)
+#+end_src
 
 OK, I recently acquired this knowledge for switching between cider and inf-clojure without having to comment things out and restart, so here are the functions for unplugging whatever is in first.
 
@@ -1542,8 +1565,10 @@ Some harmless inf-clojure setup
 Start off with cider for now.
 
 #+begin_src emacs-lisp
+(require 'cider-eval-sexp-fu)
 (setq cider-repl-display-help-banner nil)
 (setq cider-use-fringe-indicators nil)
+(setq cider-jump-to-pop-to-buffer-actions '((display-buffer-same-window)))
 (dolist (hook '(clojure-mode-hook
                 clojurec-mode-hook
                 clojurescript-mode-hook
@@ -1554,6 +1579,9 @@ Start off with cider for now.
   ;; (add-hook hook (lambda () (setq-local lsp-eldoc-enable-hover nil)))
   ;; (add-hook hook #'lsp)
   )
+
+(add-hook 'cider-repl-mode-hook #'subword-mode)
+(add-hook 'cider-repl-mode-hook #'paredit-mode)
 #+end_src
 
 *** Lua and Fennel
@@ -1781,6 +1809,11 @@ Because of course Telegram in Emacs, in Russian.
 (add-hook 'telega-chat-mode-hook #'visual-line-mode)
 (add-hook 'telega-chat-mode-hook #'telega-mode-line-mode)
 (add-hook 'telega-chat-mode-hook #'telega-notifications-mode)
+
+(setq telega-video-player-command
+      (concat "kmplayer"
+              (when telega-ffplay-media-timestamp
+                (format " -ss %f" telega-ffplay-media-timestamp))))
 #+end_src
 
 *** Minions
