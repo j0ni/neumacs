@@ -1300,7 +1300,7 @@ By Prot the Spectacular.
 (modus-themes-load-themes)
 
 ;; (load-theme 'modus-operandi t)
-;; (load-theme 'modus-vivendi t)
+(load-theme 'modus-vivendi t)
 #+end_src
 
 **** The Matrix
