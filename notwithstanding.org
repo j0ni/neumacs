@@ -216,6 +216,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 #+begin_src emacs-lisp
 (straight-use-package 'adoc-mode)
 (straight-use-package 'all-the-icons)
+(straight-use-package 'almost-mono-themes)
 (straight-use-package 'anzu)
 (straight-use-package 'browse-at-remote)
 (straight-use-package 'browse-kill-ring)
@@ -729,21 +730,21 @@ A fast vertical minibuffer manager which mostly plays nice with builtin stuff. M
 
 #+begin_src emacs-lisp
 ;; (setq straight-recipe-overrides nil)
-;; (vertico-mode 1)
+(vertico-mode 1)
 ;; this
 ;; (vertico-unobtrusive-mode 1)
 ;; or this
-;; (vertico-buffer-mode 1)
-;; (setq vertico-buffer-display-action
-;;       '(display-buffer-below-selected
-;;         display-buffer-at-bottom))
+(vertico-buffer-mode 1)
+(setq vertico-buffer-display-action
+      '(display-buffer-below-selected
+        display-buffer-at-bottom))
 ;; but not both
 
-;; (keymap-set vertico-map "RET" #'vertico-directory-enter)
-;; (keymap-set vertico-map "C-j" #'vertico-directory-enter)
-;; (keymap-set vertico-map "DEL" #'vertico-directory-delete-char)
-;; (keymap-set vertico-map "M-DEL" #'vertico-directory-delete-word)
-;; (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+(keymap-set vertico-map "RET" #'vertico-directory-enter)
+(keymap-set vertico-map "C-j" #'vertico-directory-enter)
+(keymap-set vertico-map "DEL" #'vertico-directory-delete-char)
+(keymap-set vertico-map "M-DEL" #'vertico-directory-delete-word)
+(add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 #+end_src
 
 *** MCT
@@ -786,7 +787,7 @@ This is Prot's close-to-emacs-metal system. I like it, but it isn't quite polish
 ;;               (slot . 99)
 ;;               (window-width . 0.3))))
 
-(add-hook 'completion-list-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
+;; (add-hook 'completion-list-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
 
 (dolist (k '("C-j" "RET"))
   (keymap-set mct-minibuffer-completion-list-map k #'mct-complete-and-exit)
@@ -794,8 +795,8 @@ This is Prot's close-to-emacs-metal system. I like it, but it isn't quite polish
   (keymap-set mct-minibuffer-local-filename-completion-map k #'mct-complete-and-exit))
 
 
-(mct-minibuffer-mode 1)
-(mct-region-mode 1)
+;; (mct-minibuffer-mode 1)
+;; (mct-region-mode 1)
 #+end_src
 
 *** Completion in Region
@@ -813,11 +814,11 @@ This is a bit previous - I should generalize it and move it up into the consult 
 
 Except when it collides with rustic, which I haven't managed to fix up. So try something else.
 
-Corfu. Why this and not company? Better integration, no special independent invocation (completion-at-point does not invoke company, so there are frequent collisions.
+Corfu. Why this and not company? Better integration, no special independent invocation (completion-at-point does not invoke company, so there are frequent collisions).
 
 #+begin_src emacs-lisp
 (require 'corfu)
-;; (corfu-global-mode 1)
+(corfu-global-mode 1)
 
 (setq corfu-cycle t)                   ;; Enable cycling for `corfu-next/previous'
 (setq corfu-auto nil)                  ;; Auto completion
@@ -1566,9 +1567,10 @@ Start off with cider for now.
 
 #+begin_src emacs-lisp
 (require 'cider-eval-sexp-fu)
+(setq cider-clojure-cli-aliases ":test")
 (setq cider-repl-display-help-banner nil)
 (setq cider-use-fringe-indicators nil)
-(setq cider-jump-to-pop-to-buffer-actions '((display-buffer-same-window)))
+(setq cider-jump-to-pop-to-buffer-actions '((display-buffer-reuse-window display-buffer-same-window)))
 (dolist (hook '(clojure-mode-hook
                 clojurec-mode-hook
                 clojurescript-mode-hook
