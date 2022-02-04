@@ -222,6 +222,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'browse-kill-ring)
 (straight-use-package 'cider)
 (straight-use-package 'cider-eval-sexp-fu)
+(straight-use-package 'circe)
 (straight-use-package 'clojure-mode)
 (straight-use-package 'consult)
 (straight-use-package 'consult-flycheck)
@@ -358,6 +359,9 @@ These are mostly settings that emacs considers to be "customizations".
 (setq shr-color-visible-luminance-min 90)
 (advice-add #'shr-colorize-region
             :around (defun shr-no-colorise-region (&rest ignore)))
+
+(setq x-use-underline-position-properties t)
+(setq x-underline-at-descent-line nil)
 
 ;; gotta find the berlin coords
 ;; 43.67066, -79.30211 - location
@@ -1147,14 +1151,47 @@ ffip setup
 (keymap-global-set "C-c f" #'find-file-in-project-by-selected)
 #+end_src
 
-*** IRC - ERC and RCIRC
-
+*** IRC - ERC, CIRCE and RCIRC
 **** Shared config
 
 #+begin_src emacs-lisp
 (defvar j0ni/irc-auth-spec nil)
-(setq j0ni/srht-sasl-pass
-      (funcall (plist-get (car (auth-source-search :host "chat.sr.ht")) :secret)))
+(defun j0ni/srht-sasl-pass ()
+  (funcall (plist-get (car (auth-source-search :host "chat.sr.ht")) :secret)))
+#+end_src
+
+**** circe
+
+#+begin_src emacs-lisp
+(require 'circe)
+(setq circe-network-options
+      `(("Sourcehut"
+         :host "chat.sr.ht"
+         :port 6697
+         :use-tls t
+         :realname "Joni Void"
+         :nick "joni"
+         :sasl-username "j0ni"
+         :sasl-password ,(j0ni/srht-sasl-pass)
+         :user "j0ni@tynan-circe/irc.libera.chat"
+         :logging t
+         :channels nil)))
+
+(setq circe-fool-list '())
+(setq circe-ignore-list '())
+(setq circe-chat-buffer-name "{target}")
+
+(setq lui-logging-directory "~/.emacs.d/circe/logs")
+(setq lui-fill-type nil)
+(setq lui-time-stamp-position 'right-margin)
+(add-hook 'lui-mode-hook
+          (lambda ()
+            (setq-local right-margin-width 7)
+            (setq-local truncate-lines nil)))
+
+(defun j0ni/circe ()
+  (interactive)
+  (circe "Sourcehut"))
 #+end_src
 
 **** rcirc
@@ -1171,7 +1208,7 @@ ffip setup
          :encryption tls
          :channels nil)))
 
-(setq rcirc-authinfo `(("chat.sr.ht" sasl "joni" ,j0ni/srht-sasl-pass)))
+(setq rcirc-authinfo `(("chat.sr.ht" sasl "joni" ,(j0ni/srht-sasl-pass))))
 
 (defun rcirc-handler-AUTHENTICATE (process _cmd _args _text)
   "Respond to authentication request.
@@ -1223,7 +1260,7 @@ ERC, needs a patch for sasl
    :port "6697"
    :nick "j0ni"
    :full-name "Joni"
-   :password j0ni/srht-sasl-pass))
+   :password (j0ni/srht-sasl-pass)))
 
 (defun j0ni/reset-erc-track-mode ()
   "Stole this whole from John Wiegley's dotemacs."
@@ -1294,7 +1331,7 @@ By Prot the Spectacular.
 (setq modus-themes-hl-line '(underline neutral))
 (setq modus-themes-completions 'opinionated)
 (setq modus-themes-scale-headings t)
-(setq modus-themes-mode-line '(accented))
+(setq modus-themes-mode-line '(accented 5))
 (setq modus-themes-paren-match '(intense bold underline))
 
 (modus-themes-load-themes)
@@ -1571,6 +1608,7 @@ Start off with cider for now.
 (setq cider-repl-display-help-banner nil)
 (setq cider-use-fringe-indicators nil)
 (setq cider-jump-to-pop-to-buffer-actions '((display-buffer-reuse-window display-buffer-same-window)))
+
 (dolist (hook '(clojure-mode-hook
                 clojurec-mode-hook
                 clojurescript-mode-hook
