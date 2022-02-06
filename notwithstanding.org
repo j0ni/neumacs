@@ -230,6 +230,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'corfu)
 (straight-use-package 'diff-hl)
 (straight-use-package 'dockerfile-mode)
+(straight-use-package 'doom-themes)
 (straight-use-package 'dracula-theme)
 (straight-use-package 'editorconfig)
 (straight-use-package 'elfeed)
@@ -272,6 +273,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'olivetti)
 (straight-use-package 'orderless)
 (straight-use-package 'org-roam)
+(straight-use-package 'org-tree-slide)
 (straight-use-package 'org-super-agenda)
 (straight-use-package 'paredit)
 (straight-use-package 'pinentry)
@@ -1180,7 +1182,7 @@ ffip setup
 (setq circe-fool-list '())
 (setq circe-ignore-list '())
 (setq circe-chat-buffer-name "{target}")
-
+(setq circe-reduce-lurker-spam t)
 
 (setq lui-logging-directory (concat user-emacs-directory "circe/logs"))
 (setq lui-fill-type nil)
@@ -1188,8 +1190,12 @@ ffip setup
 
 (add-hook 'lui-mode-hook
           (lambda ()
+            (enable-lui-irc-colors)
             (setq-local right-margin-width 7)
-            (setq-local truncate-lines nil)))
+            (setq-local truncate-lines nil)
+            (setq-local word-wrap t)
+            (setq-local fringes-outside-margins t)
+            (setq-local wrap-prefix "    ")))
 
 (defun j0ni/circe ()
   (interactive)
@@ -1360,6 +1366,18 @@ Weirdly, this is speaking to me at the moment.
 **** Dracula
 #+begin_src emacs-lisp
 (require 'dracula-theme)
+#+end_src
+
+**** Doom Themes
+#+begin_src emacs-lisp
+(require 'doom-themes)
+(load-theme 'doom-dracula t)
+(doom-themes-org-config)
+#+end_src
+
+**** Almost Mono
+#+begin_src emacs-lisp
+(require 'almost-mono-themes)
 #+end_src
 
 *** Rainbow Mode
@@ -1703,6 +1721,12 @@ Org was installed and required before tangling this file, but I believe we can s
 (require 'org)
 (require 'org-agenda)
 (require 'org-clock)
+(require 'org-tree-slide)
+
+(org-tree-slide-simple-profile)
+
+(keymap-set org-mode-map "<f8>" 'org-tree-slide-mode)
+(keymap-set org-mode-map "S-<f8>" 'org-tree-slide-skip-done-toggle)
 
 
 (keymap-global-set "C-c c" #'org-capture)
