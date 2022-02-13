@@ -1053,7 +1053,11 @@ Consult - handy featureful commands, sometimes too noisy
 
 Language Server Protocol, a Microsoft invention, is providing a common interface for a bunch of languages that are otherwise not so well supported. It's also proving useful in some other well supported modes like clojure and rust.
 
+This is a bit nasty though - once lsp-mode is loaded, it ignores lsp-keymap-prefix. So we have to do this, or go back to using a customization setting via use-package. I'm not even sure that would work. See https://github.com/emacs-lsp/lsp-mode/issues/1672
+
 #+begin_src emacs-lisp
+(setq lsp-keymap-prefix "C-c C-l")
+;; now load the code, hopefully the mapping will happen
 (require 'lsp-mode)
 #+end_src
 
@@ -1072,7 +1076,6 @@ LSP tries to switch on company-mode, and it's fiddly to prevent. This apparently
 Rust setup for lsp, which is honestly the main use case.
 
 #+begin_src emacs-lisp
-(setq lsp-keymap-prefix "C-c l")
 
 (setq lsp-rust-server 'rust-analyzer)
 
@@ -1183,6 +1186,7 @@ ffip setup
 (setq circe-ignore-list '())
 (setq circe-chat-buffer-name "{target}")
 (setq circe-reduce-lurker-spam t)
+(setq circe-color-nicks-everywhere t)
 
 (setq lui-logging-directory (concat user-emacs-directory "circe/logs"))
 (setq lui-fill-type nil)
@@ -1195,6 +1199,7 @@ ffip setup
             (setq-local truncate-lines nil)
             (setq-local word-wrap t)
             (setq-local fringes-outside-margins t)
+            (setq-local circe-color-nicks-everywhere t)
             (setq-local wrap-prefix "    ")))
 
 (defun j0ni/circe ()
@@ -1256,8 +1261,7 @@ ERC, needs a patch for sasl
 (setq erc-keywords '())
 (setq erc-track-exclude-types '("JOIN" "PART" "QUIT" "NICK" "MODE"))
 (setq erc-track-use-faces t)
-(setq erc-track-faces-priority-list
-      '(erc-current-nick-face erc-keyword-face))
+(setq erc-track-faces-priority-list '(erc-current-nick-face erc-keyword-face))
 (setq erc-track-priority-faces-only 'all)
 (setq erc-email-userid "j0ni@tynan-erc/irc.libera.chat")
 
@@ -1277,6 +1281,11 @@ ERC, needs a patch for sasl
   (erc-modified-channels-update)
   (erc-modified-channels-display)
   (force-mode-line-update))
+
+(add-hook 'erc-mode-hook
+          (lambda ()
+            (setq-local truncate-lines nil)
+            (setq-local word-wrap t)))
 #+end_src
 
 *** Undo-fu
@@ -1345,7 +1354,7 @@ By Prot the Spectacular.
 (modus-themes-load-themes)
 
 ;; (load-theme 'modus-operandi t)
-(load-theme 'modus-vivendi t)
+;; (load-theme 'modus-vivendi t)
 #+end_src
 
 **** The Matrix

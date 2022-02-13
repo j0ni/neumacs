@@ -75,16 +75,16 @@
   ;;  :foreground "steel blue")
 
   ;; erc-fill
-  ;; (csetq
-  ;;  erc-fill-column 77
-  ;;  erc-fill-function 'erc-fill-variable
-  ;;  erc-fill-static-center 18)
+  (setq erc-fill-column 100
+        erc-fill-function 'erc-fill-variable
+        erc-fill-prefix "             "
+        erc-fill-static-center 18)
   ;; to disable:
   ;; (erc-fill-mode -1)
 
   ;; erc-log
   (setq
-   ;; erc-enable-logging 'erc-log-all-but-server-buffers
+   erc-enable-logging 'erc-log-all-but-server-buffers
    erc-generate-log-file-name-function 'erc-generate-log-file-name-with-date
    erc-log-channels-directory (concat user-emacs-directory "erc/logs")
    erc-log-file-coding-system 'utf-8
@@ -101,19 +101,19 @@
         erc-timestamp-format "%T "
         erc-insert-timestamp-function 'erc-insert-timestamp-left)
 
-  (with-eval-after-load 'erc-match
-    (set-face-attribute
-     'erc-timestamp-face nil
-     :foreground "#aaeeaa"
-     :weight 'unspecified
-     :background 'unspecified))
+  ;; (with-eval-after-load 'erc-match
+  ;;   (set-face-attribute
+  ;;    'erc-timestamp-face nil
+  ;;    :foreground "#aaeeaa"
+  ;;    :weight 'unspecified
+  ;;    :background 'unspecified))
 
   ;; erc-track
   (setq erc-track-enable-keybindings nil
         erc-track-exclude-types '("JOIN" "MODE" "NICK" "PART" "QUIT"
                                   "324" "329" "332" "333" "353" "477")
         erc-track-position-in-mode-line t
-        erc-track-priority-faces-only 'all
+        ;; erc-track-priority-faces-only 'all
         erc-track-shorten-function nil
         erc-track-showcount t)
 
