@@ -824,7 +824,7 @@ Corfu. Why this and not company? Better integration, no special independent invo
 
 #+begin_src emacs-lisp
 (require 'corfu)
-(corfu-global-mode 1)
+;; (corfu-global-mode 1)
 
 (setq corfu-cycle t)                   ;; Enable cycling for `corfu-next/previous'
 (setq corfu-auto nil)                  ;; Auto completion
@@ -865,6 +865,12 @@ Another potentially useful hack - move the completion into the minibuffer on dem
         completion-cycle-threshold completion-cycling)
     (apply #'consult-completion-in-region completion-in-region--data)))
 (keymap-set corfu-map "M-m" #'corfu-move-to-minibuffer)
+#+end_src
+
+But somehow company-mode still ends up being hardcoded somewhere or other
+
+#+begin_src emacs-lisp
+(global-company-mode 1)
 #+end_src
 
 *** Marginalia
@@ -1169,6 +1175,7 @@ ffip setup
 
 #+begin_src emacs-lisp
 (require 'circe)
+(enable-circe-color-nicks)
 (setq circe-network-options
       `(("Sourcehut"
          :host "chat.sr.ht"
