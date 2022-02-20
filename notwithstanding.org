@@ -220,6 +220,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'anzu)
 (straight-use-package 'browse-at-remote)
 (straight-use-package 'browse-kill-ring)
+(straight-use-package 'cape)
 (straight-use-package 'cider)
 (straight-use-package 'cider-eval-sexp-fu)
 (straight-use-package 'circe)
@@ -679,17 +680,9 @@ Of course, fido-mode completely ignores these settings.
 Using orderless, this all means NOTHING.
 
 #+begin_src emacs-lisp
-(setq completion-styles '(basic substring initials flex partial-completion orderless))
+(setq completion-styles '(orderless partial-completion))
 (setq completion-category-defaults nil)
-(setq completion-category-overrides
-      '((buffer (styles . (orderless)))
-        (file (styles . (initials partial-completion orderless)))
-        (unicode-name (styles . (orderless)))
-        (project-file (styles . (orderless)))
-        (xref-location (styles . (orderless)))
-        (info-menu (styles . (orderless)))
-        (symbol-help (styles . (orderless)))
-        (consult-line (styles . (orderless)))))
+(setq completion-category-overrides nil)
 #+end_src
 
 More orderless configuration. From MCT docs, I finally understand why putting orderless at the end of the list of completion-styles works. Basically, hit space and it's the only one that will continue to match.
@@ -757,52 +750,52 @@ A fast vertical minibuffer manager which mostly plays nice with builtin stuff. M
 This is Prot's close-to-emacs-metal system. I like it, but it isn't quite polished enough. Every so often I give it another shot, and just now it got a release so why the hell not.
 
 #+begin_src emacs-lisp
-(require 'mct)
+  (require 'mct)
 
-(setq mct-completion-window-size '(15 . 15))
-(setq mct-remove-shadowed-file-name t)
-(setq mct-hide-completion-mode-line nil)
-(setq mct-show-completion-line-numbers nil)
-(setq mct-apply-completion-stripes nil)
+  (setq mct-completion-window-size '(15 . 15))
+  (setq mct-remove-shadowed-file-name t)
+  (setq mct-hide-completion-mode-line nil)
+  (setq mct-show-completion-line-numbers nil)
+  (setq mct-apply-completion-stripes nil)
 
-(setq mct-minimum-input 3)
-(setq mct-live-update-delay 0.3)
-(setq mct-completions-format 'one-column)
+  (setq mct-minimum-input 3)
+  (setq mct-live-update-delay 0.3)
+  (setq mct-completions-format 'one-column)
 
-(setq mct-completion-passlist
-      '(;; Some commands
-        imenu
-        Info-goto-node
-        Info-index
-        Info-menu
-        vc-retrieve-tag
-        ;; Some completion categories
-        project-file
-        xref-location
-        file
-        buffer
-        consult-buffer
-        consult-location))
+  (setq mct-completion-passlist
+        '(;; Some commands
+          imenu
+          Info-goto-node
+          Info-index
+          Info-menu
+          vc-retrieve-tag
+          ;; Some completion categories
+          project-file
+          xref-location
+          file
+          buffer
+          consult-buffer
+          consult-location))
 
-;; Alternatively - specify the window placement in more detail
-;;
-;; (setq mct-display-buffer-action
-;;       (quote ((display-buffer-reuse-window
-;;                display-buffer-in-side-window)
-;;               (side . left)
-;;               (slot . 99)
-;;               (window-width . 0.3))))
+  ;; Alternatively - specify the window placement in more detail
+  ;;
+  ;; (setq mct-display-buffer-action
+  ;;       (quote ((display-buffer-reuse-window
+  ;;                display-buffer-in-side-window)
+  ;;               (side . left)
+  ;;               (slot . 99)
+  ;;               (window-width . 0.3))))
 
-;; (add-hook 'completion-list-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
+  ;; (add-hook 'completion-list-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
 
-(dolist (k '("C-j" "RET"))
-  (keymap-set mct-minibuffer-completion-list-map k #'mct-complete-and-exit)
-  (keymap-set mct-minibuffer-local-completion-map k #'mct-complete-and-exit)
-  (keymap-set mct-minibuffer-local-filename-completion-map k #'mct-complete-and-exit))
+  ;; (dolist (k '("C-j" "RET"))
+  ;;   (keymap-set mct-minibuffer-completion-list-map k #'mct-complete-and-exit)
+  ;;   (keymap-set mct-minibuffer-local-completion-map k #'mct-complete-and-exit)
+  ;;   (keymap-set mct-minibuffer-local-filename-completion-map k #'mct-complete-and-exit))
 
 
-;; (mct-minibuffer-mode 1)
-;; (mct-region-mode 1)
+  ;; (mct-minibuffer-mode 1)
+  ;; (mct-region-mode 1)
 #+end_src
 
 *** Completion in Region
@@ -824,10 +817,9 @@ Corfu. Why this and not company? Better integration, no special independent invo
 
 #+begin_src emacs-lisp
 (require 'corfu)
-;; (corfu-global-mode 1)
 
 (setq corfu-cycle t)                   ;; Enable cycling for `corfu-next/previous'
-(setq corfu-auto nil)                  ;; Auto completion
+(setq corfu-auto t)                    ;; Auto completion
 (setq corfu-commit-predicate nil)      ;; Do not commit selected candidates on next input
 ;; (setq corfu-quit-at-boundary t)     ;; Automatically quit at word boundary
 ;; (setq corfu-quit-no-match t)        ;; Automatically quit if there is no match
@@ -835,6 +827,8 @@ Corfu. Why this and not company? Better integration, no special independent invo
 ;; (setq corfu-preselect-first nil)    ;; Disable candidate preselection
 ;; (setq corfu-echo-documentation nil) ;; Disable documentation in the echo area
 ;; (setq corfu-scroll-margin 5)        ;; Use scroll margin
+
+(corfu-global-mode 1)
 #+end_src
 
 This is cool, straight from the corfu wiki, it seems to do what I have always expected but never happens.
@@ -870,7 +864,12 @@ Another potentially useful hack - move the completion into the minibuffer on dem
 But somehow company-mode still ends up being hardcoded somewhere or other
 
 #+begin_src emacs-lisp
-(global-company-mode 1)
+(require 'company)
+(setq company-tooltip-align-annotations t)
+(setq company-idle-delay 1.0)
+(setq company-tooltip-idle-delay 1.0)
+(setq company-global-modes '(not message-mode telega-chat-mode circe-channel-mode))
+;; (global-company-mode 1)
 #+end_src
 
 *** Marginalia
@@ -1077,6 +1076,8 @@ LSP tries to switch on company-mode, and it's fiddly to prevent. This apparently
         '(orderless)))
 
 (add-hook 'lsp-completion-mode-hook #'j0ni/setup-lsp-completion)
+
+(setq-local completion-at-point-functions (list (cape-capf-buster #'lsp-completion-at-point)))
 #+end_src
 
 Rust setup for lsp, which is honestly the main use case.
@@ -1120,6 +1121,8 @@ Extras, UI stuff that I mostly don't use, and some per-buffer local overrides.
 (add-hook 'lsp-mode-hook #'lsp-ui-mode)
 (add-hook 'lsp-managed-mode-hook
           (lambda ()
+            (setq-local completion-at-point-functions
+                        (list (cape-capf-buster #'lsp-completion-at-point)))
             ;; turn off idle highlight, let lsp do it...maybe
             (setq-local idle-highlight-timer nil)))
 #+end_src
