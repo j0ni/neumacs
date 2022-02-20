@@ -1350,21 +1350,25 @@ By Prot the Spectacular.
 #+begin_src emacs-lisp
 (require 'modus-themes)
 
-(setq modus-themes-bold-constructs t)
+(setq modus-themes-bold-constructs nil)
 (setq modus-themes-italic-constructs nil)
+(setq modus-themes-subtle-line-numbers t)
 ;; (setq modus-themes-syntax '(yellow-comments))
-(setq modus-themes-syntax '())
+(setq modus-themes-syntax '(faint))
 (setq modus-themes-fringes nil)
 (setq modus-themes-hl-line '(underline neutral))
-(setq modus-themes-completions 'opinionated)
+(setq modus-themes-completions nil)
+(setq modus-themes-org-blocks 'tinted-background)
+(setq modus-themes-headings nil) ;; check docs
+(setq modus-themes-variable-pitch-ui nil)
 (setq modus-themes-scale-headings t)
-(setq modus-themes-mode-line '(accented 5))
+(setq modus-themes-mode-line '()) ;; '(accented 5)
 (setq modus-themes-paren-match '(intense bold underline))
 
 (modus-themes-load-themes)
 
 ;; (load-theme 'modus-operandi t)
-;; (load-theme 'modus-vivendi t)
+(load-theme 'modus-vivendi t)
 #+end_src
 
 **** The Matrix
@@ -1389,9 +1393,9 @@ Weirdly, this is speaking to me at the moment.
 
 **** Doom Themes
 #+begin_src emacs-lisp
-(require 'doom-themes)
-(load-theme 'doom-dracula t)
-(doom-themes-org-config)
+;; (require 'doom-themes)
+;; (load-theme 'doom-dracula t)
+;; (doom-themes-org-config)
 #+end_src
 
 **** Almost Mono

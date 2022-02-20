@@ -34,6 +34,12 @@
 ;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono" :size 11.0 :antialias t))
 (setq j0ni/variable-font "Recursive Sans Casual Static-10.5")
 
+(setq j0ni/fixed-font "Iosevka Comfy-11.5")
+(setq j0ni/fixed-font-serif "Iosevka Comfy-11.5")
+;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono" :size 11.0 :antialias t))
+(setq j0ni/variable-font "Recursive Sans Casual Static-11.5")
+
+
 (set-frame-font j0ni/fixed-font nil t)
 
 (defun j0ni/init-frame (&optional frame)
