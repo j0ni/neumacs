@@ -29,15 +29,15 @@
 ;; (setq j0ni/fixed-font "PragmataPro-12.0")
 ;; (setq j0ni/fixed-font (font-spec :family "Inconsolata Nerd Font" :size 13.5 :spacing 'm))
 ;; (setq j0ni/fixed-font "Inconsolata Nerd Font-13.0")
-(setq j0ni/fixed-font "Recursive Mono Linear Static-10.5")
-(setq j0ni/fixed-font-serif "Recursive Mono Casual Static-10.5")
+(setq j0ni/fixed-font "Recursive Mono Linear Static-12.0")
+(setq j0ni/fixed-font-serif "Recursive Mono Casual Static-12.0")
 ;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono" :size 11.0 :antialias t))
-(setq j0ni/variable-font "Recursive Sans Casual Static-10.5")
+(setq j0ni/variable-font "Recursive Sans Casual Static-12.0")
 
-(setq j0ni/fixed-font "Iosevka Comfy-11.5")
-(setq j0ni/fixed-font-serif "Iosevka Comfy-11.5")
+;; (setq j0ni/fixed-font "Iosevka Comfy-11.5")
+;; (setq j0ni/fixed-font-serif "Iosevka Comfy-11.5")
 ;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono" :size 11.0 :antialias t))
-(setq j0ni/variable-font "Recursive Sans Casual Static-11.5")
+;; (setq j0ni/variable-font "Recursive Sans Casual Static-11.5")
 
 
 (set-frame-font j0ni/fixed-font nil t)
@@ -62,9 +62,9 @@
 
   (set-fontset-font t 'unicode "Symbola" frame 'prepend)
   ;; if the font is paying attention ¯\_(ツ)_/¯
-  ;; (set-face-attribute
-  ;;  'default frame
-  ;;  :weight 'light)
+  (set-face-attribute
+   'default frame
+   :weight 'semi-light)
   (set-face-attribute
    'bold frame
    :weight 'semi-bold)

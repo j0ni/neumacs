@@ -72,6 +72,10 @@ If BACKWARD-ONLY is non-nil, only delete them before point."
   (interactive)
   (insert "¯\\_(ツ)_/¯"))
 
+(defun j0ni/insert-tableflip ()
+  (interactive)
+  (insert "(╯°□°）╯︵ ┻━┻"))
+
 (defun j0ni/reload-config ()
   "This is weirdly not recursive, unless you consider installing a
 file containing this definition is part of what it does, and the
@@ -132,9 +136,9 @@ Sometimes I accidentally find myself in the C-x map, and hit C-g to get the hell
 OTOH, how to make this future proof... check if it's bound?
 
 #+begin_src emacs-lisp
-(when (not (keymap-global-lookup "C-x C-g"))
-  (message "Fixing C-x C-g")
-  (keymap-global-set "C-x C-g" #'keyboard-quit))
+  (when (not (lookup-key (current-global-map) "C-x C-g"))
+    (message "Fixing C-x C-g")
+    (global-set-key "C-x C-g" #'keyboard-quit))
 #+end_src
 
 *** A little about the package manager
@@ -184,7 +188,7 @@ The next thing is a set of key mappings for getting special characters, like uml
 (fset 'j0ni/unicode-shortcut-map j0ni/unicode-shortcut-map)
 
 ;; This isn't available in Org-mode - find a better one
-(keymap-global-set "C-'" 'j0ni/unicode-shortcut-map)
+;; (global-set-key "C-'" 'j0ni/unicode-shortcut-map)
 #+end_src
 
 *** Global Switches
@@ -259,6 +263,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'inf-clojure)
 (straight-use-package 'inf-ruby)
 (straight-use-package 'json-mode)
+(straight-use-package 'lsp-haskell)
 (straight-use-package 'lsp-mode)
 (straight-use-package 'lsp-ui)
 (straight-use-package 'lua-mode)
@@ -420,7 +425,7 @@ I mean, we do live in this world now.
 Pixel scroll settings are amazing, and even though I've been using emacs build from mainline for ages I totally didn't know about it. Because that's the kind of bleeding edge life I lead. One of pointless risks, taken without regard to any potential benefits or even stopping to see what they might be.
 
 #+begin_src emacs-lisp
-(pixel-scroll-precision-mode 1)
+;; (pixel-scroll-precision-mode 1)
 #+end_src
 
 Be less of a jerk (sorry everyone around me is now speaking and seeing double entendres, I can't help it).
@@ -526,7 +531,7 @@ Because sometimes I want to live without consult:
 
 #+begin_src emacs-lisp
 (recentf-mode 1)
-(keymap-global-set "C-x M-f" #'recentf-open-files)
+(global-set-key (kbd "C-x M-f") #'recentf-open-files)
 #+end_src
 
 Dired. I am not really sure that I get it.
@@ -549,22 +554,23 @@ Dired. I am not really sure that I get it.
 Proced, which I recently discovered in bbatsov's dotfiles. It's a nice enough process table and editor.
 
 #+begin_src emacs-lisp
-(keymap-global-set "C-x P" #'proced)
+(global-set-key (kbd "C-x P") #'proced)
 #+end_src
 
 Some bindings I've come to depend on. I'm genuinely trying to scale down these kinds of customisations where I have probably been stomping on binds I have never ever experienced before.
 
 #+begin_src emacs-lisp
-(keymap-set lisp-mode-shared-map "C-c C-k" #'eval-buffer)
+(define-key lisp-mode-shared-map (kbd "C-c C-k") #'eval-buffer)
 
 (dolist (binding
          '(("C-x C-r" . revert-buffer)
            ("C-x |" . j0ni/toggle-window-split)
            ("C-c ." . j0ni/delete-whitespace)
            ("C-c s" . j0ni/insert-shrug)
+           ("C-c t" . j0ni/insert-tableflip)
            ("C-=" . text-scale-increase)
            ("C--" . text-scale-decrease)))
-  (keymap-global-set (car binding) (cdr binding)))
+  (global-set-key (kbd (car binding)) (cdr binding)))
 #+end_src
 
 Command history for the minibuffer. Invaluable intell.
@@ -580,7 +586,7 @@ Command history for the minibuffer. Invaluable intell.
 Time and date, and battery, for the modeline.
 
 #+begin_src emacs-lisp
-(setq display-time-format "%Y-%m-%d %H:%M")
+(setq display-time-format "%Y-%m-%d %H:%M ")
 (setq display-time-24hr-format t)
 (setq display-time-day-and-date nil)
 (setq display-time-interval 15)
@@ -711,9 +717,9 @@ More orderless configuration. From MCT docs, I finally understand why putting or
         try-complete-lisp-symbol))
 
 ;; Swap M-/ and C-M-/
-(keymap-global-set "M-/" #'hippie-expand)
-(keymap-global-set "s-/" #'hippie-expand)
-(keymap-global-set "C-M-/" #'hippie-expand)
+(global-set-key (kbd "M-/") #'hippie-expand)
+(global-set-key (kbd "s-/") #'hippie-expand)
+(global-set-key (kbd "C-M-/") #'hippie-expand)
 #+end_src
 
 **** Abbrev
@@ -739,10 +745,10 @@ A fast vertical minibuffer manager which mostly plays nice with builtin stuff. M
         display-buffer-at-bottom))
 ;; but not both
 
-(keymap-set vertico-map "RET" #'vertico-directory-enter)
-(keymap-set vertico-map "C-j" #'vertico-directory-enter)
-(keymap-set vertico-map "DEL" #'vertico-directory-delete-char)
-(keymap-set vertico-map "M-DEL" #'vertico-directory-delete-word)
+(define-key vertico-map (kbd "RET") #'vertico-directory-enter)
+(define-key vertico-map (kbd "C-j") #'vertico-directory-enter)
+(define-key vertico-map (kbd "DEL") #'vertico-directory-delete-char)
+(define-key vertico-map (kbd "M-DEL") #'vertico-directory-delete-word)
 (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 #+end_src
 
@@ -789,9 +795,9 @@ This is Prot's close-to-emacs-metal system. I like it, but it isn't quite polish
   ;; (add-hook 'completion-list-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
 
   ;; (dolist (k '("C-j" "RET"))
-  ;;   (keymap-set mct-minibuffer-completion-list-map k #'mct-complete-and-exit)
-  ;;   (keymap-set mct-minibuffer-local-completion-map k #'mct-complete-and-exit)
-  ;;   (keymap-set mct-minibuffer-local-filename-completion-map k #'mct-complete-and-exit))
+  ;;   (define-key mct-minibuffer-completion-list-map (kbd k) #'mct-complete-and-exit)
+  ;;   (define-key mct-minibuffer-local-completion-map (kbd k) #'mct-complete-and-exit)
+  ;;   (define-key mct-minibuffer-local-filename-completion-map (kbd k) #'mct-complete-and-exit))
 
 
   ;; (mct-minibuffer-mode 1)
@@ -858,7 +864,7 @@ Another potentially useful hack - move the completion into the minibuffer on dem
   (let ((completion-extra-properties corfu--extra)
         completion-cycle-threshold completion-cycling)
     (apply #'consult-completion-in-region completion-in-region--data)))
-(keymap-set corfu-map "M-m" #'corfu-move-to-minibuffer)
+(define-key  corfu-map (kbd "M-m") #'corfu-move-to-minibuffer)
 #+end_src
 
 But somehow company-mode still ends up being hardcoded somewhere or other
@@ -901,7 +907,7 @@ OK I lied a bit. ibuffer is built-in, but ibuffer-vc is not, and I wanted to kee
 ;; (setq ibuffer-saved-filter-groups nil)
 (setq ibuffer-old-time 72)
 
-(keymap-global-set "C-x C-b" #'ibuffer)
+(global-set-key (kbd "C-x C-b") #'ibuffer)
 
 (require 'vc)
 (require 'ibuffer-vc)
@@ -1037,10 +1043,10 @@ Consult - handy featureful commands, sometimes too noisy
                    ("M-#" . consult-register-load)
                    ("M-'" . consult-register-store) ;; orig. abbrev-prefix-mark (unrelated)
                    ("C-M-#" . consult-register)))
-  (keymap-global-set (car binding) (cdr binding)))
+  (global-set-key (kbd (car binding)) (cdr binding)))
 
 ;; this is better than isearch
-(keymap-global-set "C-s" #'consult-line)
+(global-set-key (kbd "C-s") #'consult-line)
 
 (add-hook 'completion-list-mode-hook #'consult-preview-at-point-mode)
 
@@ -1162,7 +1168,7 @@ ffip setup
 #+begin_src emacs-lisp
 (require 'find-file-in-project)
 (setq ffip-use-rust-fd t)
-(keymap-global-set "C-c f" #'find-file-in-project-by-selected)
+(global-set-key (kbd "C-c f") #'find-file-in-project-by-selected)
 #+end_src
 
 *** IRC - ERC, CIRCE and RCIRC
@@ -1312,7 +1318,7 @@ undo-fu, ripped from doom
            ("C-x u"  . ,#'undo-fu-only-undo)
            ("M-_"    . ,#'undo-fu-only-redo)
            ("C-M-z"  . ,#'undo-fu-only-redo)))
-  (keymap-global-set (car binding) (cdr binding)))
+  (global-set-key (kbd (car binding)) (cdr binding)))
 
 (global-undo-fu-session-mode 1)
 #+end_src
@@ -1368,7 +1374,7 @@ By Prot the Spectacular.
 (modus-themes-load-themes)
 
 ;; (load-theme 'modus-operandi t)
-(load-theme 'modus-vivendi t)
+;; (load-theme 'modus-vivendi t)
 #+end_src
 
 **** The Matrix
@@ -1389,13 +1395,14 @@ Weirdly, this is speaking to me at the moment.
 **** Dracula
 #+begin_src emacs-lisp
 (require 'dracula-theme)
+;; (load-theme 'dracula t)
 #+end_src
 
 **** Doom Themes
 #+begin_src emacs-lisp
-;; (require 'doom-themes)
-;; (load-theme 'doom-dracula t)
-;; (doom-themes-org-config)
+(require 'doom-themes)
+(load-theme 'doom-dracula t)
+(doom-themes-org-config)
 #+end_src
 
 **** Almost Mono
@@ -1408,7 +1415,7 @@ Weirdly, this is speaking to me at the moment.
 This is for turning the background of all the color strings (e.g. "#ff3700") into the actual color which is IMMENSELY helpful but only when you need it. Otherwise it is awful, and pulls you right out of flow.
 
 #+begin_src emacs-lisp
-(keymap-global-set "C-c r" #'rainbow-mode)
+(global-set-key (kbd "C-c r") #'rainbow-mode)
 #+end_src
 
 *** Rainbow Delimiters Mode
@@ -1440,7 +1447,7 @@ This can be useful, but not often enough to have a binding.
 Super simple alternative to text objects, that vim users go on about.
 
 #+begin_src emacs-lisp
-(keymap-global-set "C-x C-x" #'er/expand-region)
+(global-set-key (kbd "C-x C-x") #'er/expand-region)
 #+end_src
 
 *** Anzu
@@ -1463,8 +1470,8 @@ For counting isearch results - mode-line highlighter.
 (setq magit-diff-refine-hunk t)
 (setq magit-bury-buffer-function #'magit-mode-quit-window)
 
-(keymap-global-set "C-x g" #'magit-status)
-(keymap-global-set "C-x M-g" #'magit-dispatch-popup)
+(global-set-key (kbd "C-x g") #'magit-status)
+(global-set-key (kbd "C-x M-g") #'magit-dispatch-popup)
 #+end_src
 
 Diff Highlight Mode loaded when the global mode is enabled above. Magit hopefully won't load until first invoked.
@@ -1503,8 +1510,8 @@ Because it may be ass code but it is the best at what it does.
 
 (with-eval-after-load 'paredit
   (progn
-    (keymap-set paredit-mode-map "C-M-s" #'paredit-splice-sexp)
-    (keymap-set paredit-mode-map "M-s" nil)))
+    (define-key paredit-mode-map (kbd "C-M-s") #'paredit-splice-sexp)
+    (define-key paredit-mode-map (kbd "M-s") nil)))
 #+end_src
 
 Other modes are hooked in their own configurations.
@@ -1551,7 +1558,7 @@ Like avy, but a bit smaller? Or something.
 (setq switch-window-background t)
 (setq switch-window-default-window-size 0.8)
 (switch-window-mouse-mode 1)
-(keymap-global-set "C-x o" #'switch-window)
+(global-set-key (kbd "C-x o") #'switch-window)
 #+end_src
 
 *** Web mode and webbish stuff
@@ -1699,14 +1706,14 @@ I spent a lot more time on this than I ever spent writing C or C++.
                           (cons 'ggtags-try-complete-tag hippie-expand-try-functions-list))
               (ggtags-mode 1))))
 
-(keymap-set ggtags-mode-map "C-c g s" 'ggtags-find-other-symbol)
-(keymap-set ggtags-mode-map "C-c g h" 'ggtags-view-tag-history)
-(keymap-set ggtags-mode-map "C-c g r" 'ggtags-find-reference)
-(keymap-set ggtags-mode-map "C-c g f" 'ggtags-find-file)
-(keymap-set ggtags-mode-map "C-c g c" 'ggtags-create-tags)
-(keymap-set ggtags-mode-map "C-c g u" 'ggtags-update-tags)
+(define-key ggtags-mode-map (kbd "C-c g s") #'ggtags-find-other-symbol)
+(define-key ggtags-mode-map (kbd "C-c g h") #'ggtags-view-tag-history)
+(define-key ggtags-mode-map (kbd "C-c g r") #'ggtags-find-reference)
+(define-key ggtags-mode-map (kbd "C-c g f") #'ggtags-find-file)
+(define-key ggtags-mode-map (kbd "C-c g c") #'ggtags-create-tags)
+(define-key ggtags-mode-map (kbd "C-c g u") #'ggtags-update-tags)
 
-(keymap-set ggtags-mode-map "M-," 'pop-tag-mark)
+(define-key ggtags-mode-map (kbd "M-,") #'pop-tag-mark)
 #+end_src
 
 *** Markdown
@@ -1748,12 +1755,11 @@ Org was installed and required before tangling this file, but I believe we can s
 
 (org-tree-slide-simple-profile)
 
-(keymap-set org-mode-map "<f8>" 'org-tree-slide-mode)
-(keymap-set org-mode-map "S-<f8>" 'org-tree-slide-skip-done-toggle)
+(define-key org-mode-map (kbd "<f8>") 'org-tree-slide-mode)
+(define-key org-mode-map (kbd "S-<f8>") 'org-tree-slide-skip-done-toggle)
 
-
-(keymap-global-set "C-c c" #'org-capture)
-(keymap-global-set "C-c a" #'org-agenda)
+(global-set-key (kbd "C-c c") #'org-capture)
+(global-set-key (kbd "C-c a") #'org-agenda)
 
 (setq org-startup-indented t)
 
@@ -1911,7 +1917,7 @@ Remove the annoying mode list
 
 #+begin_src emacs-lisp
 (minions-mode 1)
-(keymap-global-set "C-x C-m" #'minions-minor-modes-menu)
+(global-set-key (kbd "C-x C-m") #'minions-minor-modes-menu)
 #+end_src
 
 *** Icons
@@ -1926,6 +1932,9 @@ Icons for noisy modes, milk for the morning cake.
 *** Haskell
 
 #+begin_src emacs-lisp
+(require 'lsp-haskell)
+
+(add-hook 'haskell-mode-hook #'lsp)
 (add-hook 'haskell-mode-hook #'electric-pair-mode)
 (add-hook 'haskell-mode-hook #'subword-mode)
 (add-hook 'haskell-mode-hook #'interactive-haskell-mode)
@@ -1945,8 +1954,8 @@ Declutter the screen - good for big screens, laptop doesn't care.
 I remember this from Netbeans!
 
 #+begin_src emacs-lisp
-(keymap-global-set "M-S-<up>" #'move-text-up)
-(keymap-global-set "M-S-<down>" #'move-text-down)
+(global-set-key (kbd "M-S-<up>") #'move-text-up)
+(global-set-key (kbd "M-S-<down>") #'move-text-down)
 #+end_src
 
 *** Set all the fonts one last time
