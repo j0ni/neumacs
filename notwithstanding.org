@@ -263,6 +263,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'inf-clojure)
 (straight-use-package 'inf-ruby)
 (straight-use-package 'json-mode)
+(straight-use-package 'logos)
 (straight-use-package 'lsp-haskell)
 (straight-use-package 'lsp-mode)
 (straight-use-package 'lsp-ui)
@@ -284,6 +285,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'paredit)
 (straight-use-package 'pinentry)
 (straight-use-package 'psc-ide)
+(straight-use-package '(pulsar :type git :repo "https://gitlab.com/protesilaos/pulsar"))
 (straight-use-package 'purescript-mode)
 (straight-use-package 'racket-mode)
 (straight-use-package 'rainbow-delimiters)
@@ -425,7 +427,7 @@ I mean, we do live in this world now.
 Pixel scroll settings are amazing, and even though I've been using emacs build from mainline for ages I totally didn't know about it. Because that's the kind of bleeding edge life I lead. One of pointless risks, taken without regard to any potential benefits or even stopping to see what they might be.
 
 #+begin_src emacs-lisp
-;; (pixel-scroll-precision-mode 1)
+(pixel-scroll-precision-mode 1)
 #+end_src
 
 Be less of a jerk (sorry everyone around me is now speaking and seeing double entendres, I can't help it).
@@ -600,7 +602,7 @@ Time and date, and battery, for the modeline.
         ("Asia/Tokyo" "Tokyo")))
 
 (display-time-mode 1)
-;; (display-battery-mode 1)
+(display-battery-mode 1)
 #+end_src
 
 A little configuration for xref, which is honesly mostly totally fine.
@@ -1362,19 +1364,19 @@ By Prot the Spectacular.
 ;; (setq modus-themes-syntax '(yellow-comments))
 (setq modus-themes-syntax '(faint))
 (setq modus-themes-fringes nil)
-(setq modus-themes-hl-line '(underline neutral))
+(setq modus-themes-hl-line '(neutral))
 (setq modus-themes-completions nil)
 (setq modus-themes-org-blocks 'tinted-background)
 (setq modus-themes-headings nil) ;; check docs
 (setq modus-themes-variable-pitch-ui nil)
 (setq modus-themes-scale-headings t)
-(setq modus-themes-mode-line '()) ;; '(accented 5)
+(setq modus-themes-mode-line '(borderless accented 5))
 (setq modus-themes-paren-match '(intense bold underline))
 
 (modus-themes-load-themes)
 
 ;; (load-theme 'modus-operandi t)
-;; (load-theme 'modus-vivendi t)
+(load-theme 'modus-vivendi t)
 #+end_src
 
 **** The Matrix
@@ -1401,13 +1403,92 @@ Weirdly, this is speaking to me at the moment.
 **** Doom Themes
 #+begin_src emacs-lisp
 (require 'doom-themes)
-(load-theme 'doom-dracula t)
-(doom-themes-org-config)
+;; (load-theme 'doom-dracula t)
+;; (doom-themes-org-config)
 #+end_src
 
 **** Almost Mono
 #+begin_src emacs-lisp
 (require 'almost-mono-themes)
+#+end_src
+
+*** Pulsar
+#+begin_src emacs-lisp
+(require 'pulsar)
+
+(pulsar-setup)
+
+(customize-set-variable
+ 'pulsar-pulse-functions ; Read the doc string for why not `setq'
+ '(recenter-top-bottom
+   move-to-window-line-top-bottom
+   reposition-window
+   bookmark-jump
+   other-window
+   delete-window
+   delete-other-windows
+   forward-page
+   backward-page
+   scroll-up-command
+   scroll-down-command
+   windmove-right
+   windmove-left
+   windmove-up
+   windmove-down
+   windmove-swap-states-right
+   windmove-swap-states-left
+   windmove-swap-states-up
+   windmove-swap-states-down
+   tab-new
+   tab-close
+   tab-next
+   org-next-visible-heading
+   org-previous-visible-heading
+   org-forward-heading-same-level
+   org-backward-heading-same-level
+   outline-backward-same-level
+   outline-forward-same-level
+   outline-next-visible-heading
+   outline-previous-visible-heading
+   outline-up-heading))
+
+(setq pulsar-face 'pulsar-magenta)
+(setq pulsar-delay 0.055)
+
+;; integration with the `consult' package:
+(add-hook 'consult-after-jump-hook #'pulsar-recenter-top)
+(add-hook 'consult-after-jump-hook #'pulsar-reveal-entry)
+
+;; integration with the built-in `imenu':
+(add-hook 'imenu-after-jump-hook #'pulsar-recenter-top)
+(add-hook 'imenu-after-jump-hook #'pulsar-reveal-entry)
+#+end_src
+
+*** Logos
+#+begin_src emacs-lisp
+(require 'logos)
+
+;; If you want to use outlines instead of page breaks (the ^L)
+(setq logos-outlines-are-pages t)
+(setq logos-outline-regexp-alist
+      `((emacs-lisp-mode . "^;;;+ ")
+        (org-mode . "^\\*+ +")
+        (t . ,(or outline-regexp logos--page-delimiter))))
+
+;; These apply when `logos-focus-mode' is enabled.  Their value is
+;; buffer-local.
+(setq-default logos-hide-mode-line nil
+              logos-scroll-lock nil
+              logos-variable-pitch nil
+              logos-indicate-buffer-boundaries nil
+              logos-buffer-read-only nil
+              logos-olivetti t)
+
+(let ((map global-map))
+  (define-key map [remap narrow-to-region] #'logos-narrow-dwim)
+  (define-key map [remap forward-page] #'logos-forward-page-dwim)
+  (define-key map [remap backward-page] #'logos-backward-page-dwim)
+  (define-key map (kbd "<f9>") #'logos-focus-mode))
 #+end_src
 
 *** Rainbow Mode
@@ -1973,10 +2054,7 @@ Either way, this is flaky as hell and almost always needs tweaking for a new OS.
 #+begin_src emacs-lisp
 (defvar j0ni/mu4e-path nil "Find a mu4e client to run")
 
-(if j0ni/is-mac
-    (setq j0ni/mu4e-path "/usr/local/share/emacs/site-lisp/mu/mu4e")
-  (setq j0ni/mu4e-path "/usr/local/share/emacs/site-lisp/mu4e"))
-(setq j0ni/mu4e-path "/usr/share/emacs/site-lisp/mu4e")
+(setq j0ni/mu4e-path "/usr/local/share/emacs/site-lisp/mu4e")
 (add-to-list 'load-path j0ni/mu4e-path)
 
 (require 'mu4e)
