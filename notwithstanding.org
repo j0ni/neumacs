@@ -588,7 +588,7 @@ Command history for the minibuffer. Invaluable intell.
 Time and date, and battery, for the modeline.
 
 #+begin_src emacs-lisp
-(setq display-time-format "%Y-%m-%d %H:%M ")
+(setq display-time-format "%Y-%m-%d %H:%M")
 (setq display-time-24hr-format t)
 (setq display-time-day-and-date nil)
 (setq display-time-interval 15)
