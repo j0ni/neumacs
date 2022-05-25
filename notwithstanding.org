@@ -136,9 +136,9 @@ Sometimes I accidentally find myself in the C-x map, and hit C-g to get the hell
 OTOH, how to make this future proof... check if it's bound?
 
 #+begin_src emacs-lisp
-  (when (not (lookup-key (current-global-map) "C-x C-g"))
-    (message "Fixing C-x C-g")
-    (global-set-key "C-x C-g" #'keyboard-quit))
+(when (not (lookup-key (current-global-map) "C-x C-g"))
+  (message "Fixing C-x C-g")
+  (global-set-key "C-x C-g" #'keyboard-quit))
 #+end_src
 
 *** A little about the package manager
@@ -208,6 +208,8 @@ This is how you merge in changes to a straight recipe. Took me a good long time 
 
 #+begin_src emacs-lisp
 (straight-override-recipe '(vertico :inherit t :files (:defaults "extensions/*.el")))
+(straight-override-recipe '(synthwave-theme :type git :host github :local-repo "emacs-synthwave-theme" :repo "TroyFletcher/emacs-synthwave-theme"))
+(straight-override-recipe '(carp-emacs :type git :host github :repo "carp-lang/carp-emacs"))
 ;; (straight-override-recipe '(the-matrix-theme :inherit t :fork "j0ni/matrix-emacs-theme"))
 #+end_src
 
@@ -225,16 +227,23 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'browse-at-remote)
 (straight-use-package 'browse-kill-ring)
 (straight-use-package 'cape)
+(straight-use-package 'carp-emacs)
 (straight-use-package 'cider)
 (straight-use-package 'cider-eval-sexp-fu)
 (straight-use-package 'circe)
 (straight-use-package 'clojure-mode)
+(straight-use-package 'company)
+(straight-use-package 'company-quickhelp)
+(straight-use-package 'constant-theme)
 (straight-use-package 'consult)
 (straight-use-package 'consult-flycheck)
 (straight-use-package 'consult-lsp)
+(straight-use-package 'consult-projectile)
 (straight-use-package 'corfu)
+(straight-use-package 'cyberpunk-theme)
 (straight-use-package 'diff-hl)
 (straight-use-package 'dockerfile-mode)
+(straight-use-package 'doom-modeline)
 (straight-use-package 'doom-themes)
 (straight-use-package 'dracula-theme)
 (straight-use-package 'editorconfig)
@@ -248,6 +257,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'find-file-in-project)
 (straight-use-package 'flycheck)
 (straight-use-package 'flycheck-eldev)
+(straight-use-package 'flycheck-projectile)
 (straight-use-package 'geiser)
 (straight-use-package 'geiser-chez)
 (straight-use-package 'geiser-chicken)
@@ -255,7 +265,6 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'ggtags)
 (straight-use-package 'git-timemachine)
 (straight-use-package 'graphql-mode)
-(straight-use-package 'gruvbox-theme)
 (straight-use-package 'haskell-mode)
 (straight-use-package 'hl-todo)
 (straight-use-package 'ibuffer-vc)
@@ -263,6 +272,7 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'inf-clojure)
 (straight-use-package 'inf-ruby)
 (straight-use-package 'json-mode)
+(straight-use-package 'jupyter)
 (straight-use-package 'logos)
 (straight-use-package 'lsp-haskell)
 (straight-use-package 'lsp-mode)
@@ -277,21 +287,28 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'modus-themes)
 (straight-use-package 'monroe)
 (straight-use-package 'move-text)
+(straight-use-package 'nyan-mode)
 (straight-use-package 'olivetti)
 (straight-use-package 'orderless)
+(straight-use-package 'org-msg)
 (straight-use-package 'org-roam)
 (straight-use-package 'org-tree-slide)
 (straight-use-package 'org-super-agenda)
 (straight-use-package 'paredit)
+(straight-use-package 'phoenix-dark-pink-theme)
 (straight-use-package 'pinentry)
+(straight-use-package 'plan9-theme)
+(straight-use-package 'projectile)
 (straight-use-package 'psc-ide)
-(straight-use-package '(pulsar :type git :repo "https://gitlab.com/protesilaos/pulsar"))
+(straight-use-package 'pulsar)
 (straight-use-package 'purescript-mode)
 (straight-use-package 'racket-mode)
 (straight-use-package 'rainbow-delimiters)
 (straight-use-package 'rainbow-mode)
 (straight-use-package 'rbenv)
 (straight-use-package 'restclient)
+(straight-use-package 'rg)
+(straight-use-package 'ripgrep)
 (straight-use-package 'ruby-mode)
 (straight-use-package 'rust-mode)
 (straight-use-package 'rustic)
@@ -300,7 +317,9 @@ Future me may well ditch the autoloads completely in favour of git submodules, n
 (straight-use-package 'sly-asdf)
 (straight-use-package 'sly-macrostep)
 (straight-use-package 'sly-quicklisp)
+(straight-use-package 'sml-mode)
 (straight-use-package 'switch-window)
+(straight-use-package 'synthwave-theme)
 (straight-use-package 'telega)
 (straight-use-package 'the-matrix-theme)
 (straight-use-package 'typescript-mode)
@@ -343,41 +362,41 @@ So, begin suppressive actions:
 These are mostly settings that emacs considers to be "customizations".
 
 #+begin_src emacs-lisp
-(setq epa-pinentry-mode 'loopback)
-(setq inhibit-startup-screen t)
-(setq auto-revert-verbose t)
-(setq vc-follow-symlinks t)
-(setq find-file-suppress-same-file-warnings t)
-(setq comint-prompt-read-only t)
-(setq select-enable-clipboard t)
-(setq select-enable-primary t)
-(setq uniquify-buffer-name-style 'forward)
-(setq save-interprogram-paste-before-kill t)
-(setq compilation-always-kill t)
-(setq compilation-ask-about-save nil)
-(setq apropos-do-all t)
-(setq mouse-yank-at-point t)
-(setq save-place-file (concat user-emacs-directory ".places"))
-(setq backup-directory-alist `(("." . ,(concat user-emacs-directory ".backups"))))
-(setq enable-local-variables t) ;; :all
-(setq confirm-kill-emacs nil)
-(setq sentence-end-double-space nil)
-(setq delete-old-versions t)
-(setq version-control t)
-(setq custom-safe-themes t)
-(setq mouse-wheel-progressive-speed t)              ; accelerate scrolling
-(setq shr-color-visible-luminance-min 90)
-(advice-add #'shr-colorize-region
-            :around (defun shr-no-colorise-region (&rest ignore)))
+  (setq epa-pinentry-mode 'loopback)
+  (setq inhibit-startup-screen t)
+  (setq auto-revert-verbose t)
+  (setq vc-follow-symlinks t)
+  (setq find-file-suppress-same-file-warnings t)
+  (setq comint-prompt-read-only t)
+  (setq select-enable-clipboard t)
+  (setq select-enable-primary t)
+  (setq uniquify-buffer-name-style 'forward)
+  (setq save-interprogram-paste-before-kill t)
+  (setq compilation-always-kill t)
+  (setq compilation-ask-about-save nil)
+  (setq apropos-do-all t)
+  (setq mouse-yank-at-point t)
+  (setq save-place-file (concat user-emacs-directory ".places"))
+  (setq backup-directory-alist `(("." . ,(concat user-emacs-directory ".backups"))))
+  (setq enable-local-variables t) ;; :all
+  (setq confirm-kill-emacs nil)
+  (setq sentence-end-double-space nil)
+  (setq delete-old-versions t)
+  (setq version-control t)
+  (setq custom-safe-themes t)
+  (setq mouse-wheel-progressive-speed t)              ; accelerate scrolling
+  (setq shr-color-visible-luminance-min 90)
+  (advice-add #'shr-colorize-region
+	      :around (defun shr-no-colorise-region (&rest ignore)))
 
-(setq x-use-underline-position-properties t)
-(setq x-underline-at-descent-line nil)
+  (setq x-use-underline-position-properties t)
+  (setq x-underline-at-descent-line nil)
 
-;; gotta find the berlin coords
-;; 43.67066, -79.30211 - location
-;; (setq calendar-longitude 43.67066)
-;; (setq calendar-latitude -79.30211)
-;; (setq calendar-location-name "Toronto")
+  ;; gotta find the berlin coords
+  ;; 43.67066, -79.30211 - location
+  (setq calendar-longitude 43.67066)
+  (setq calendar-latitude -79.30211)
+  (setq calendar-location-name "Toronto")
 #+end_src
 
 Configure keyboard for MacOS. This repurposes:
@@ -403,7 +422,8 @@ Pick a browser based on OS. I recently added the `gnu/linux` clause to try to ma
 (setq-default browse-url-browser-function
               (cl-case system-type
                 ((darwin macos) 'browse-url-default-macosx-browser)
-                ((gnu/linux) 'eww-browse-url)
+                ((gnu/linux) 'browse-url-xdg-open)
+                ;; ((gnu/linux) 'eww-browse-url)
                 (t 'browse-url-default-browser)))
 #+end_src
 
@@ -474,10 +494,10 @@ We should absolutely not use tabs for indentation though, so make sure we never 
 (setq require-final-newline t)
 #+end_src
 
-This, like pixel scrolling, is something I didn't know I was missing.
+This, like pixel scrolling, is something I didn't know I was missing. I tried it for a while and it turns out that I don't mind an extra keystroke in exchange for some flexibility. The emacs way.
 
 #+begin_src emacs-lisp
-(delete-selection-mode 1)
+(delete-selection-mode -1)
 #+end_src
 
 More cosmetic tweaks, more agreeable defaults, and some things I don't understand.
@@ -490,16 +510,18 @@ More cosmetic tweaks, more agreeable defaults, and some things I don't understan
 (setq-default word-wrap nil)
 (setq-default indicate-buffer-boundaries 'left)
 (setq-default fill-column 80)
-(setq-default line-spacing 0)
+(setq-default line-spacing 1)
 (setq-default truncate-lines t)
 (setq resize-mini-windows t)
 (setq completion-show-help nil)
 #+end_src
 
-I've used projectile for a long time, but it seems like project.el is actually entirely capable of supporting my use cases. So I'm using that now mostly without extra configuration. However the questionnaire I have to peruse and fill out when I pick a project is annoying, and I would like to just go ahead and choose a file.
+I've used projectile for a long time, but it seems like project.el is actually entirely capable of supporting my use cases. So I've been using that mostly without extra configuration. However the questionnaire I have to peruse and fill out when I pick a project is annoying, and I would like to just go ahead and choose a file.
+
+In the end though, projectile's ergonomics are just better.
 
 #+begin_src emacs-lisp
-(setq project-switch-commands 'project-find-file)
+(setq project-switch-commands 'projectile-switch-project)
 #+end_src
 
 Because I honestly don't care about anyone else. That's what ?w=1 is for.
@@ -514,7 +536,7 @@ Start a few global essentials.
 (dolist (mode '(electric-indent-mode
                 show-paren-mode
                 save-place-mode
-                size-indication-mode
+                ;; size-indication-mode
                 global-hl-line-mode
                 column-number-mode
                 winner-mode
@@ -601,8 +623,8 @@ Time and date, and battery, for the modeline.
         ("Asia/Hong_Kong" "Hong Kong")
         ("Asia/Tokyo" "Tokyo")))
 
-(display-time-mode 1)
-(display-battery-mode 1)
+;; (display-time-mode 1)
+;; (display-battery-mode 1)
 #+end_src
 
 A little configuration for xref, which is honesly mostly totally fine.
@@ -821,7 +843,10 @@ This is a bit previous - I should generalize it and move it up into the consult 
 
 Except when it collides with rustic, which I haven't managed to fix up. So try something else.
 
-Corfu. Why this and not company? Better integration, no special independent invocation (completion-at-point does not invoke company, so there are frequent collisions).
+**** Corfu
+Note: Corfu isn't switched on at the moment. It has potential to be much better than company-mode, but right now there are too many things that only kinda sorta work with corfu, and company still ends up being installed as a dependency anyway.
+
+Why this and not company? Better integration, no special independent invocation (completion-at-point does not invoke company, so there are frequent collisions).
 
 #+begin_src emacs-lisp
 (require 'corfu)
@@ -836,7 +861,7 @@ Corfu. Why this and not company? Better integration, no special independent invo
 ;; (setq corfu-echo-documentation nil) ;; Disable documentation in the echo area
 ;; (setq corfu-scroll-margin 5)        ;; Use scroll margin
 
-(corfu-global-mode 1)
+;; (global-corfu-mode 1)
 #+end_src
 
 This is cool, straight from the corfu wiki, it seems to do what I have always expected but never happens.
@@ -869,19 +894,25 @@ Another potentially useful hack - move the completion into the minibuffer on dem
 (define-key  corfu-map (kbd "M-m") #'corfu-move-to-minibuffer)
 #+end_src
 
+**** Company-mode
 But somehow company-mode still ends up being hardcoded somewhere or other
 
 #+begin_src emacs-lisp
 (require 'company)
+(require 'company-quickhelp)
+;; (require 'company-statistics)
+
 (setq company-tooltip-align-annotations t)
-(setq company-idle-delay 1.0)
-(setq company-tooltip-idle-delay 1.0)
-(setq company-global-modes '(not message-mode telega-chat-mode circe-channel-mode))
-;; (global-company-mode 1)
+(setq company-idle-delay 0.7)
+(setq company-tooltip-idle-delay 0.7)
+(setq company-global-modes '(not telega-chat-mode circe-channel-mode))
+
+(add-hook 'after-init-hook #'global-company-mode)
+(add-hook 'after-init-hook #'company-quickhelp-mode)
+;; (add-hook 'after-init-hook #'company-statistics-mode)
 #+end_src
 
 *** Marginalia
-
 Marginalia adds a bunch of metadata annotations to completions, which are portable across builtin completion functionality as well as things like vertico. Mostly handy info, occasionally just line filler.
 
 #+begin_src
@@ -889,6 +920,12 @@ Marginalia adds a bunch of metadata annotations to completions, which are portab
 #+end_src
 
 ** Package Configuration
+
+*** Nyan
+
+#+begin_src emacs-lisp
+(add-hook 'after-init-hook 'nyan-mode) ;; nuff said
+#+end_src
 
 *** ibuffer
 
@@ -949,6 +986,25 @@ OK I lied a bit. ibuffer is built-in, but ibuffer-vc is not, and I wanted to kee
   (key-chord-define-global "jk" #'next-window-any-frame)
   (key-chord-define-global ";'" #'j0ni/unicode-shortcut-map)
   (key-chord-define prog-mode-map "[]" #'display-line-numbers-mode))
+#+end_src
+
+*** Projectile
+
+For a while I tried to get with the builtin project.el, but it just isn't enough.
+
+#+begin_src emacs-lisp
+(require 'projectile)
+
+(setq projectile-sort-order 'recently-active)
+(setq projectile-enable-caching t)
+(setq projectile-require-project-root t)
+
+(define-key projectile-mode-map (kbd "C-x p") 'projectile-command-map)
+
+(projectile-mode 1)
+
+(require 'consult-projectile)
+(require 'flycheck-projectile)
 #+end_src
 
 *** Flymake
@@ -1237,7 +1293,12 @@ ffip setup
          :full-name "Joni Voidshrieker"
          :port 6697
          :encryption tls
-         :channels nil)))
+         :channels nil)
+        ("irc.sdf.org"
+         :nick "mhcat"
+         :user-name "mhcat"
+         :full-name "Mental H Cat"
+         :port 6667)))
 
 (setq rcirc-authinfo `(("chat.sr.ht" sasl "joni" ,(j0ni/srht-sasl-pass))))
 
@@ -1291,6 +1352,14 @@ ERC, needs a patch for sasl
    :nick "j0ni"
    :full-name "Joni"
    :password (j0ni/srht-sasl-pass)))
+
+(defun j0ni/connect-sdf ()
+  (interactive)
+  (erc
+   :server "irc.sdf.org"
+   :port "6667"
+   :nick "mhcat"
+   :full-name "Mental H Cat"))
 
 (defun j0ni/reset-erc-track-mode ()
   "Stole this whole from John Wiegley's dotemacs."
@@ -1362,23 +1431,29 @@ By Prot the Spectacular.
 (setq modus-themes-italic-constructs nil)
 (setq modus-themes-subtle-line-numbers t)
 ;; (setq modus-themes-syntax '(yellow-comments))
-(setq modus-themes-syntax '(faint))
+(setq modus-themes-syntax '())
 (setq modus-themes-fringes nil)
 (setq modus-themes-hl-line '(neutral))
 (setq modus-themes-completions nil)
 (setq modus-themes-org-blocks 'tinted-background)
 (setq modus-themes-headings nil) ;; check docs
 (setq modus-themes-variable-pitch-ui nil)
-(setq modus-themes-scale-headings t)
-(setq modus-themes-mode-line '(borderless accented 5))
+(setq modus-themes-mode-line '(5 borderless accented)) ;; '(borderless accented)
 (setq modus-themes-paren-match '(intense bold underline))
 
 (modus-themes-load-themes)
-
-;; (load-theme 'modus-operandi t)
-(load-theme 'modus-vivendi t)
+;; (modus-themes-load-vivendi)
+;; (modus-themes-load-operandi)
 #+end_src
-
+**** Yeah...maybe Cyberpunk Neon?
+#+begin_src emacs-lisp
+(require 'cyberpunk-neon-theme)
+;; (load-theme 'cyberpunk-neon t)
+#+end_src
+**** Phoenix Dark
+#+begin_src emacs-lisp
+;; (load-theme 'phoenix-dark-pink t)
+#+end_src
 **** The Matrix
 
 Weirdly, this is speaking to me at the moment.
@@ -1386,12 +1461,6 @@ Weirdly, this is speaking to me at the moment.
 #+begin_src emacs-lisp
 ;; (require 'the-matrix-theme)
 ;; (load-theme 'the-matrix t)
-#+end_src
-
-**** Gruvbox
-
-#+begin_src emacs-lisp
-;; (load-theme 'gruvbox-dark-hard t)
 #+end_src
 
 **** Dracula
@@ -1403,20 +1472,53 @@ Weirdly, this is speaking to me at the moment.
 **** Doom Themes
 #+begin_src emacs-lisp
 (require 'doom-themes)
+
+(setq doom-dracula-padded-modeline t)
+(setq doom-dracula-brighter-comments t)
 ;; (load-theme 'doom-dracula t)
+(setq doom-ir-black-padded-modeline t)
+(setq doom-ir-black-brighter-comments t)
+;; (load-theme 'doom-ir-black t)
+(setq doom-sourcerer-brighter-comments t)
+(setq doom-sourcerer-brighter-modeline t)
+;; (load-theme 'doom-sourcerer t)
+(setq doom-outrun-electric-brighter-comments t)
+(setq doom-outrun-electric-brighter-modeline t)
+;; (load-theme 'doom-outrun-electric t)
+(setq doom-tokyo-night-brighter-comments nil)
+(setq doom-tokyo-night-brighter-modeline nil)
+(setq doom-tokyo-night-padded-modeline t)
+
+(setq doom-manegarm-darker-background t)
+(setq doom-manegarm-muted-modeline nil)
+(setq doom-manegarm-padded-modeline nil)
+
+(setq doom-miramare-brighter-comments nil)
+(setq doom-miramare-padded-modeline nil)
+
+;; (load-theme 'doom-manegarm t)
 ;; (doom-themes-org-config)
+#+end_src
+
+**** Doom Modeline
+Not strictly a theme, but this seems like the best place for it. Maybe this is really the eye candy section.
+#+begin_src emacs-lisp
+(require 'doom-modeline)
+;; (setq doom-modeline-icon nil)
+;; (doom-modeline-mode 1)
 #+end_src
 
 **** Almost Mono
 #+begin_src emacs-lisp
 (require 'almost-mono-themes)
+(load-theme 'almost-mono-black t)
 #+end_src
 
 *** Pulsar
 #+begin_src emacs-lisp
 (require 'pulsar)
 
-(pulsar-setup)
+;; (pulsar-setup)
 
 (customize-set-variable
  'pulsar-pulse-functions ; Read the doc string for why not `setq'
@@ -1666,6 +1768,13 @@ Some of the shit we just have to have, unsightly though it may be.
 (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
 #+end_src
 
+Enough is enough though.
+
+#+begin_src emacs-lisp
+(setq-default css-fontify-colors nil)
+(add-hook 'css-mode-hook (lambda () (setq-local css-fontify-colors nil)))
+#+end_src
+
 *** ASCII Doc
 #+begin_src emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.adoc\\'" . adoc-mode))
@@ -1692,6 +1801,9 @@ For common lisp, this is most likely the successor to slime.
 
 ;; this is new, and might cause problems - bear in mind
 (setq clojure-toplevel-inside-comment-form t)
+
+;; fix comments to be compatible with VIM users
+;; (add-hook 'clojure-mode-hook (lambda () (setq-local comment-column nil)))
 #+end_src
 
 OK, I recently acquired this knowledge for switching between cider and inf-clojure without having to comment things out and restart, so here are the functions for unplugging whatever is in first.
@@ -1738,7 +1850,20 @@ Start off with cider for now.
 (setq cider-clojure-cli-aliases ":test")
 (setq cider-repl-display-help-banner nil)
 (setq cider-use-fringe-indicators nil)
-(setq cider-jump-to-pop-to-buffer-actions '((display-buffer-reuse-window display-buffer-same-window)))
+(setq cider-jump-to-pop-to-buffer-actions
+      '((display-buffer-reuse-window display-buffer-same-window)))
+
+(setq cider-prompt-for-symbol nil)
+(setq cider-save-file-on-load t)
+(setq cider-prefer-local-resources t)
+(setq cider-eldoc-display-context-dependent-info t)
+(setq nrepl-use-ssh-fallback-for-remote-hosts t)
+(setq cljr-suppress-middleware-warnings t)
+(setq cider-repl-require-ns-on-set t)
+(setq cider-repl-history-size 1000)
+(setq cider-connection-message-fn #'cider-random-tip)
+(setq cider-completion-annotations-include-ns 'always)
+
 
 (dolist (hook '(clojure-mode-hook
                 clojurec-mode-hook
@@ -1762,6 +1887,10 @@ Start off with cider for now.
 
 (add-hook 'fennel-mode-hook #'monroe-interaction-mode)
 (add-hook 'fennel-mode-hook #'paredit-mode)
+(add-hook 'fennel-mode-hook (lambda () (setq-local inferior-lisp-program "fennel")))
+
+;; for compiling lua to fennel
+(add-hook 'lua-mode-hook #'antifennel-mode)
 #+end_src
 
 *** Ruby
@@ -1820,13 +1949,14 @@ I spent a lot more time on this than I ever spent writing C or C++.
 
 This renders eval results in-buffer at the end of the eval'd expression. Honestly I've forgotten what life was like before this feature.
 
+
 #+begin_src emacs-lisp
 (eros-mode 1)
 #+end_src
 
 *** Org Mode
 
-Org was installed and required before tangling this file, but I believe we can spare a duplicate, since it is a caching operation (or it better be).
+Org was installed and required before tangling this file.
 
 #+begin_src emacs-lisp
 (require 'org)
@@ -1842,13 +1972,14 @@ Org was installed and required before tangling this file, but I believe we can s
 (global-set-key (kbd "C-c c") #'org-capture)
 (global-set-key (kbd "C-c a") #'org-agenda)
 
-(setq org-startup-indented t)
+;; hmm, also on the fence about this, let's try just laying it out
+(setq org-startup-indented nil)
 
 ;; fix up encryption - not sure I want this
 ;; (org-crypt-use-before-save-magic)
 
-;; make it short to start with
-(setq org-startup-folded t)
+;; On the fence about this
+(setq org-startup-folded nil)
 
 ;; where things live
 (setq org-directory "~/Dropbox/OrgMode/")
@@ -1891,13 +2022,13 @@ Org was installed and required before tangling this file, but I believe we can s
 (setq org-clock-persist t)
 
 ;; extra indentation
-(setq org-adapt-indentation t)
+(setq org-adapt-indentation nil)
 
 ;; Let's have pretty source code blocks
 (setq org-src-preserve-indentation t)
 
 ;; This is ignored if `org-src-preserve-indentation` is set
-;; (setq org-edit-src-content-indentation 0)
+;; (setq org-edit-src-content-indentation 0) ; default is 2
 
 (setq org-src-tab-acts-natively t)
 (setq org-src-fontify-natively t)
@@ -1981,15 +2112,15 @@ Org was installed and required before tangling this file, but I believe we can s
 Because of course Telegram in Emacs, in Russian.
 
 #+begin_src emacs-lisp
-(require 'telega)
-(add-hook 'telega-chat-mode-hook #'visual-line-mode)
-(add-hook 'telega-chat-mode-hook #'telega-mode-line-mode)
-(add-hook 'telega-chat-mode-hook #'telega-notifications-mode)
+  (require 'telega)
+  (add-hook 'telega-chat-mode-hook #'visual-line-mode)
+  (add-hook 'telega-chat-mode-hook #'telega-mode-line-mode)
+  (add-hook 'telega-chat-mode-hook #'telega-notifications-mode)
 
-(setq telega-video-player-command
-      (concat "kmplayer"
-              (when telega-ffplay-media-timestamp
-                (format " -ss %f" telega-ffplay-media-timestamp))))
+  ;; (setq telega-video-player-command
+  ;;       (concat "kmplayer"
+  ;;               (when telega-ffplay-media-timestamp
+  ;;                 (format " -ss %f" telega-ffplay-media-timestamp))))
 #+end_src
 
 *** Minions
@@ -2058,6 +2189,10 @@ Either way, this is flaky as hell and almost always needs tweaking for a new OS.
 (add-to-list 'load-path j0ni/mu4e-path)
 
 (require 'mu4e)
+
+(add-hook 'message-mode 'org-msg-mode)
+(setq org-msg-default-alternatives '((new . (text html))
+                                     (reply-to-html . (text html))))
 
 (defun j0ni/mu4e-bookmark (sub-maildir days char)
   (list (concat "date:" days "d..now AND (maildir:/" sub-maildir
@@ -2132,6 +2267,58 @@ Either way, this is flaky as hell and almost always needs tweaking for a new OS.
                      (smtpmail-smtp-server . "smtp.fastmail.com")
                      (smtpmail-smtp-service . 587)
                      (smtpmail-stream-type . starttls)))
+            (make-mu4e-context
+             :name "JefferiesTube"
+             :enter-func (lambda ()
+                           (when (mu4e-running-p)
+                             (mu4e-update-mail-and-index nil))
+                           (mu4e-message "Switching to JTN context"))
+             :match-func (lambda (msg)
+                           (when msg
+                             (string-match-p "^/JefferiesTube" (mu4e-message-field msg :maildir))))
+             :vars `((user-mail-address . "joni@jefferiestube.net")
+                     (user-full-name . "Jon Irving")
+                     (mu4e-sent-messages-behavior . sent)
+                     (mu4e-sent-folder . "/JefferiesTube/sent-mail")
+                     (mu4e-trash-folder . "/JefferiesTube/trash")
+                     (mu4e-drafts-folder . "/JefferiesTube/drafts")
+                     (mu4e-refile-folder . "/JefferiesTube/all-mail")
+                     (mu4e-maildir-shortcuts . (("/JefferiesTube/INBOX" . ?i)
+                                                ("/JefferiesTube/sent-mail" . ?s)
+                                                ("/JefferiesTube/drafts" . ?d)
+                                                ("/JefferiesTube/trash" . ?t)))
+                     (mu4e-bookmarks . ,(list (j0ni/mu4e-bookmark "JefferiesTube" "7" ?w)
+                                              (j0ni/mu4e-bookmark "JefferiesTube" "30" ?m)))
+                     (smtpmail-smtp-user . "joni@jefferiestube.net")
+                     (smtpmail-smtp-server . "smtp.migadu.com")
+                     (smtpmail-smtp-service . 465)
+                     (smtpmail-stream-type . ssl)))
+            (make-mu4e-context
+             :name "Lollyshouse.net"
+             :enter-func (lambda ()
+                           (when (mu4e-running-p)
+                             (mu4e-update-mail-and-index nil))
+                           (mu4e-message "Switching to LHN context"))
+             :match-func (lambda (msg)
+                           (when msg
+                             (string-match-p "^/Lollyshouse.net" (mu4e-message-field msg :maildir))))
+             :vars `((user-mail-address . "j@lollyshouse.net")
+                     (user-full-name . "Jon Irving")
+                     (mu4e-sent-messages-behavior . sent)
+                     (mu4e-sent-folder . "/Lollyshouse.net/sent-mail")
+                     (mu4e-trash-folder . "/Lollyshouse.net/trash")
+                     (mu4e-drafts-folder . "/Lollyshouse.net/drafts")
+                     (mu4e-refile-folder . "/Lollyshouse.net/all-mail")
+                     (mu4e-maildir-shortcuts . (("/Lollyshouse.net/INBOX" . ?i)
+                                                ("/Lollyshouse.net/sent-mail" . ?s)
+                                                ("/Lollyshouse.net/drafts" . ?d)
+                                                ("/Lollyshouse.net/trash" . ?t)))
+                     (mu4e-bookmarks . ,(list (j0ni/mu4e-bookmark "Lollyshouse.net" "7" ?w)
+                                              (j0ni/mu4e-bookmark "Lollyshouse.net" "30" ?m)))
+                     (smtpmail-smtp-user . "j@lollyshouse.net")
+                     (smtpmail-smtp-server . "smtp.migadu.com")
+                     (smtpmail-smtp-service . 465)
+                     (smtpmail-stream-type . ssl)))
             (make-mu4e-context
              :name "Well"
              :enter-func (lambda ()

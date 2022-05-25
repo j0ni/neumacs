@@ -24,11 +24,15 @@
         (eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
 
-  (straight-use-package 'org)
-  (straight-use-package 'org-contrib)
+  ;; see if builtin can already handle it
+  ;; (straight-use-package 'org)
+  ;; (straight-use-package 'org-contrib)
   (require 'org)
   ;; tangle the rest of the configuration
   (let ((init-source-file (expand-file-name "notwithstanding.org" user-emacs-directory)))
+    ;; remove the old configuration because org is not correctly dealing
+    ;; with something sequence oriented in new emacs
+    (delete-file (expand-file-name "notwithstanding.el" user-emacs-directory) nil)
     (with-temp-buffer
       (org-babel-load-file init-source-file)
       (org-publish "notwithstanding"))

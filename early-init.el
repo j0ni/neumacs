@@ -11,13 +11,13 @@
 
 ;;; Fonty fonty fonty fonty fonty LEAVE ME ALONE fonty fonty fonty
 
-(setq j0ni/fixed-font "AurulentSansMono Nerd Font Mono-9.0")
+;; (setq j0ni/fixed-font "AurulentSansMono Nerd Font Mono-9.0")
 ;; (setq j0ni/fixed-font (font-spec :family "Iosevka Nerd Font" :size 13.5 :antialias t))
 (setq j0ni/fixed-font "Fira Code-10.0")
 ;; (setq j0ni/fixed-font "FuraMono Nerd Font Mono-9.0")
-(setq j0ni/fixed-font "Monoisome-8.5")
+;; (setq j0ni/fixed-font "Monoisome-8.5")
 ;; (setq j0ni/fixed-font (font-spec :family "Agave Nerd Font" :size 16.0 :antialias t))
-(setq j0ni/fixed-font "Lucida Grande Mono Nrw-10.5")
+;; (setq j0ni/fixed-font "Lucida Grande Mono Nrw-10.5")
 ;; (setq j0ni/fixed-font (font-spec :family "TerminessTTF Nerd Font Mono" :size 16.5 :antialias t))
 ;; (setq j0ni/fixed-font (font-spec :family "Latin Modern Mono" :size 15.0 :antialias t))
 ;; (setq j0ni/fixed-font (font-spec :family "BlexMono Nerd Font Mono" :size 12.5 :antialias t))
@@ -29,16 +29,32 @@
 ;; (setq j0ni/fixed-font "PragmataPro-12.0")
 ;; (setq j0ni/fixed-font (font-spec :family "Inconsolata Nerd Font" :size 13.5 :spacing 'm))
 ;; (setq j0ni/fixed-font "Inconsolata Nerd Font-13.0")
-(setq j0ni/fixed-font "Recursive Mono Linear Static-12.5")
-(setq j0ni/fixed-font-serif "Recursive Mono Casual Static-12.5")
-;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono" :size 11.0 :antialias t))
-(setq j0ni/variable-font "Recursive Sans Casual Static-12.5")
+(setq j0ni/fixed-font "Recursive Mono Linear Static-12.0")
+(setq j0ni/fixed-font-serif "Recursive Mono Casual Static-12.0")
+(setq j0ni/variable-font "Recursive Sans Casual Static-12.0")
 
 (setq j0ni/fixed-font "Iosevka Comfy-12.5")
 (setq j0ni/fixed-font-serif "Iosevka Comfy-12.5")
 ;; (setq j0ni/fixed-font (font-spec :family "Lucida Grande Mono" :size 11.0 :antialias t))
-(setq j0ni/variable-font "Recursive Sans Casual Static-12.5")
+;; (setq j0ni/variable-font "Recursive Sans Casual Static-12.5")
 
+;; (setq j0ni/fixed-font "Lucida Grande Mono Nrw-13.5")
+;; (setq j0ni/fixed-font-serif "Lucida Grande Mono Nrw-13.5")
+;; (setq j0ni/variable-font "Cantarell-13.0")
+
+;; (setq j0ni/fixed-font "PragmataPro Mono-13.0")
+;; (setq j0ni/fixed-font-serif "PragmataPro Mono-13.0")
+
+;; (setq j0ni/fixed-font "3270Narrow Nerd Font Mono-15.0")
+;; (setq j0ni/fixed-font-serif "3270Narrow Nerd Font Mono-15.0")
+
+;; (setq j0ni/fixed-font "Fira Code-9.5")
+;; (setq j0ni/fixed-font-serif "Fira Code-9.5")
+;; (setq j0ni/fixed-font "D2Coding-9.5")
+;; (setq j0ni/fixed-font-serif "D2Coding-9.5")
+(setq j0ni/fixed-font "mononoki Nerd Font-11.0")
+(setq j0ni/fixed-font-serif "mononoki Nerd Font-11.0")
+(setq j0ni/variable-font "Recursive Sans Casual Static-11.0")
 
 (set-frame-font j0ni/fixed-font nil t)
 
@@ -64,10 +80,13 @@
   ;; if the font is paying attention ¯\_(ツ)_/¯
   (set-face-attribute
    'default frame
-   :weight 'semi-light)
+   :weight 'light)
   (set-face-attribute
    'bold frame
    :weight 'semi-bold)
+  ;; (set-face-attribute
+  ;;  'mode-line frame
+  ;;  :box '(:line-width 1 :style released-button))
 
   (menu-bar-mode -1)
 
